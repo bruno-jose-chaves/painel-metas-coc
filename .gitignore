@@ -1,0 +1,10 @@
+node_modules
+.next
+out
+.env*
+next-env.d.ts
+*.tsbuildinfo
+
+# sobra da estrutura antiga, upload manual
+painel-metas-coc/
+.netlify/

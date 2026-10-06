@@ -18,10 +18,10 @@ async function cred(servico: string): Promise<Cred | null> {
   const { data } = await db.rpc("credencial_obter", { p_servico: servico });
   return data?.[0] ?? null;
 }
-async function token(servico: "rd_crm" | "rd_marketing"): Promise<string | null> {
+async function token(servico: "rd_crm" | "rd_marketing", forcar = false): Promise<string | null> {
   const c = await cred(servico);
   if (!c?.refresh_token) return null;
-  if (c.access_token && c.expira_em && new Date(c.expira_em).getTime() - Date.now() > 10 * 60_000) return c.access_token;
+  if (!forcar && c.access_token && c.expira_em && new Date(c.expira_em).getTime() - Date.now() > 10 * 60_000) return c.access_token;
   const { client_id, client_secret } = c.extra;
   const r = servico === "rd_crm"
     ? await fetch("https://api.rd.services/oauth2/token", {
@@ -60,6 +60,7 @@ async function crm(tk: string, caminho: string, params: Record<string, string> =
   for (const [k, v] of Object.entries(params)) u.searchParams.set(k, v);
   const r = await fetch(u, { headers: { Authorization: `Bearer ${tk}`, accept: "application/json" } });
   if (r.status === 429) { await dormir(Number(r.headers.get("Retry-After") ?? 10) * 1000); return crm(tk, caminho, params); }
+  if (r.status === 401) throw new Error("CRM_401");
   if (!r.ok) throw new Error(`CRM ${caminho} ${r.status} ${(await r.text()).slice(0, 200)}`);
   return r.json();
 }
@@ -86,7 +87,7 @@ async function sincronizarCatalogo(tk: string) {
         out.push(...(j.data ?? []));
         if (!j.links?.next) break; p++;
       }
-    } catch (e) { log.push(`catálogo ${caminho}: ${(e as Error).message}`); }
+    } catch (e) { if ((e as Error).message === "CRM_401") throw e; log.push(`catálogo ${caminho}: ${(e as Error).message}`); }
     return out;
   };
   for (const u of await todos("/users")) linhas.push({ tipo: "usuario", id: u.id, nome: (u.name ?? "").trim(), extra: { email: u.email } });
@@ -136,7 +137,7 @@ async function sincronizarRecurso(tk: string, chave: string, caminho: string, gr
 
 // ---------- Marketing: conversões por ativo por dia ----------
 async function sincronizarMarketing() {
-  const tk = await token("rd_marketing");
+  let tk = await token("rd_marketing");
   if (!tk) return;
   const est = await estado("mkt_conversoes");
   const hoje = new Date(Date.now() - 3 * 3600_000); // horário de Brasília
@@ -148,7 +149,14 @@ async function sincronizarMarketing() {
   let n = 0;
   for (const dia of dias) {
     if (!temTempo()) break;
-    const r = await fetch(`https://api.rd.services/platform/analytics/conversions?start_date=${dia}&end_date=${dia}`, { headers: { Authorization: `Bearer ${tk}` } });
+    let r = await fetch(`https://api.rd.services/platform/analytics/conversions?start_date=${dia}&end_date=${dia}`, { headers: { Authorization: `Bearer ${tk}` } });
+    // O RD pode invalidar o token antes da hora. Nesse caso renova à força e tenta de novo.
+    if (r.status === 401) {
+      const novo = await token("rd_marketing", true);
+      if (!novo) { log.push("marketing: token inválido e sem renovação"); break; }
+      tk = novo;
+      r = await fetch(`https://api.rd.services/platform/analytics/conversions?start_date=${dia}&end_date=${dia}`, { headers: { Authorization: `Bearer ${tk}` } });
+    }
     if (!r.ok) { log.push(`marketing ${dia}: ${r.status}`); break; }
     const j = await r.json();
     const linhas = (j.conversions ?? []).filter((c: any) => c.conversion_count > 0 || Number(c.visits_count) > 0).map((c: any) => ({
@@ -173,8 +181,12 @@ Deno.serve(async (req) => {
 
   const { data: sync } = await db.from("sincronizacoes").insert({ fonte: "rd", status: "rodando" }).select("id").single();
   let erro: string | null = null;
+  // Uma repetição é suficiente: se o RD invalidou o token antes da hora,
+  // renova à força e refaz a rodada.
+  for (let tentativa = 0; tentativa < 2; tentativa++) {
+  erro = null;
   try {
-    const tk = await token("rd_crm");
+    const tk = await token("rd_crm", tentativa > 0);
     if (tk) {
       await sincronizarCatalogo(tk);
       const cat = await mapaCatalogo();
@@ -234,6 +246,9 @@ Deno.serve(async (req) => {
     }
   } catch (e) {
     erro = String((e as Error).message ?? e);
+  }
+  if (erro !== "CRM_401") break;
+  log.push("CRM: token recusado, renovando e repetindo");
   }
   await db.from("sincronizacoes").update({
     terminado_em: new Date().toISOString(), status: erro ? "erro" : "ok", detalhes: { erro, log },

@@ -6,10 +6,11 @@ import { supabase } from "@/lib/supabase";
 
 const MENU = [
   { href: "/", nome: "Visão geral" },
-  { href: "/campanha/", nome: "Campanha", breve: true },
-  { href: "/vendas/", nome: "Vendas", breve: true },
-  { href: "/time/", nome: "Time comercial", breve: true },
-  { href: "/leads/", nome: "Leads", breve: true },
+  { href: "/campanha/", nome: "Campanha" },
+  { href: "/vendas/", nome: "Vendas" },
+  { href: "/time/", nome: "Time comercial" },
+  { href: "/leads/", nome: "Leads" },
+  { href: "/campanhas/", nome: "Cadastro" },
   { href: "/configuracao/", nome: "Configuração" },
 ];
 
@@ -59,8 +60,7 @@ export default function Shell({ children }: { children: (ctx: { admin: boolean; 
         <a className="marca" href="/">COC <span>METAS</span></a>
         <nav className="nav">
           {MENU.map((m) => (
-            <a key={m.href} href={m.href} className={(path === m.href || path + "/" === m.href ? "ativo " : "") + (m.breve ? "off" : "")}
-               title={m.breve ? "Em construção" : undefined}>{m.nome}</a>
+            <a key={m.href} href={m.href} className={path === m.href || path + "/" === m.href ? "ativo" : ""}>{m.nome}</a>
           ))}
         </nav>
         <button className="sair" onClick={sair}>Sair</button>
