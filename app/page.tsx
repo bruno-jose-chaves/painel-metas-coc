@@ -68,6 +68,7 @@ type Ritmo = {
   campanha_id: string; nome: string; alunos: number; esperado_hoje: number; hoje: number; ontem: number;
   media_7: number; media_28: number; media_campanha: number | null;
   necessario_dia: number | null; falta: number; dias_restantes: number;
+  dias_uteis_restantes: number; anteriores: number;
   cobertura: number | null; projecao_restante: number;
 };
 
@@ -157,49 +158,7 @@ function Visao() {
         </div>
       </div>
 
-      <h2><span className="idx">002</span> O que falta por dia</h2>
-      {!ritmo ? <p className="rotulo">Carregando</p> : ritmo.length === 0 ? (
-        <p className="mudo">Nenhuma campanha ativa.</p>
-      ) : (
-        <>
-          <div className="cards">
-            {ritmo.map((r) => {
-              const falta = Number(r.falta);
-              const prec = r.necessario_dia == null ? null : Number(r.necessario_dia);
-              const media = Number(r.media_7);
-              const sobra = prec == null ? null : media - prec;
-              return (
-                <article className="card" key={"falta-" + r.campanha_id}>
-                  <div className="rotulo">{r.nome}</div>
-                  <div className="grande num">
-                    {prec == null ? "meta batida" : num(Math.ceil(prec))}
-                    {prec == null ? null : <small> por dia</small>}
-                  </div>
-                  <div className="mudo num">
-                    {falta <= 0
-                      ? "nada a fazer, a meta já fechou"
-                      : `faltam ${num(falta)} alunos em ${num(r.dias_restantes)} dias`}
-                  </div>
-                  {prec != null && (
-                    <div className="legenda num" style={{ marginTop: 10 }}>
-                      <span>ritmo atual {num(media.toFixed(1))}/dia</span>
-                      <span className={sobra! >= 0 ? "ok" : "alerta"}>
-                        {sobra! >= 0 ? "acima do necessário" : `faltam ${num(Math.abs(sobra!).toFixed(1))}/dia`}
-                      </span>
-                    </div>
-                  )}
-                </article>
-              );
-            })}
-          </div>
-          <p className="mudo" style={{ marginTop: 10 }}>
-            Quantas matrículas por dia cada campanha precisa daqui até o fim para bater a meta ativa,
-            comparado com a média dos últimos sete dias. O detalhe por dia está na seção 005.
-          </p>
-        </>
-      )}
-
-      <h2><span className="idx">003</span> Campanhas</h2>
+      <h2><span className="idx">002</span> Campanhas</h2>
       <div className="filtros" style={{ marginBottom: 16 }}>
         <div className="atalhos">
           {FAIXAS.map((f) => {
@@ -239,6 +198,25 @@ function Visao() {
                 <div><div className="rotulo">Fase atual</div><div className="v">{c.fase_atual ?? "-"}</div><div className="mudo num">{c.preco_atual ? brl(c.preco_atual, 2) + " até " + dataCurta(c.fase_fim) : ""}</div></div>
                 <div><div className="rotulo">Dias restantes</div><div className="v num">{num(c.dias_restantes)}</div><div className="mudo num">share {pct(c.market_share, 2)}</div></div>
                 <div>
+                  <div className="rotulo">Falta por dia útil</div>
+                  {(() => {
+                    const r = ritmo?.find((x) => x.campanha_id === c.id);
+                    if (!r) return <div className="v num">-</div>;
+                    const prec = r.necessario_dia == null ? null : Number(r.necessario_dia);
+                    const media = Number(r.media_7);
+                    if (prec == null || Number(r.falta) <= 0)
+                      return <><div className="v">meta batida</div><div className="mudo">nada a fazer</div></>;
+                    return (
+                      <>
+                        <div className="v num">{num(prec.toFixed(1))}</div>
+                        <div className={"mudo num " + (media >= prec ? "ok" : "alerta")}>
+                          ritmo {num(media.toFixed(1))} · faltam {num(r.falta)} em {num(r.dias_uteis_restantes ?? r.dias_restantes)} dias úteis
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+                <div>
                   <div className="rotulo">Projeção de fechamento</div>
                   <div className="v num">{proj[c.id]?.projecao_alunos != null ? num(proj[c.id].projecao_alunos) + " alunos" : "-"}</div>
                   <div className="mudo num">
@@ -258,7 +236,7 @@ function Visao() {
       <p className="mudo" style={{ marginTop: 24 }}>Barra preta: realizado. Traço vermelho: onde a meta ativa espera que a campanha esteja hoje.</p>
 
 
-      <h2><span className="idx">004</span> Metas de captação</h2>
+      <h2><span className="idx">003</span> Metas de captação</h2>
       {Object.keys(metasLeads).length === 0 ? (
         <p className="mudo">Nenhuma meta de captação cadastrada.</p>
       ) : (
@@ -302,7 +280,7 @@ function Visao() {
         </>
       )}
 
-      <h2><span className="idx">005</span> Ritmo diário de matrículas</h2>
+      <h2><span className="idx">004</span> Ritmo diário de matrículas</h2>
       {!ritmo ? <p className="rotulo">Carregando</p> : ritmo.length === 0 ? (
         <p className="mudo">Nenhuma campanha ativa.</p>
       ) : (
@@ -316,11 +294,12 @@ function Visao() {
                   <th className="n">Esperado hoje</th>
                   <th className="n">Hoje</th>
                   <th className="n">Ontem</th>
-                  <th className="n">Média 7 dias</th>
-                  <th className="n">Precisa por dia</th>
+                  <th className="n">Anteriores</th>
+                  <th className="n">Média 7 dias úteis</th>
+                  <th className="n">Precisa por dia útil</th>
                   <th style={{ minWidth: 110 }}>Cobertura</th>
                   <th className="n">Faltam</th>
-                  <th className="n">Dias</th>
+                  <th className="n">Dias úteis</th>
                   <th>No ritmo das últimas semanas</th>
                 </tr>
               </thead>
@@ -339,6 +318,7 @@ function Visao() {
                       </td>
                       <td className="n">{num(r.hoje)}</td>
                       <td className="n">{num(r.ontem)}</td>
+                      <td className="n">{Number(r.anteriores ?? 0) > 0 ? num(r.anteriores) : "-"}</td>
                       <td className="n"><b>{num(r.media_7)}</b><div className="rotulo">28d: {num(r.media_28)}</div></td>
                       <td className="n">{r.necessario_dia == null ? "-" : num(r.necessario_dia)}</td>
                       <td>
@@ -346,7 +326,7 @@ function Visao() {
                         <div className="rotulo num">{cob == null ? "-" : num(cob) + "x o necessário"}</div>
                       </td>
                       <td className="n"><b>{num(r.falta)}</b></td>
-                      <td className="n">{num(r.dias_restantes)}</td>
+                      <td className="n">{num(r.dias_uteis_restantes ?? r.dias_restantes)}<div className="rotulo">{num(r.dias_restantes)} corridos</div></td>
                       <td>
                         <span className={"selo " + (cobre ? "no_ritmo" : "atras")}>
                           {cobre ? "entrega a meta" : "falta " + num(r.falta - entrega)}
@@ -364,6 +344,7 @@ function Visao() {
                   <td className="n">{num(ritmo.reduce((s, r) => s + Number(r.esperado_hoje), 0))}</td>
                   <td className="n">{num(ritmo.reduce((s, r) => s + Number(r.hoje), 0))}</td>
                   <td className="n">{num(ritmo.reduce((s, r) => s + Number(r.ontem), 0))}</td>
+                  <td className="n">{num(ritmo.reduce((s, r) => s + Number(r.anteriores ?? 0), 0))}</td>
                   <td className="n">{num(ritmo.reduce((s, r) => s + Number(r.media_7), 0).toFixed(2))}</td>
                   <td className="n">{num(ritmo.reduce((s, r) => s + Number(r.necessario_dia ?? 0), 0).toFixed(2))}</td>
                   <td />
@@ -375,7 +356,7 @@ function Visao() {
             </table>
           </div>
           <p className="mudo" style={{ marginTop: 10 }}>
-            O período de venda termina uma semana depois do início das aulas, e é essa data que conta como fim da campanha aqui.
+            Média e ritmo contam só dia útil: sábado e domingo somam pouco mais de três por cento das matrículas e, contados, diluem o que a operação precisa bater por dia. Anteriores são as matrículas lançadas antes do início da campanha, que entram no realizado. O período de venda termina uma semana depois do início das aulas, e é essa data que conta como fim da campanha aqui.
           </p>
           <p className="mudo">
             São três leituras diferentes e elas podem discordar. <b>Esperado hoje</b> vem da escada de fases, então uma campanha que concentra venda no fim aparece adiantada no começo.

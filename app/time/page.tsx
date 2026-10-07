@@ -41,8 +41,10 @@ function Tela() {
     setTime(null); setParados(null); setMotivos(null); setApv(null);
     supabase.rpc("painel_time_comercial", { ...p, p_produto: produto })
       .then(({ data }) => setTime((data as Linha[]) ?? []));
-    supabase.rpc("painel_parados", { ...p, p_trilha: "comercial" }).then(({ data }) => setParados((data as Parado[]) ?? []));
-    supabase.rpc("painel_motivos_perda", p).then(({ data }) => setMotivos((data as Motivo[]) ?? []));
+    supabase.rpc("painel_parados", { ...p, p_trilha: "comercial", p_produto: produto })
+      .then(({ data }) => setParados((data as Parado[]) ?? []));
+    supabase.rpc("painel_motivos_perda", { ...p, p_produto: produto })
+      .then(({ data }) => setMotivos((data as Motivo[]) ?? []));
     supabase.rpc("painel_pre_venda", p).then(({ data }) => setApv(((data as PreVenda[]) ?? [])[0] ?? null));
   }, [periodo, produto]);
 
@@ -121,7 +123,7 @@ function Tela() {
         </div>
       )}
       <p className="mudo" style={{ marginTop: 10 }}>
-        Conversão é ganhas sobre negócios decididos no período, ou seja ganhas mais perdidas. Negócio em aberto não entra na conta.
+        Conversão é ganhas sobre o funil inteiro do período: ganhas mais perdidas mais o que ainda está em aberto. Contar só o que já foi decidido inflava o número, porque a maior parte do funil ainda não decidiu.
         Venda automática é a matrícula fechada sem vendedor na planilha, ou seja a compra que o aluno fez sozinho pelo site. Ela entra no faturamento, mas fica fora do ranking.
       </p>
 

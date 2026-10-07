@@ -33,7 +33,7 @@ type Funil = {
   dias_medio: number | null; dias_mediana: number | null; dias_max: number | null;
 };
 type Origem = {
-  origem: string; negocios: number; matriculas: number; conversao: number | null;
+  origem: string; negocios: number; matriculas: number; matriculas_unicas: number; conversao: number | null;
   faturamento: number; ticket_medio: number | null; dias_medio: number | null;
 };
 type Cenario = {
@@ -367,7 +367,7 @@ function Tela() {
               <table className="tabela">
                 <thead>
                   <tr>
-                    <th>{porOrigem === "campanha" ? "Campanha no CRM" : "Fonte"}</th><th className="n">Negócios</th><th className="n">Matrículas</th>
+                    <th>{porOrigem === "campanha" ? "Campanha no CRM" : "Fonte"}</th><th className="n">Negócios</th><th className="n">Matrículas</th><th className="n">Só desta peça</th>
                     <th className="n">Conversão</th><th style={{ minWidth: 110 }} />
                     <th className="n">Faturamento</th><th className="n">Ticket</th><th className="n">Dias até fechar</th>
                   </tr>
@@ -378,6 +378,7 @@ function Tela() {
                       <td style={{ maxWidth: 320, wordBreak: "break-word" }}>{o.origem}</td>
                       <td className="n">{num(o.negocios)}</td>
                       <td className="n"><b>{num(o.matriculas)}</b></td>
+                      <td className="n">{num(o.matriculas_unicas)}</td>
                       <td className="n">{pct(o.conversao == null ? null : Number(o.conversao))}</td>
                       <td><div className="mini"><i style={{ width: `${Math.min(Number(o.conversao ?? 0) / 0.2, 1) * 100}%` }} /></div></td>
                       <td className="n">{brl(o.faturamento)}</td>
@@ -392,6 +393,8 @@ function Tela() {
           <p className="mudo" style={{ marginTop: 10 }}>
             Cada matrícula da planilha é ligada à negociação do CRM que deu origem a ela, cruzando por e-mail, telefone e, em último caso, nome. A barra de conversão usa 20% como referência de topo.
             A leitura por campanha mostra qual peça trouxe o lead, que é o que permite decidir onde investir. A fonte diz só o canal, e fica como segunda visão.
+            A matrícula só conta para a peça quando aconteceu depois da conversão nela e dentro de sessenta dias, senão a peça levaria crédito por venda que veio antes dela.
+            <b> Só desta peça</b> são as matrículas de quem converteu nela e em mais nenhuma outra no período, ou seja o que ela fecha sozinha.
           </p>
         </>
       )}

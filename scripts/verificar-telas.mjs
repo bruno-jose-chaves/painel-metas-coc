@@ -104,15 +104,15 @@ const cenarios = [
 ];
 
 const ritmo = [
-  { campanha_id: "acafe-2026-2", nome: "Método ACAFE 2º/2026", alunos: 191, esperado_hoje: 204, hoje: 1, ontem: 19, media_7: 6.57, media_28: 3.21, media_campanha: 5.14, necessario_dia: 2.28, falta: 73, dias_restantes: 32, cobertura: 2.88, projecao_restante: 210 },
-  { campanha_id: "ufsc-2026", nome: "Missão UFSC 2026", alunos: 64, esperado_hoje: 33, hoje: 0, ontem: 1, media_7: 1.14, media_28: 2.11, media_campanha: 3.05, necessario_dia: 1.91, falta: 88, dias_restantes: 46, cobertura: 0.6, projecao_restante: 53 },
+  { campanha_id: "acafe-2026-2", nome: "Método ACAFE 2º/2026", alunos: 191, esperado_hoje: 204, hoje: 1, ontem: 19, media_7: 6.57, media_28: 3.21, media_campanha: 5.14, necessario_dia: 4.85, falta: 73, dias_restantes: 32, dias_uteis_restantes: 22, anteriores: 60, cobertura: 1.35, projecao_restante: 210 },
+  { campanha_id: "ufsc-2026", nome: "Missão UFSC 2026", alunos: 64, esperado_hoje: 33, hoje: 0, ontem: 1, media_7: 1.14, media_28: 2.11, media_campanha: 3.05, necessario_dia: 3.48, falta: 88, dias_restantes: 46, dias_uteis_restantes: 33, anteriores: 15, cobertura: 0.46, projecao_restante: 53 },
 ];
 
 const funil = [{ matriculas: 190, cruzadas: 187, cobertura: 0.9842, por_email: 163, por_telefone: 20, por_nome: 4, dias_medio: 27.5, dias_mediana: 3, dias_max: 386 }];
 
 const origemMat = [
-  { fonte: "Tráfego Direto", negocios: 210, matriculas: 29, conversao: 0.1381, faturamento: 18094.08, ticket_medio: 623.93, dias_medio: 37.6 },
-  { fonte: "Busca Paga | Facebook", negocios: 430, matriculas: 23, conversao: 0.0535, faturamento: 14682.7, ticket_medio: 638.38, dias_medio: 15.2 },
+  { origem: "RESERVA MÉTODO ACAFE 2026/2", negocios: 210, matriculas: 29, matriculas_unicas: 11, conversao: 0.1381, faturamento: 18094.08, ticket_medio: 623.93, dias_medio: 37.6 },
+  { origem: "[ACAFE 26/2] LIVE", negocios: 430, matriculas: 23, matriculas_unicas: 9, conversao: 0.0535, faturamento: 14682.7, ticket_medio: 638.38, dias_medio: 15.2 },
 ];
 
 const rotas = {
