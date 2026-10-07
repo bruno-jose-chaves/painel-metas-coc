@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Shell from "@/components/Shell";
 import FiltroCampanha, { type Campanha } from "@/components/FiltroCampanha";
 import { supabase } from "@/lib/supabase";
+import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta } from "@/lib/formato";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
 
@@ -21,6 +22,7 @@ type PreVenda = {
 };
 
 function Tela() {
+  const { volta, em, minutos } = useAtualizacao();
   const [periodo, setPeriodo] = useState<Periodo>(ultimosDias(30));
   const [campanhas, setCampanhas] = useState<Campanha[]>([]);
   const [campanha, setCampanha] = useState<string | null>(null);
@@ -32,7 +34,7 @@ function Tela() {
   useEffect(() => {
     supabase.from("resumo_campanhas").select("id,nome,inicio,fim,produto_id").order("inicio")
       .then(({ data }) => setCampanhas((data as Campanha[]) ?? []));
-  }, []);
+  }, [volta]);
 
   const produto = campanhas.find((c) => c.id === campanha)?.produto_id ?? null;
 
@@ -46,7 +48,7 @@ function Tela() {
     supabase.rpc("painel_motivos_perda", { ...p, p_produto: produto })
       .then(({ data }) => setMotivos((data as Motivo[]) ?? []));
     supabase.rpc("painel_pre_venda", p).then(({ data }) => setApv(((data as PreVenda[]) ?? [])[0] ?? null));
-  }, [periodo, produto]);
+  }, [periodo, produto, volta]);
 
   const totalFat = time?.reduce((s, l) => s + Number(l.faturamento), 0) ?? 0;
   const maiorFat = Math.max(1, ...(time ?? []).map((l) => Number(l.faturamento)));
@@ -55,6 +57,9 @@ function Tela() {
     <>
       <div className="rotulo">008 · Time comercial</div>
       <h1>Quem está entregando</h1>
+      <p className="mudo num" style={{ marginTop: -8, marginBottom: 16 }}>
+        Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
+      </p>
 
       <FiltroCampanha
         campanhas={campanhas}

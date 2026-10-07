@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import Shell from "@/components/Shell";
 import Curva from "@/components/Curva";
 import { supabase } from "@/lib/supabase";
+import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta } from "@/lib/formato";
 import { hojeSP } from "@/lib/periodo";
 
@@ -36,6 +37,10 @@ type Origem = {
   origem: string; negocios: number; matriculas: number; matriculas_unicas: number; conversao: number | null;
   faturamento: number; ticket_medio: number | null; dias_medio: number | null;
 };
+type Recompra = {
+  indicador: string; rotulo: string; pessoas: number; base: number;
+  taxa: number | null; faturamento: number | null;
+};
 type Cenario = {
   nivel: number; ativa: boolean; alunos: number; faturamento: number;
   atingido: number | null; falta: number; ritmo_dia: number | null;
@@ -48,6 +53,7 @@ const SITUACAO: Record<string, string> = {
 const ESTADO: Record<string, string> = { atual: "Em curso", encerrada: "Encerrada", futura: "A seguir" };
 
 function Tela() {
+  const { volta, em, minutos } = useAtualizacao();
   const [campanhas, setCampanhas] = useState<Resumo[] | null>(null);
   const [id, setId] = useState<string>("");
   const [fases, setFases] = useState<Fase[] | null>(null);
@@ -57,6 +63,7 @@ function Tela() {
   const [funil, setFunil] = useState<Funil | null>(null);
   const [origens, setOrigens] = useState<Origem[] | null>(null);
   const [porOrigem, setPorOrigem] = useState<"campanha" | "fonte">("campanha");
+  const [recompra, setRecompra] = useState<Recompra[] | null>(null);
 
   useEffect(() => {
     supabase.from("resumo_campanhas").select("*").order("inicio").then(({ data }) => {
@@ -64,25 +71,26 @@ function Tela() {
       setCampanhas(lista);
       if (lista.length) setId(lista[0].id);
     });
-  }, []);
+  }, [volta]);
 
   useEffect(() => {
     if (!id) return;
-    setFases(null); setPontos(null); setProj(null); setCenarios(null); setFunil(null); setOrigens(null);
+    setFases(null); setPontos(null); setProj(null); setCenarios(null); setFunil(null); setOrigens(null); setRecompra(null);
     const p = { p_campanha: id };
     supabase.rpc("painel_fases", p).then(({ data }) => setFases((data as Fase[]) ?? []));
     supabase.rpc("painel_curva", p).then(({ data }) => setPontos((data as Ponto[]) ?? []));
     supabase.rpc("painel_projecao", p).then(({ data }) => setProj(((data as Projecao[]) ?? [])[0] ?? null));
     supabase.rpc("painel_cenarios", p).then(({ data }) => setCenarios((data as Cenario[]) ?? []));
     supabase.rpc("painel_funil", p).then(({ data }) => setFunil(((data as Funil[]) ?? [])[0] ?? null));
-  }, [id]);
+    supabase.rpc("painel_recompra", p).then(({ data }) => setRecompra((data as Recompra[]) ?? []));
+  }, [id, volta]);
 
   useEffect(() => {
     if (!id) return;
     setOrigens(null);
     supabase.rpc("painel_origem_matriculas", { p_campanha: id, p_por: porOrigem })
       .then(({ data }) => setOrigens((data as Origem[]) ?? []));
-  }, [id, porOrigem]);
+  }, [id, porOrigem, volta]);
 
   const c = campanhas?.find((x) => x.id === id);
 
@@ -94,7 +102,7 @@ function Tela() {
       meta: pontos.map((x) => Number(x.meta)),
       anterior: pontos.map((x) => Number(x.anterior)),
     };
-  }, [pontos]);
+  }, [pontos, volta]);
 
   if (!campanhas) return <p className="rotulo">Carregando</p>;
   if (!c) return <p className="mudo">Nenhuma campanha ativa cadastrada.</p>;
@@ -107,6 +115,9 @@ function Tela() {
     <>
       <div className="rotulo">001 · Campanha</div>
       <h1>{c.nome}</h1>
+      <p className="mudo num" style={{ marginTop: -8, marginBottom: 16 }}>
+        Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
+      </p>
 
       <div className="filtros">
         <label>
@@ -399,7 +410,32 @@ function Tela() {
         </>
       )}
 
-      <h2><span className="idx">007</span> Marcos</h2>
+      <h2><span className="idx">007</span> Quem já era da casa</h2>
+      {!recompra ? <p className="rotulo">Carregando</p> : recompra.length === 0 ? (
+        <p className="mudo">Sem matrícula nesta campanha ainda.</p>
+      ) : (
+        <>
+          <div className="faixa">
+            {recompra.map((r) => (
+              <div key={r.indicador}>
+                <div className="rotulo">{r.rotulo}</div>
+                <div className="valor num">{num(r.pessoas)}</div>
+                <div className="mudo num">
+                  {r.taxa == null ? "" : pct(Number(r.taxa), 1) + " das matrículas"}
+                  {r.indicador === "rematricula" && r.base ? ` · base de ${num(r.base)}` : ""}
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mudo" style={{ marginTop: 10 }}>
+            Rematrícula é quem fez o mesmo curso na edição anterior e voltou. As outras linhas olham se a pessoa também
+            tem curso longo ou o outro intensivo. A mesma pessoa é reconhecida por e-mail, telefone ou nome.
+            As faixas se sobrepõem de propósito: alguém pode ser rematrícula e ter curso longo ao mesmo tempo.
+          </p>
+        </>
+      )}
+
+      <h2><span className="idx">008</span> Marcos</h2>
       {c.marcos?.length ? (
         <div className="marcos">
           {c.marcos.map((m) => {
@@ -417,7 +453,7 @@ function Tela() {
 
       {ref && (
         <>
-          <h2><span className="idx">008</span> Contra {ref.ano}</h2>
+          <h2><span className="idx">009</span> Contra {ref.ano}</h2>
           <div className="faixa">
             <div>
               <div className="rotulo">Alunos {ref.ano}</div>

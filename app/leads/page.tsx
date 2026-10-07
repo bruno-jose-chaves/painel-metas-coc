@@ -4,6 +4,7 @@ import Shell from "@/components/Shell";
 import SeletorPeriodo from "@/components/Periodo";
 import Curva from "@/components/Curva";
 import { supabase } from "@/lib/supabase";
+import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, pct, dataCurta } from "@/lib/formato";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
 
@@ -17,6 +18,7 @@ type Tag = { tag: string; leads: number; conversoes: number };
 const TIPO: Record<string, string> = { landing_page: "Landing page do RD", formulario: "Formulário embutido" };
 
 function Tela() {
+  const { volta, em, minutos } = useAtualizacao();
   const [periodo, setPeriodo] = useState<Periodo>(ultimosDias(30));
   const [campanhas, setCampanhas] = useState<Campanha[]>([]);
   const [dias, setDias] = useState<Dia[] | null>(null);
@@ -28,7 +30,7 @@ function Tela() {
   useEffect(() => {
     supabase.from("resumo_campanhas").select("id,nome,inicio,fim").order("inicio")
       .then(({ data }) => setCampanhas((data as Campanha[]) ?? []));
-  }, []);
+  }, [volta]);
 
   useEffect(() => {
     const p = { p_de: periodo.de, p_ate: periodo.ate };
@@ -38,7 +40,7 @@ function Tela() {
     supabase.rpc("painel_fontes", p).then(({ data }) => setFontes((data as Fonte[]) ?? []));
     supabase.rpc("painel_pre_venda", p).then(({ data }) => setApv(((data as PreVenda[]) ?? [])[0] ?? null));
     supabase.rpc("painel_tags", p).then(({ data }) => setTags((data as Tag[]) ?? []));
-  }, [periodo]);
+  }, [periodo, volta]);
 
   const totalConv = dias?.reduce((s, d) => s + Number(d.conversoes), 0) ?? 0;
   const totalConvLp = dias?.reduce((s, d) => s + Number(d.conversoes_lp), 0) ?? 0;
@@ -49,6 +51,9 @@ function Tela() {
     <>
       <div className="rotulo">015 · Leads</div>
       <h1>De onde vem o lead</h1>
+      <p className="mudo num" style={{ marginTop: -8, marginBottom: 16 }}>
+        Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
+      </p>
 
       <SeletorPeriodo
         valor={periodo}

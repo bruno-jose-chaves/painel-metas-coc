@@ -117,10 +117,16 @@ const origemMat = [
 
 const rotas = {
   "rpc/painel_funil": funil,
+  "rpc/painel_recompra": [
+    { indicador: "rematricula", rotulo: "Rematrícula", pessoas: 92, base: 676, taxa: 0.4623, faturamento: 56158.52 },
+    { indicador: "curso_longo", rotulo: "Também tem curso longo", pessoas: 23, base: 273, taxa: 0.1156, faturamento: 14155.42 },
+    { indicador: "outro_intensivo", rotulo: "Também comprou o outro intensivo", pessoas: 2, base: 197, taxa: 0.0101, faturamento: 1231.78 },
+    { indicador: "novos", rotulo: "Primeira compra na casa", pessoas: 100, base: 199, taxa: 0.5025, faturamento: 66290 },
+  ],
   "rpc/painel_resumo_periodo": [{ alunos: 52, faturamento: 35034.8, ticket_medio: 673.75, leads: 1003, cancelados: 0, dias: 7, melhor_dia: "2026-09-30", melhor_dia_alunos: 20 }],
   "rpc/painel_metas_leads": [
-    { indicador: "leads", rotulo: "Leads captados", meta: 3400, realizado: 1907, atingido: 0.5609, esperado_hoje: 2105, situacao: "atencao" },
-    { indicador: "inscritos_lives", rotulo: "Inscritos nas lives", meta: 1050, realizado: 571, atingido: 0.5438, esperado_hoje: 650, situacao: "atencao" },
+    { indicador: "leads", rotulo: "Leads captados", meta: 3400, realizado: 1907, atingido: 0.5609, esperado_hoje: 2105, situacao: "atencao", identificadores: ["live-acafe-21-a-23-do-09"] },
+    { indicador: "inscritos_lives", rotulo: "Inscritos nas lives", meta: 1050, realizado: 571, atingido: 0.5438, esperado_hoje: 650, situacao: "atencao", identificadores: ["live-acafe-21-a-23-do-09"] },
     { indicador: "reservas", rotulo: "Reservas", meta: 300, realizado: 280, atingido: 0.9333, esperado_hoje: 186, situacao: "no_ritmo" },
   ],
   "rpc/painel_tags": [{ tag: "ufsc-simulado", leads: 112, conversoes: 140 }, { tag: "acafe-live", leads: 83, conversoes: 95 }],

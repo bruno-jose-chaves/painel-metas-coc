@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Shell from "@/components/Shell";
 import { supabase } from "@/lib/supabase";
+import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta } from "@/lib/formato";
 
 type Venda = {
@@ -15,6 +16,7 @@ type Campanha = { id: string; nome: string };
 const PAGINA = 100;
 
 function Tela() {
+  const { volta, em, minutos } = useAtualizacao();
   const [campanhas, setCampanhas] = useState<Campanha[]>([]);
   const [campanha, setCampanha] = useState("");
   const [vendedor, setVendedor] = useState("");
@@ -30,9 +32,9 @@ function Tela() {
       setCampanhas(lista);
       if (lista.length) setCampanha(lista[lista.length - 1].id);
     });
-  }, []);
+  }, [volta]);
 
-  useEffect(() => { setPagina(0); }, [campanha, vendedor, status, busca]);
+  useEffect(() => { setPagina(0); }, [campanha, vendedor, status, busca, volta]);
 
   useEffect(() => {
     if (!campanha) return;
@@ -49,7 +51,7 @@ function Tela() {
     q.order("data", { ascending: false }).order("numero", { ascending: false })
       .range(pagina * PAGINA, pagina * PAGINA + PAGINA - 1)
       .then(({ data, count }) => { setLinhas((data as Venda[]) ?? []); setTotal(count ?? 0); });
-  }, [campanha, vendedor, status, busca, pagina]);
+  }, [campanha, vendedor, status, busca, pagina, volta]);
 
   // Totais da seleção inteira, não só da página visível.
   const [resumo, setResumo] = useState<{ alunos: number; faturamento: number; tabela: number } | null>(null);
@@ -75,17 +77,17 @@ function Tela() {
         tabela: sel.reduce((s, v) => s + Number(v.valor_tabela ?? 0), 0),
       });
     });
-  }, [campanha, vendedor, status, busca]);
+  }, [campanha, vendedor, status, busca, volta]);
 
   const vendedores = useMemo(() => {
     const s = new Set((linhas ?? []).map((l) => l.vendedor).filter(Boolean) as string[]);
     return [...s].sort();
-  }, [linhas]);
+  }, [linhas, volta]);
 
   const statusUnicos = useMemo(() => {
     const s = new Set((linhas ?? []).map((l) => l.status).filter(Boolean) as string[]);
     return [...s].sort();
-  }, [linhas]);
+  }, [linhas, volta]);
 
   const paginas = Math.ceil(total / PAGINA);
 
@@ -93,6 +95,9 @@ function Tela() {
     <>
       <div className="rotulo">013 · Vendas</div>
       <h1>Matrícula por matrícula</h1>
+      <p className="mudo num" style={{ marginTop: -8, marginBottom: 16 }}>
+        Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
+      </p>
 
       <div className="filtros">
         <label>

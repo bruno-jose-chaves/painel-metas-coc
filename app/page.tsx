@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Shell from "@/components/Shell";
 import { supabase } from "@/lib/supabase";
+import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta, dataHora } from "@/lib/formato";
 import { hojeSP, somaDias } from "@/lib/periodo";
 
@@ -23,7 +24,7 @@ type Resumo7 = {
 };
 type MetaLead = {
   indicador: string; rotulo: string; meta: number; realizado: number;
-  atingido: number | null; esperado_hoje: number; situacao: string;
+  atingido: number | null; esperado_hoje: number; situacao: string; identificadores: string[] | null;
 };
 
 type Janela = { id: string; nome: string; dias?: number; semana?: boolean };
@@ -73,6 +74,7 @@ type Ritmo = {
 };
 
 function Visao() {
+  const { volta, em, minutos } = useAtualizacao();
   const [dados, setDados] = useState<Resumo[] | null>(null);
   const [sync, setSync] = useState<string | null>(null);
   const [proj, setProj] = useState<Record<string, Projecao>>({});
@@ -100,14 +102,14 @@ function Visao() {
     supabase.rpc("painel_ritmo").then(({ data }) => setRitmo((data as Ritmo[]) ?? []));
     supabase.from("sincronizacoes").select("terminado_em").eq("status", "ok").like("fonte", "planilha:%")
       .order("terminado_em", { ascending: false }).limit(1).then(({ data }) => setSync(data?.[0]?.terminado_em ?? null));
-  }, []);
+  }, [volta]);
 
   useEffect(() => {
     const { de, ate } = intervalo(janela);
     setPeriodo(null);
     supabase.rpc("painel_resumo_periodo", { p_de: de, p_ate: ate })
       .then(({ data }) => setPeriodo(((data as Resumo7[]) ?? [])[0] ?? null));
-  }, [janela]);
+  }, [janela, volta]);
 
   if (!dados) return <p className="rotulo">Carregando</p>;
 
@@ -124,7 +126,8 @@ function Visao() {
         </div>
         <span className="mudo num" style={{ marginLeft: "auto" }}>
           {(() => { const { de, ate } = intervalo(janela); return de === ate ? dataCurta(ate) : `${dataCurta(de)} a ${dataCurta(ate)}`; })()}
-          {" · atualizado "}{dataHora(sync)}
+          {" · sincronizado "}{dataHora(sync)}
+          {" · tela de "}{horaCurta(em)}
         </span>
       </div>
 
@@ -267,6 +270,11 @@ function Visao() {
                         <span>{num(m.realizado)} de {num(m.meta)} · {pct(ating)}</span>
                         <span>esperado hoje: {num(m.esperado_hoje)}</span>
                       </div>
+                      {m.identificadores?.length ? (
+                        <div className="rotulo" style={{ marginTop: 4, wordBreak: "break-word", lineHeight: 1.5 }}>
+                          {m.identificadores.join(" · ")}
+                        </div>
+                      ) : null}
                     </div>
                   );
                 })}
@@ -274,6 +282,8 @@ function Visao() {
             ))}
           </div>
           <p className="mudo" style={{ marginTop: 16 }}>
+            Abaixo de cada barra estão as páginas que entraram na conta, para o número poder ser conferido.
+            Só entra conversão cujo nome da página casa com o curso da campanha: antes disso as duas campanhas mostravam o mesmo número.
             Leads captados conta todas as conversões do período da campanha. Inscritos nas lives e reservas contam as
             conversões das páginas com esse nome. O traço vermelho é onde a meta espera que o número esteja hoje.
           </p>
