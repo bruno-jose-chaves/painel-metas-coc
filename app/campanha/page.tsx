@@ -33,7 +33,7 @@ type Funil = {
   dias_medio: number | null; dias_mediana: number | null; dias_max: number | null;
 };
 type Origem = {
-  fonte: string; negocios: number; matriculas: number; conversao: number | null;
+  origem: string; negocios: number; matriculas: number; conversao: number | null;
   faturamento: number; ticket_medio: number | null; dias_medio: number | null;
 };
 type Cenario = {
@@ -56,6 +56,7 @@ function Tela() {
   const [cenarios, setCenarios] = useState<Cenario[] | null>(null);
   const [funil, setFunil] = useState<Funil | null>(null);
   const [origens, setOrigens] = useState<Origem[] | null>(null);
+  const [porOrigem, setPorOrigem] = useState<"campanha" | "fonte">("campanha");
 
   useEffect(() => {
     supabase.from("resumo_campanhas").select("*").order("inicio").then(({ data }) => {
@@ -74,8 +75,14 @@ function Tela() {
     supabase.rpc("painel_projecao", p).then(({ data }) => setProj(((data as Projecao[]) ?? [])[0] ?? null));
     supabase.rpc("painel_cenarios", p).then(({ data }) => setCenarios((data as Cenario[]) ?? []));
     supabase.rpc("painel_funil", p).then(({ data }) => setFunil(((data as Funil[]) ?? [])[0] ?? null));
-    supabase.rpc("painel_origem_matriculas", p).then(({ data }) => setOrigens((data as Origem[]) ?? []));
   }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+    setOrigens(null);
+    supabase.rpc("painel_origem_matriculas", { p_campanha: id, p_por: porOrigem })
+      .then(({ data }) => setOrigens((data as Origem[]) ?? []));
+  }, [id, porOrigem]);
 
   const c = campanhas?.find((x) => x.id === id);
 
@@ -317,6 +324,16 @@ function Tela() {
 
 
       <h2><span className="idx">006</span> Da origem à matrícula</h2>
+      <div className="filtros" style={{ marginBottom: 16 }}>
+        <div className="atalhos">
+          <button className={porOrigem === "campanha" ? "ativo" : ""} onClick={() => setPorOrigem("campanha")}>
+            Por campanha do CRM
+          </button>
+          <button className={porOrigem === "fonte" ? "ativo" : ""} onClick={() => setPorOrigem("fonte")}>
+            Por fonte
+          </button>
+        </div>
+      </div>
       {!funil ? <p className="rotulo">Carregando</p> : (
         <>
           <div className="faixa">
@@ -350,15 +367,15 @@ function Tela() {
               <table className="tabela">
                 <thead>
                   <tr>
-                    <th>Origem</th><th className="n">Negócios</th><th className="n">Matrículas</th>
+                    <th>{porOrigem === "campanha" ? "Campanha no CRM" : "Fonte"}</th><th className="n">Negócios</th><th className="n">Matrículas</th>
                     <th className="n">Conversão</th><th style={{ minWidth: 110 }} />
                     <th className="n">Faturamento</th><th className="n">Ticket</th><th className="n">Dias até fechar</th>
                   </tr>
                 </thead>
                 <tbody>
                   {origens.map((o) => (
-                    <tr key={o.fonte}>
-                      <td style={{ maxWidth: 320, wordBreak: "break-word" }}>{o.fonte}</td>
+                    <tr key={o.origem}>
+                      <td style={{ maxWidth: 320, wordBreak: "break-word" }}>{o.origem}</td>
                       <td className="n">{num(o.negocios)}</td>
                       <td className="n"><b>{num(o.matriculas)}</b></td>
                       <td className="n">{pct(o.conversao == null ? null : Number(o.conversao))}</td>
@@ -374,6 +391,7 @@ function Tela() {
           )}
           <p className="mudo" style={{ marginTop: 10 }}>
             Cada matrícula da planilha é ligada à negociação do CRM que deu origem a ela, cruzando por e-mail, telefone e, em último caso, nome. A barra de conversão usa 20% como referência de topo.
+            A leitura por campanha mostra qual peça trouxe o lead, que é o que permite decidir onde investir. A fonte diz só o canal, e fica como segunda visão.
           </p>
         </>
       )}

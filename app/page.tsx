@@ -157,7 +157,49 @@ function Visao() {
         </div>
       </div>
 
-      <h2><span className="idx">002</span> Campanhas</h2>
+      <h2><span className="idx">002</span> O que falta por dia</h2>
+      {!ritmo ? <p className="rotulo">Carregando</p> : ritmo.length === 0 ? (
+        <p className="mudo">Nenhuma campanha ativa.</p>
+      ) : (
+        <>
+          <div className="cards">
+            {ritmo.map((r) => {
+              const falta = Number(r.falta);
+              const prec = r.necessario_dia == null ? null : Number(r.necessario_dia);
+              const media = Number(r.media_7);
+              const sobra = prec == null ? null : media - prec;
+              return (
+                <article className="card" key={"falta-" + r.campanha_id}>
+                  <div className="rotulo">{r.nome}</div>
+                  <div className="grande num">
+                    {prec == null ? "meta batida" : num(Math.ceil(prec))}
+                    {prec == null ? null : <small> por dia</small>}
+                  </div>
+                  <div className="mudo num">
+                    {falta <= 0
+                      ? "nada a fazer, a meta já fechou"
+                      : `faltam ${num(falta)} alunos em ${num(r.dias_restantes)} dias`}
+                  </div>
+                  {prec != null && (
+                    <div className="legenda num" style={{ marginTop: 10 }}>
+                      <span>ritmo atual {num(media.toFixed(1))}/dia</span>
+                      <span className={sobra! >= 0 ? "ok" : "alerta"}>
+                        {sobra! >= 0 ? "acima do necessário" : `faltam ${num(Math.abs(sobra!).toFixed(1))}/dia`}
+                      </span>
+                    </div>
+                  )}
+                </article>
+              );
+            })}
+          </div>
+          <p className="mudo" style={{ marginTop: 10 }}>
+            Quantas matrículas por dia cada campanha precisa daqui até o fim para bater a meta ativa,
+            comparado com a média dos últimos sete dias. O detalhe por dia está na seção 005.
+          </p>
+        </>
+      )}
+
+      <h2><span className="idx">003</span> Campanhas</h2>
       <div className="filtros" style={{ marginBottom: 16 }}>
         <div className="atalhos">
           {FAIXAS.map((f) => {
@@ -216,7 +258,7 @@ function Visao() {
       <p className="mudo" style={{ marginTop: 24 }}>Barra preta: realizado. Traço vermelho: onde a meta ativa espera que a campanha esteja hoje.</p>
 
 
-      <h2><span className="idx">003</span> Metas de captação</h2>
+      <h2><span className="idx">004</span> Metas de captação</h2>
       {Object.keys(metasLeads).length === 0 ? (
         <p className="mudo">Nenhuma meta de captação cadastrada.</p>
       ) : (
@@ -260,7 +302,7 @@ function Visao() {
         </>
       )}
 
-      <h2><span className="idx">004</span> Ritmo diário de matrículas</h2>
+      <h2><span className="idx">005</span> Ritmo diário de matrículas</h2>
       {!ritmo ? <p className="rotulo">Carregando</p> : ritmo.length === 0 ? (
         <p className="mudo">Nenhuma campanha ativa.</p>
       ) : (

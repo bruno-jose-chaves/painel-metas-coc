@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Shell from "@/components/Shell";
-import SeletorPeriodo from "@/components/Periodo";
+import FiltroCampanha, { type Campanha } from "@/components/FiltroCampanha";
 import { supabase } from "@/lib/supabase";
 import { brl, num, pct, dataCurta } from "@/lib/formato";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
@@ -17,31 +17,34 @@ type Parado = {
 type Motivo = { motivo: string; perdidas: number; fatia: number };
 type PreVenda = {
   captados: number; contatados: number; sem_contato: number;
-  entregues: number; ganhos: number; parados_7d: number; parados_30d: number;
+  entregues: number; ganhos: number; ganhos_de_antes: number; parados_7d: number; parados_30d: number;
 };
-type Campanha = { id: string; nome: string; inicio: string; fim: string };
 
 function Tela() {
   const [periodo, setPeriodo] = useState<Periodo>(ultimosDias(30));
   const [campanhas, setCampanhas] = useState<Campanha[]>([]);
+  const [campanha, setCampanha] = useState<string | null>(null);
   const [time, setTime] = useState<Linha[] | null>(null);
   const [parados, setParados] = useState<Parado[] | null>(null);
   const [motivos, setMotivos] = useState<Motivo[] | null>(null);
   const [apv, setApv] = useState<PreVenda | null>(null);
 
   useEffect(() => {
-    supabase.from("resumo_campanhas").select("id,nome,inicio,fim").order("inicio")
+    supabase.from("resumo_campanhas").select("id,nome,inicio,fim,produto_id").order("inicio")
       .then(({ data }) => setCampanhas((data as Campanha[]) ?? []));
   }, []);
+
+  const produto = campanhas.find((c) => c.id === campanha)?.produto_id ?? null;
 
   useEffect(() => {
     const p = { p_de: periodo.de, p_ate: periodo.ate };
     setTime(null); setParados(null); setMotivos(null); setApv(null);
-    supabase.rpc("painel_time_comercial", p).then(({ data }) => setTime((data as Linha[]) ?? []));
+    supabase.rpc("painel_time_comercial", { ...p, p_produto: produto })
+      .then(({ data }) => setTime((data as Linha[]) ?? []));
     supabase.rpc("painel_parados", { ...p, p_trilha: "comercial" }).then(({ data }) => setParados((data as Parado[]) ?? []));
     supabase.rpc("painel_motivos_perda", p).then(({ data }) => setMotivos((data as Motivo[]) ?? []));
     supabase.rpc("painel_pre_venda", p).then(({ data }) => setApv(((data as PreVenda[]) ?? [])[0] ?? null));
-  }, [periodo]);
+  }, [periodo, produto]);
 
   const totalFat = time?.reduce((s, l) => s + Number(l.faturamento), 0) ?? 0;
   const maiorFat = Math.max(1, ...(time ?? []).map((l) => Number(l.faturamento)));
@@ -51,13 +54,22 @@ function Tela() {
       <div className="rotulo">008 · Time comercial</div>
       <h1>Quem está entregando</h1>
 
-      <SeletorPeriodo
-        valor={periodo}
-        aoMudar={setPeriodo}
-        atalhos={campanhas.map((c) => ({ nome: c.nome, de: c.inicio, ate: c.fim }))}
+      <FiltroCampanha
+        campanhas={campanhas}
+        campanha={campanha}
+        aoMudarCampanha={setCampanha}
+        periodo={periodo}
+        aoMudarPeriodo={setPeriodo}
       />
       <p className="mudo" style={{ marginBottom: 24 }}>
-        Período em análise: {dataCurta(periodo.de)} a {dataCurta(periodo.ate)}. Vendas vêm da planilha comercial, negócios e conversão vêm do RD CRM.
+        Período em análise: {dataCurta(periodo.de)} a {dataCurta(periodo.ate)}
+        {campanha ? ", só " + (campanhas.find((c) => c.id === campanha)?.nome ?? "") : ", todos os cursos"}.
+      </p>
+      <p className="mudo" style={{ marginBottom: 24 }}>
+        <b>Alunos</b> é a planilha comercial, que é a fonte firme: a venda entra no dia em que aconteceu.
+        <b> Ganhas no CRM</b> é outra contagem, do RD, e costuma ficar atrás porque o negócio às vezes é
+        fechado no dia seguinte, e porque nem toda venda tem negócio correspondente. Para cobrança de meta,
+        vale a coluna Alunos.
       </p>
 
       <h2><span className="idx">009</span> Ranking de vendas</h2>
@@ -70,7 +82,7 @@ function Tela() {
               <tr>
                 <th>#</th><th>Vendedor</th><th className="n">Alunos</th><th className="n">Faturamento</th>
                 <th style={{ minWidth: 90 }} /><th className="n">Ticket</th><th className="n">Leads recebidos</th>
-                <th className="n">Ganhas</th><th className="n">Perdidas</th><th className="n">Conversão</th><th className="n">Em aberto</th>
+                <th className="n">Ganhas no CRM</th><th className="n">Perdidas</th><th className="n">Conversão</th><th className="n">Em aberto</th>
               </tr>
             </thead>
             <tbody>
@@ -195,7 +207,9 @@ function Tela() {
               <div className="rotulo">Viraram matrícula</div>
               <div className="valor num">{num(apv.ganhos)}</div>
               <div className="mudo num">
-                {apv.entregues ? pct(Number(apv.ganhos) / Number(apv.entregues), 1) + " do entregue" : ""}
+                {Number(apv.ganhos_de_antes) > 0
+                  ? num(apv.ganhos_de_antes) + " vieram de antes do período"
+                  : "todas captadas no período"}
               </div>
             </div>
             <div>
@@ -215,7 +229,9 @@ function Tela() {
           <p className="mudo" style={{ marginTop: 10 }}>
             O APV é o agente de IA de pré-vendas. Ele captura o lead de material rico no funil SDR e o time comercial abre a negociação no funil principal.
             Entregue significa que o mesmo contato virou negócio no funil comercial depois de entrar no SDR, que é a leitura confiável da passagem de bastão.
-            O painel não lê o histórico de movimentação de etapa, porque a API do RD não entrega isso: a etapa atual é o que indica se o agente trabalhou o lead.
+            Captação e resultado têm janelas diferentes de propósito: captado é quem entrou no SDR dentro do período,
+            e matrícula é a venda fechada dentro do período, mesmo que o agente tenha trabalhado o lead antes, como acontece com reserva de campanha anterior.
+            Sem essa separação a entrega do agente aparecia muito menor do que é.
           </p>
         </>
       )}

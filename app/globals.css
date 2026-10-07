@@ -118,3 +118,7 @@ h2 .idx { color: var(--cinza); font-weight: 500; }
 .abas { display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap; }
 .abas button { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; background: none; border: 1px solid var(--tinta); padding: 8px 12px; }
 .abas button.ativo { background: var(--tinta); color: var(--papel); }
+
+/* Sinal de cor em texto solto, usado no bloco do que falta por dia. */
+.ok { color: var(--ok); }
+.alerta { color: var(--ruim); }
