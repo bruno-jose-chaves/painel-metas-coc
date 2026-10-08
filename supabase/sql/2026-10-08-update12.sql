@@ -1,0 +1,47 @@
+-- Update 12 — Turmas por ano, upsell modular e correção do cruzamento
+-- Aplicado direto no banco em 08/10/2026. Este arquivo é o registro.
+
+-- 1. Conceito de turma: produto + ano + semestre.
+--    A turma é a unidade de análise. "Semiextensivo" sozinho não diz nada:
+--    o que se compara é Semiextensivo 2026/1 contra Semiextensivo 2025/1.
+--
+--    create table turmas (
+--      id text primary key,              -- semi-extensivo-2026-1
+--      produto_id text references produtos(id),
+--      ano int, semestre int,            -- semestre null em produto de uma temporada
+--      nome text,                        -- "Semiextensivo 2026/1"
+--      venda_de date, venda_ate date     -- janela em que a turma vende
+--    );
+--
+--    produtos.duas_temporadas marca quem tem /1 e /2 (Semiextensivo, Método ACAFE).
+--    As janelas vieram da sazonalidade real das vendas 2021-2025:
+--      Semi /1        out -> abr      Semi /2      mai -> set
+--      Extensivo      ago -> jul      Missão UFSC  jun -> mai
+--      Método ACAFE/1 jan -> jun      ACAFE /2     jul -> dez
+--
+--    gerar_turmas()  semeia 2021..2027
+--    semestre_do_curso(produto, data) -> 1 | 2 | null
+--    turma_da_venda(venda) -> turma_id
+--    v_vendas_turma  venda com turma resolvida
+--    painel_turmas(p_so_com_venda) -> turma + alunos + faturamento
+--
+--    Conferência contra os números do projeto:
+--      Método ACAFE 2025/1   259 (projeto: 259)
+--      Semiextensivo 2025/1  164 (projeto: 161)
+--      Missão UFSC 2025      155 (projeto: 152)
+
+-- 2. painel_upsell_modular(p_base text[], p_alvo text[], p_ano_anterior boolean)
+--    Em vez de uma tela estática com um cruzamento fixo, recebe duas listas de
+--    turmas: a base de comparação e o curso de destino. Devolve duas linhas,
+--    'atual' e 'ano anterior' (mesmas turmas um ano atrás), com pessoas_base,
+--    pessoas_alvo, cruzaram, taxa, faturamento_alvo, ticket_alvo, dias_medio.
+--    Cruza por e-mail, telefone e nome normalizados; conta pessoa, não matrícula.
+
+-- 3. cruzar_vendas — correção
+--    O filtro era  where v.campanha_id is not null,
+--    o que só cruzava venda de campanha já cadastrada. Virou
+--                  where v.produto_id is not null.
+--    Reprocessado desde 2025-01-01. Cobertura das vendas 2026:
+--      antes  272 de 822 (33%)
+--      depois metodo-acafe 387/404 (95,8%), semi-extensivo 184/199 (92,5%),
+--             missao-ufsc 72/74 (97,3%), extensivo 52/58 (89,7%)

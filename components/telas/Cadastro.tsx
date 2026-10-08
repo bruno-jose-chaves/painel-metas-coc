@@ -9,6 +9,10 @@ type Campanha = {
   regra_curso: string | null; ativa: boolean;
 };
 type Produto = { id: string; nome: string };
+type Turma = {
+  id: string; produto_id: string; produto: string; ano: number; semestre: number | null;
+  nome: string; venda_de: string; venda_ate: string; alunos: number; faturamento: number;
+};
 type Meta = { nivel: number; alunos: number; faturamento: number };
 type Fase = {
   ordem: number; nome: string; inicio: string; fim: string;
@@ -32,12 +36,15 @@ export default function Cadastro({ admin }: { admin: boolean }) {
   const [fases, setFases] = useState<Fase[]>([]);
   const [aviso, setAviso] = useState<{ tipo: "ok" | "erro"; texto: string } | null>(null);
   const [ocupado, setOcupado] = useState(false);
+  const [turmas, setTurmas] = useState<Turma[] | null>(null);
 
   const carregar = () => {
     supabase.from("campanhas").select("*").order("inicio", { ascending: false })
       .then(({ data }) => setLista((data as Campanha[]) ?? []));
     supabase.from("produtos").select("id,nome").order("ordem")
       .then(({ data }) => setProdutos((data as Produto[]) ?? []));
+    supabase.rpc("painel_turmas", { p_so_com_venda: true })
+      .then(({ data }) => setTurmas((data as Turma[]) ?? []));
   };
   useEffect(carregar, []);
 
@@ -218,6 +225,39 @@ export default function Cadastro({ admin }: { admin: boolean }) {
       <button className="btn claro" style={{ marginTop: 12 }} onClick={() => setFases([...fases, faseVazia(fases.length + 1)])}>
         Adicionar fase
       </button>
+
+      <h2><span className="idx">006</span> Turmas por ano</h2>
+      <p className="mudo" style={{ marginBottom: 16 }}>
+        Turma é o produto de um ano específico: "Semi Extensivo" é produto, "Semi Extensivo 2026/2" é turma. É o que
+        permite comparar maçã com maçã entre anos e escolher o recorte certo na análise de upsell. A janela de venda
+        define a qual turma cada matrícula pertence, e foi tirada do comportamento real da base. Se alguma janela
+        estiver errada, é só avisar.
+      </p>
+      {!turmas ? <p className="rotulo">Carregando</p> : turmas.length === 0 ? (
+        <p className="mudo">Nenhuma turma com venda registrada.</p>
+      ) : (
+        <div className="rolar">
+          <table className="tabela">
+            <thead>
+              <tr>
+                <th>Turma</th><th>Produto</th><th>Janela de venda</th>
+                <th className="n">Alunos</th><th className="n">Faturamento</th>
+              </tr>
+            </thead>
+            <tbody>
+              {turmas.map((t) => (
+                <tr key={t.id}>
+                  <td><b>{t.nome}</b></td>
+                  <td className="mudo">{t.produto}</td>
+                  <td className="mudo num">{dataCurta(t.venda_de)} a {dataCurta(t.venda_ate)}</td>
+                  <td className="n">{num(t.alunos)}</td>
+                  <td className="n">{brl(t.faturamento)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <h2><span className="idx">005</span> Campanhas cadastradas</h2>
       <div className="rolar">
