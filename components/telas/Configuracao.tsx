@@ -178,7 +178,7 @@ export default function Configuracao({ admin }: { admin: boolean }) {
 
   return (
     <>
-      <div className="rotulo">006 · Configuração</div>
+      <div className="rotulo">Configuração</div>
       <h1>Integrações e acessos</h1>
       {retorno && <div className={"aviso " + retorno.tipo}>{retorno.msg}</div>}
 
@@ -278,7 +278,7 @@ export default function Configuracao({ admin }: { admin: boolean }) {
       </div>
 
       <h2><span className="idx">007</span> Cobertura do RD Marketing</h2>
-      <p className="mudo" style={{ marginBottom: 14 }}>
+      <p className="nota">
         As conversões do RD Marketing vêm dia a dia. Um dia que não foi buscado não aparece em lugar nenhum e faz todo
         número de captação ficar menor do que é, sem avisar. Foi o que aconteceu entre 04/09 e 26/09: vinte e três dias
         sumiram e a live do ACAFE mostrava 543 inscrições em vez de 1.031. Agora cada dia buscado fica registrado e o
@@ -386,7 +386,7 @@ export default function Configuracao({ admin }: { admin: boolean }) {
 
         {admin && (
           <>
-            <p className="mudo" style={{ marginTop: 16 }}>
+            <p className="rodape">
               Para liberar alguém, crie a conta já com uma senha e entregue essa senha à pessoa. É o caminho mais direto
               enquanto o envio de e-mail não estiver configurado em servidor próprio.
             </p>

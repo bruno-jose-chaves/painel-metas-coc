@@ -120,9 +120,9 @@ export default function Campanha() {
 
   return (
     <>
-      <div className="rotulo">001 · Campanha</div>
+      <div className="rotulo">Campanha</div>
       <h1>{c.nome}</h1>
-      <p className="mudo num" style={{ marginTop: -8, marginBottom: 16 }}>
+      <p className="carimbo num">
         Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
       </p>
 
@@ -408,7 +408,7 @@ export default function Campanha() {
               </table>
             </div>
           )}
-          <p className="mudo" style={{ marginTop: 10 }}>
+          <p className="rodape">
             Cada matrícula da planilha é ligada à negociação do CRM que deu origem a ela, cruzando por e-mail, telefone e, em último caso, nome. A barra de conversão usa 20% como referência de topo.
             A leitura por campanha mostra qual peça trouxe o lead, que é o que permite decidir onde investir. A fonte diz só o canal, e fica como segunda visão.
             A matrícula só conta para a peça quando aconteceu depois da conversão nela e dentro de sessenta dias, senão a peça levaria crédito por venda que veio antes dela.
@@ -434,7 +434,7 @@ export default function Campanha() {
               </div>
             ))}
           </div>
-          <p className="mudo" style={{ marginTop: 10 }}>
+          <p className="rodape">
             Rematrícula é quem fez o mesmo curso na edição anterior e voltou. As outras linhas olham se a pessoa também
             tem curso longo ou o outro intensivo. A mesma pessoa é reconhecida por e-mail, telefone ou nome.
             As faixas se sobrepõem de propósito: alguém pode ser rematrícula e ter curso longo ao mesmo tempo.
@@ -469,7 +469,7 @@ export default function Campanha() {
               </tbody>
             </table>
           </div>
-          <p className="mudo" style={{ marginTop: 10 }}>
+          <p className="rodape">
             Os três primeiros são de onde mais vem gente. Dias até voltar é quanto tempo passou entre a compra
             anterior e esta, o que indica em que momento vale disparar a oferta para a turma daquele curso.
           </p>

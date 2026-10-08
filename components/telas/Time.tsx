@@ -54,9 +54,9 @@ export default function Time() {
 
   return (
     <>
-      <div className="rotulo">008 · Time comercial</div>
+      <div className="rotulo">Time comercial</div>
       <h1>Quem está entregando</h1>
-      <p className="mudo num" style={{ marginTop: -8, marginBottom: 16 }}>
+      <p className="carimbo num">
         Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
       </p>
 
@@ -67,11 +67,11 @@ export default function Time() {
         periodo={periodo}
         aoMudarPeriodo={setPeriodo}
       />
-      <p className="mudo" style={{ marginBottom: 24 }}>
+      <p className="nota">
         Período em análise: {dataCurta(periodo.de)} a {dataCurta(periodo.ate)}
         {campanha ? ", só " + (campanhas.find((c) => c.id === campanha)?.nome ?? "") : ", todos os cursos"}.
       </p>
-      <p className="mudo" style={{ marginBottom: 24 }}>
+      <p className="nota">
         <b>Alunos</b> é a planilha comercial, que é a fonte firme: a venda entra no dia em que aconteceu.
         <b> Ganhas no CRM</b> é outra contagem, do RD, e costuma ficar atrás porque o negócio às vezes é
         fechado no dia seguinte, e porque nem toda venda tem negócio correspondente. Para cobrança de meta,
@@ -126,7 +126,7 @@ export default function Time() {
           </table>
         </div>
       )}
-      <p className="mudo" style={{ marginTop: 10 }}>
+      <p className="rodape">
         Conversão é ganhas sobre o funil inteiro do período: ganhas mais perdidas mais o que ainda está em aberto. Contar só o que já foi decidido inflava o número, porque a maior parte do funil ainda não decidiu.
         Venda automática é a matrícula fechada sem vendedor na planilha, ou seja a compra que o aluno fez sozinho pelo site. Ela entra no faturamento, mas fica fora do ranking. O ranking conta só a venda lançada dentro do período acima: campanha com reserva vendida antes do início aparece menor aqui do que no cartão da campanha, que traz o total cheio.
       </p>
@@ -232,7 +232,7 @@ export default function Time() {
               <div className="valor num">{num(apv.parados_30d)}</div>
             </div>
           </div>
-          <p className="mudo" style={{ marginTop: 10 }}>
+          <p className="rodape">
             O APV é o agente de IA de pré-vendas. Ele captura o lead de material rico no funil SDR e o time comercial abre a negociação no funil principal.
             Entregue significa que o mesmo contato virou negócio no funil comercial depois de entrar no SDR, que é a leitura confiável da passagem de bastão.
             Captação e resultado têm janelas diferentes de propósito: captado é quem entrou no SDR dentro do período,

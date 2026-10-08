@@ -92,9 +92,9 @@ export default function Vendas() {
 
   return (
     <>
-      <div className="rotulo">013 · Vendas</div>
+      <div className="rotulo">Vendas</div>
       <h1>Matrícula por matrícula</h1>
-      <p className="mudo num" style={{ marginTop: -8, marginBottom: 16 }}>
+      <p className="carimbo num">
         Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
       </p>
 
@@ -185,7 +185,7 @@ export default function Vendas() {
           <button disabled={pagina + 1 >= paginas} onClick={() => setPagina((p) => p + 1)}>Próxima</button>
         </div>
       )}
-      <p className="mudo" style={{ marginTop: 16 }}>
+      <p className="rodape">
         E-mail, telefone e responsável financeiro do aluno ficam fora do painel de propósito. Quem precisa desse dado usa a planilha ou o CRM.
       </p>
     </>

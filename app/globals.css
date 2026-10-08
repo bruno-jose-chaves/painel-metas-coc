@@ -153,24 +153,25 @@ button { font: inherit; cursor: pointer; }
 main {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 28px 20px 96px;
+  padding: 20px 20px 88px;
 }
 
 /* ---------- títulos ---------- */
 
 h1 {
-  font-size: clamp(27px, 4.6vw, 38px);
+  font-size: clamp(25px, 3.6vw, 32px);
   font-weight: 800;
   letter-spacing: -.028em;
-  line-height: 1.08;
-  margin: 6px 0 18px;
+  line-height: 1.1;
+  margin: 3px 0 14px;
 }
 
 h2 {
   font-size: 12px;
   letter-spacing: .1em;
   text-transform: uppercase;
-  margin: 44px 0 14px;
+  margin: 30px 0 11px;
+  scroll-margin-top: 112px;
   font-weight: 700;
   color: var(--tinta);
   display: flex;
@@ -199,7 +200,7 @@ h3 { letter-spacing: -.02em; }
 }
 
 .faixa > div {
-  padding: 16px 18px;
+  padding: 13px 16px;
   border-right: 1px solid var(--linha);
   min-width: 0;
 }
@@ -207,7 +208,7 @@ h3 { letter-spacing: -.02em; }
 .faixa > div:last-child { border-right: 0; }
 
 .faixa .valor {
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 750;
   letter-spacing: -.03em;
   margin-top: 3px;
@@ -225,7 +226,7 @@ h3 { letter-spacing: -.02em; }
 .card {
   border: 1px solid var(--linha);
   background: var(--superficie);
-  padding: 22px;
+  padding: 18px;
   border-radius: var(--raio);
   box-shadow: var(--sombra);
 }
@@ -258,7 +259,7 @@ h3 { letter-spacing: -.02em; }
 }
 
 .grande {
-  font-size: 42px;
+  font-size: 36px;
   font-weight: 800;
   letter-spacing: -.045em;
   line-height: 1;
@@ -319,8 +320,15 @@ h3 { letter-spacing: -.02em; }
 
 /* ---------- tabelas ---------- */
 
+/* A sombra na direita avisa que a tabela continua para o lado. Sem ela, no
+   telefone, a pessoa acha que a última coluna visível é a última que existe. */
 .rolar {
   overflow-x: auto;
+  background-image: linear-gradient(to left, #12121114, #12121100 24px);
+  background-position: right;
+  background-size: 24px 100%;
+  background-repeat: no-repeat;
+  background-attachment: local, scroll;
   background: var(--superficie);
   border: 1px solid var(--linha);
   border-radius: var(--raio);
@@ -340,6 +348,9 @@ h3 { letter-spacing: -.02em; }
   padding: 10px 14px;
   font-weight: 650;
   white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .tabela td {
@@ -430,8 +441,8 @@ h3 { letter-spacing: -.02em; }
   border: 1px solid var(--linha);
   border-radius: var(--raio);
   box-shadow: var(--sombra);
-  padding: 13px 16px;
-  margin-bottom: 20px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
 }
 
 .filtros label { display: grid; gap: 4px; }
@@ -445,7 +456,18 @@ h3 { letter-spacing: -.02em; }
   border-radius: var(--raio-p);
 }
 
-.atalhos { display: flex; gap: 3px; background: #1212110A; padding: 3px; border-radius: 11px; }
+.atalhos {
+  display: flex;
+  gap: 3px;
+  background: #1212110A;
+  padding: 3px;
+  border-radius: 11px;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.atalhos::-webkit-scrollbar { display: none; }
 
 .atalhos button {
   font-size: 12.5px;
@@ -638,4 +660,282 @@ h3 { letter-spacing: -.02em; }
   .card { padding: 18px; }
   .tabela th, .tabela td { padding: 10px 11px; }
   h2 { margin: 34px 0 12px; }
+}
+
+
+/* ---------- texto de apoio, com uma régua só ----------
+   Antes cada tela escolhia a própria margem para a frase que explica o bloco:
+   12, 14, 16, 18, 24. De perto não se nota; a tela inteira fica torta. Agora
+   são duas posições, antes do conteúdo e depois dele, e nada mais. */
+
+.nota {
+  color: var(--cinza);
+  font-size: 14px;
+  margin: -2px 0 16px;
+  max-width: 76ch;
+}
+
+.rodape {
+  color: var(--cinza);
+  font-size: 13.5px;
+  margin: 14px 0 0;
+  max-width: 76ch;
+}
+
+/* Carimbo de quando o dado é. Vai logo abaixo do h1 em toda tela. */
+.carimbo {
+  color: var(--cinza);
+  font-size: 13px;
+  margin: -8px 0 14px;
+}
+
+/* Título de seção com o controle dele na mesma linha. */
+.secao-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 30px 0 11px;
+}
+
+.secao-topo h2 { margin: 0; }
+
+/* ---------- descrição das abas ---------- */
+
+/* Não é grudada no topo de propósito: o índice de seções, que aparece ao
+   rolar, ocupa exatamente esse lugar, e duas barras coladas no mesmo ponto se
+   cobrem. Aqui as abas ficam no começo da tela e o índice assume depois. */
+.subnav-caixa {
+  margin: 0 0 18px;
+}
+
+.subnav { margin-bottom: 0; }
+
+.subnav-oque {
+  margin: 9px 0 0;
+  padding-bottom: 11px;
+  font-size: 13px;
+  color: var(--cinza);
+  max-width: 86ch;
+}
+
+/* ---------- índice de seções ---------- */
+
+.indice {
+  position: fixed;
+  top: var(--topo-altura);
+  left: 0;
+  right: 0;
+  z-index: 16;
+  background: #F4F2ECF2;
+  backdrop-filter: saturate(1.6) blur(14px);
+  border-bottom: 1px solid var(--linha-forte);
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity .16s, transform .16s;
+}
+
+.indice.visivel { opacity: 1; transform: none; pointer-events: auto; }
+
+.indice-in {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  height: 42px;
+}
+
+.indice-in::-webkit-scrollbar { display: none; }
+
+.indice-in button {
+  background: none;
+  border: 0;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 550;
+  color: var(--cinza);
+  white-space: nowrap;
+}
+
+.indice-in button:hover { color: var(--tinta); background: #12121109; }
+.indice-in button.ativo { color: var(--tinta); font-weight: 700; background: var(--lima-suave); }
+.indice-in .topo-de-novo { margin-left: auto; font-size: 14px; padding: 5px 9px; }
+
+/* Com o índice colado no topo, a barra de abas não pode ficar colada também:
+   uma cobriria a outra. Quando o índice aparece, as abas rolam com a página. */
+
+/* ---------- estrela de insights ---------- */
+
+.estrela {
+  position: relative;
+  background: none;
+  border: 1px solid var(--linha-forte);
+  border-radius: var(--raio-p);
+  width: 34px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cinza);
+  flex: none;
+}
+
+.estrela:hover { border-color: var(--tinta); color: var(--tinta); }
+.estrela.tem { color: #8A7B00; border-color: #CFB40455; background: #FBFBE8; }
+
+.estrela .conta {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--tinta);
+  color: var(--papel);
+  font-size: 10.5px;
+  font-weight: 750;
+  line-height: 17px;
+}
+
+/* ---------- gaveta de insights ---------- */
+
+.cortina {
+  position: fixed;
+  inset: 0;
+  background: #12121126;
+  z-index: 40;
+  animation: aparecer .14s ease-out;
+}
+
+.gaveta {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(420px, 100vw);
+  background: var(--papel);
+  border-left: 1px solid var(--linha-forte);
+  box-shadow: var(--sombra-alta);
+  z-index: 41;
+  display: flex;
+  flex-direction: column;
+  animation: entrar .18s ease-out;
+}
+
+@keyframes aparecer { from { opacity: 0 } }
+@keyframes entrar { from { transform: translateX(14px); opacity: .4 } }
+
+.gaveta-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px 20px 14px;
+}
+
+.gaveta-corpo {
+  overflow-y: auto;
+  padding: 0 20px 24px;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.insight {
+  background: var(--superficie);
+  border: 1px solid var(--linha);
+  border-left: 3px solid var(--cinza-claro);
+  border-radius: var(--raio-p);
+  padding: 13px 15px;
+  box-shadow: var(--sombra);
+}
+
+.insight.p1 { border-left-color: var(--tinta); }
+.insight.p2 { border-left-color: var(--lima); }
+
+.insight-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.insight b { display: block; font-size: 15px; font-weight: 700; letter-spacing: -.012em; }
+.insight p { margin: 5px 0 0; font-size: 13.5px; }
+
+.insight .selo {
+  background: #1212110A;
+  color: var(--tinta-2);
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 11.5px;
+  font-weight: 650;
+}
+
+.insight-pe {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  font-size: 12.5px;
+}
+
+.insight-pe .quem {
+  background: var(--lima-suave);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 650;
+}
+
+.insight-pe a { color: var(--cinza); text-decoration: none; font-weight: 600; }
+.insight-pe a:hover { color: var(--tinta); text-decoration: underline; }
+
+/* ---------- descrição das áreas no menu ---------- */
+
+.nav a small { display: none; }
+
+@media (max-width: 880px) {
+  .subnav-caixa { margin: 0 0 14px; }
+  /* O índice continua no telefone: é onde rolar custa mais. Ele só encolhe. */
+  .indice-in { height: 38px; padding: 0 14px; }
+  .indice-in button { font-size: 12px; padding: 4px 9px; }
+
+  /* Na gaveta do telefone cada área ganha a frase do que tem dentro: é onde
+     sobra espaço e é onde a pessoa está escolhendo para onde ir. */
+  .nav a { display: grid; gap: 1px; }
+  .nav a small {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 450;
+    color: var(--cinza);
+    line-height: 1.35;
+  }
+  .nav a.ativo small { color: #F4F2ECB0; }
+}
+
+@media (max-width: 640px) {
+  /* No telefone a faixa de números vira duas colunas de verdade, em vez de uma
+     coluna só com cinco linhas que empurram todo o resto para fora da tela. */
+  .faixa { grid-template-columns: 1fr 1fr; }
+  .faixa > div:nth-child(odd) { border-right: 1px solid var(--linha); }
+  .faixa > div:nth-child(even) { border-right: 0; }
+  .faixa > div { border-bottom: 1px solid var(--linha); }
+  /* Número ímpar deixa meia célula vazia no fim. Esticar a última fecha a
+     caixa em vez de deixar um buraco branco. */
+  .faixa > div:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .faixa .valor { font-size: 20px; }
+  .cards { grid-template-columns: 1fr; gap: 14px; }
+  .gaveta { width: 100vw; }
+  h1 { margin-bottom: 14px; }
+  .nota, .rodape { max-width: none; }
 }

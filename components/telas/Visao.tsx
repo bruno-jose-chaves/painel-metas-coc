@@ -120,7 +120,7 @@ export default function Visao() {
 
   return (
     <>
-      <div className="rotulo">001 · Visão geral</div>
+      <div className="rotulo">Visão geral</div>
       <h1>Como estamos</h1>
 
       <div className="filtros" style={{ marginBottom: 8 }}>
@@ -166,8 +166,11 @@ export default function Visao() {
         </div>
       </div>
 
-      <h2><span className="idx">002</span> Campanhas</h2>
-      <div className="filtros" style={{ marginBottom: 16 }}>
+      {/* O filtro mora na linha do título. Virar um cartão inteiro para quatro
+          botões custava uma tela de altura em notebook, e empurrava o primeiro
+          cartão de campanha para fora. */}
+      <div className="secao-topo">
+        <h2><span className="idx">002</span> Campanhas</h2>
         <div className="atalhos">
           {FAIXAS.map((f) => {
             const quantas = dados.filter((c) => naFaixa(c, f.id)).length;
@@ -241,7 +244,7 @@ export default function Visao() {
       {dados.filter((c) => naFaixa(c, faixa)).length === 0 && (
         <p className="mudo">Nenhuma campanha nesta situação.</p>
       )}
-      <p className="mudo" style={{ marginTop: 24 }}>Barra preta: realizado. Traço vermelho: onde a meta ativa espera que a campanha esteja hoje.</p>
+      <p className="rodape">Barra preta: realizado. Traço vermelho: onde a meta ativa espera que a campanha esteja hoje.</p>
 
 
       <h2><span className="idx">003</span> Metas de captação</h2>
@@ -299,7 +302,7 @@ export default function Visao() {
               </article>
             ))}
           </div>
-          <p className="mudo" style={{ marginTop: 16 }}>
+          <p className="rodape">
             Abaixo de cada barra estão as páginas que entraram na conta, para o número poder ser conferido.
             Leads captados e inscritos nas lives contam unidades diferentes de propósito: o CRM conta pessoa, o
             formulário conta envio, e quem preenche duas vezes aparece duas vezes no segundo. Quando os dois existem,
@@ -387,7 +390,7 @@ export default function Visao() {
               </tfoot>
             </table>
           </div>
-          <p className="mudo" style={{ marginTop: 10 }}>
+          <p className="rodape">
             Média e ritmo contam só dia útil: sábado e domingo somam pouco mais de três por cento das matrículas e, contados, diluem o que a operação precisa bater por dia. Anteriores são as matrículas lançadas antes do início da campanha, que entram no realizado. O período de venda termina uma semana depois do início das aulas, e é essa data que conta como fim da campanha aqui.
           </p>
           <p className="mudo">

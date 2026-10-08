@@ -40,9 +40,9 @@ export default function Gestao() {
 
   return (
     <>
-      <div className="rotulo">023 · Gestão</div>
+      <div className="rotulo">Gestão</div>
       <h1>O dia da operação</h1>
-      <p className="mudo num" style={{ marginTop: -8, marginBottom: 16 }}>
+      <p className="carimbo num">
         Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
       </p>
 
@@ -78,14 +78,14 @@ export default function Gestao() {
         </div>
       </div>
 
-      <p className="mudo" style={{ marginBottom: 16, marginTop: 4 }}>
+      <p className="nota">
         O histórico de conversa importado do Pigeon começa em 01/08/2026. As regras de 15 e 20 dias valem
         cheias de 21/08 em diante. Antes disso o painel conta menos lead conhecido e menos requentado do que
         o real, porque não tem como ver a conversa que veio antes do corte.
       </p>
 
       <h2><span className="idx">024</span> Quem chegou no período</h2>
-      <p className="mudo" style={{ marginBottom: 16 }}>
+      <p className="nota">
         Lead novo é negociação criada sem nenhuma conversa nos 20 dias anteriores — gente que entrou agora.
         Quem já falava com a gente antes de virar negociação aparece separado, porque não é captação nova:
         é o funil andando.

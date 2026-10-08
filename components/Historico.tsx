@@ -77,9 +77,9 @@ export default function Historico() {
 
   return (
     <>
-      <div className="rotulo">008 · Histórico</div>
+      <div className="rotulo">Histórico</div>
       <h1>O mesmo curso, ano a ano</h1>
-      <p className="mudo num" style={{ marginTop: -8, marginBottom: 16 }}>
+      <p className="carimbo num">
         Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
       </p>
 
@@ -149,7 +149,7 @@ export default function Historico() {
       )}
 
       <h2><span className="idx">009</span> Curva acumulada, sobreposta</h2>
-      <p className="mudo" style={{ marginBottom: 16 }}>
+      <p className="nota">
         Alinhada pela semana do ano, não pelo dia da campanha, porque a campanha muda de data a cada ano. Lido assim,
         a distância vertical entre as linhas na semana de hoje é exatamente o quanto {nomeProduto}
         {temporada ? ` do ${temporada}º semestre` : ""} está à frente ou atrás do mesmo momento dos anos anteriores.
@@ -192,7 +192,7 @@ export default function Historico() {
           </table>
         </div>
       )}
-      <p className="mudo" style={{ marginTop: 14 }}>
+      <p className="rodape">
         Até esta data compara maçã com maçã: conta só a venda feita até o mesmo dia do ano, nos anos anteriores
         também, e dentro do mesmo semestre quando o curso tem duas turmas: o Método ACAFE do 1º semestre vende de
         janeiro a junho e o do 2º de julho a novembro, então somar os dois esconde o que cada turma está fazendo. A coluna de alunos no ano é o fechamento cheio, que para o ano corrente ainda vai crescer. Ticket e

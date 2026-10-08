@@ -36,9 +36,9 @@ export default function Sugestoes() {
 
   return (
     <>
-      <div className="rotulo">032 · Conferência</div>
+      <div className="rotulo">Conferência</div>
       <h1>O que vale conferir</h1>
-      <p className="mudo num" style={{ marginTop: -8, marginBottom: 16 }}>
+      <p className="carimbo num">
         Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
       </p>
 
@@ -58,7 +58,7 @@ export default function Sugestoes() {
       </div>
 
       <h2><span className="idx">033</span> Lista de conferência</h2>
-      <p className="mudo" style={{ marginBottom: 16 }}>
+      <p className="nota">
         Isto não é cobrança, é uma lista do que está estranho na base. Cada ponto diz por que importa e o que fazer, e
         abre a relação nominal para conferir caso a caso no CRM ou na planilha. Nada aqui é apagado ou corrigido pelo
         painel: quem decide é quem conhece a negociação.
@@ -73,7 +73,7 @@ export default function Sugestoes() {
               <div className="card-top">
                 <div>
                   <h3 style={{ margin: 0, fontSize: 17 }}>{s.titulo}</h3>
-                  <p className="mudo" style={{ margin: "6px 0 0", maxWidth: 680 }}>{s.detalhe}</p>
+                  <p className="nota">{s.detalhe}</p>
                 </div>
                 <span className={"selo " + (CLASSE[s.severidade] ?? "")}>
                   {SEVERIDADE[s.severidade] ?? s.severidade}
@@ -121,7 +121,7 @@ export default function Sugestoes() {
                         </table>
                       </div>
                       {casos.length >= 200 && (
-                        <p className="mudo" style={{ marginTop: 10 }}>
+                        <p className="rodape">
                           Mostrando os 200 primeiros. Resolva estes e a lista se refaz sozinha na próxima atualização.
                         </p>
                       )}

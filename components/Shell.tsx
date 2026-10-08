@@ -3,17 +3,19 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
+import Insights from "@/components/Insights";
+import Indice from "@/components/Indice";
 
 // Cinco áreas, no caminho que a pergunta faz: como estamos hoje, como vai a
 // campanha, quem está vendendo, de onde vem o lead, e o que é ajuste de
 // sistema. Antes eram nove abas, o que obrigava a lembrar em qual delas estava
 // cada número.
-const MENU: { href: string; nome: string; soAdmin?: boolean }[] = [
-  { href: "/", nome: "Hoje" },
-  { href: "/campanha/", nome: "Campanha" },
-  { href: "/comercial/", nome: "Comercial" },
-  { href: "/marketing/", nome: "Marketing" },
-  { href: "/ajustes/", nome: "Ajustes", soAdmin: true },
+const MENU: { href: string; nome: string; oque: string; soAdmin?: boolean }[] = [
+  { href: "/", nome: "Hoje", oque: "O dia de hoje e o cartão de cada campanha no ar" },
+  { href: "/campanha/", nome: "Campanha", oque: "Uma campanha por dentro: fases, funil, origem, histórico e upsell" },
+  { href: "/comercial/", nome: "Comercial", oque: "Quem vende, o que foi vendido e o que está parado na mão de quem" },
+  { href: "/marketing/", nome: "Marketing", oque: "De onde vem o lead e se ele chegou inteiro no comercial" },
+  { href: "/ajustes/", nome: "Ajustes", oque: "Cadastro, integrações e saúde dos dados", soAdmin: true },
 ];
 
 type Estado = "carregando" | "sem_sessao" | "nao_autorizado" | "ok";
@@ -116,11 +118,16 @@ export default function Shell({ children }: { children: (ctx: { admin: boolean; 
         </button>
         <nav className={"nav" + (menu ? " aberto" : "")}>
           {MENU.filter((m) => admin || !m.soAdmin).map((m) => (
-            <a key={m.href} href={m.href} className={ativo(m.href) ? "ativo" : ""}>{m.nome}</a>
+            <a key={m.href} href={m.href} className={ativo(m.href) ? "ativo" : ""} title={m.oque}>
+              {m.nome}
+              <small>{m.oque}</small>
+            </a>
           ))}
         </nav>
+        <Insights />
         <button className="sair" onClick={sair}>Sair</button>
       </div></header>
+      <Indice />
       <main>{children({ admin, session: session! })}</main>
     </>
   );

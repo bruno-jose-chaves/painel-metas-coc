@@ -70,9 +70,9 @@ export default function Passagem({ admin }: { admin: boolean }) {
 
   return (
     <>
-      <div className="rotulo">034 · Passagem</div>
+      <div className="rotulo">Passagem</div>
       <h1>Do marketing para o comercial</h1>
-      <p className="mudo num" style={{ marginTop: -8, marginBottom: 16 }}>
+      <p className="carimbo num">
         Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
       </p>
 
@@ -97,7 +97,7 @@ export default function Passagem({ admin }: { admin: boolean }) {
       </div>
 
       <h2><span className="idx">035</span> Formulário por formulário</h2>
-      <p className="mudo" style={{ marginBottom: 16 }}>
+      <p className="nota">
         Ter formulário não faz o lead chegar no comercial: é preciso um fluxo no RD Marketing criando a negociação, e o
         nome desse fluxo é o que o comercial vê como campanha. Quando alguém publica um formulário e esquece o fluxo, a
         captação aparece no marketing e ninguém recebe o lead. Aqui a conta é direta: quanto o formulário converteu
@@ -161,7 +161,7 @@ export default function Passagem({ admin }: { admin: boolean }) {
       {aviso && <div className="aviso ok" style={{ marginTop: 12 }}>{aviso}</div>}
 
       <h2><span className="idx">036</span> Captação e entrada no CRM, dia a dia</h2>
-      <p className="mudo" style={{ marginBottom: 16 }}>
+      <p className="nota">
         Esta leitura não depende de fluxo apontado nenhum: é tudo que o marketing captou contra tudo que entrou como
         negociação. As duas linhas não precisam se encostar, porque nem toda conversão vira negociação e quem já está no
         CRM não entra de novo. O que importa é a distância entre elas mudar de repente, que é o sinal de fluxo quebrado.

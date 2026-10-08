@@ -29,7 +29,7 @@ function Escolha({
   return (
     <div className="bloco" style={{ marginBottom: 0 }}>
       <div className="rotulo">{titulo}</div>
-      <p className="mudo" style={{ margin: "6px 0 14px" }}>{explicacao}</p>
+      <p className="nota">{explicacao}</p>
       <div style={{ display: "grid", gap: 14, maxHeight: 360, overflowY: "auto" }}>
         {anos.map((ano) => (
           <div key={ano}>
@@ -81,19 +81,23 @@ export default function Upsell() {
 
   const atual = res?.find((r) => r.recorte === "atual");
   const anterior = res?.find((r) => r.recorte === "ano anterior");
-  const variacao = atual?.taxa != null && anterior?.taxa != null && Number(anterior.taxa) > 0
-    ? Number(atual.taxa) / Number(anterior.taxa) - 1
+  // Diferença em pontos percentuais, não em porcentagem da porcentagem. De
+  // 13,6% para 9,0% a leitura certa é "caiu 4,6 pontos", e não "caiu 33,7%",
+  // que é verdade aritmética e mentira prática: ninguém lê taxa de upsell
+  // assim, e o número grande assusta à toa.
+  const pontos = atual?.taxa != null && anterior?.taxa != null
+    ? Number(atual.taxa) - Number(anterior.taxa)
     : null;
 
   return (
     <>
-      <div className="rotulo">037 · Upsell</div>
+      <div className="rotulo">Upsell</div>
       <h1>Quem comprou um, comprou o outro?</h1>
-      <p className="mudo num" style={{ marginTop: -8, marginBottom: 16 }}>
+      <p className="carimbo num">
         Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
       </p>
 
-      <p className="mudo" style={{ marginBottom: 18, maxWidth: 760 }}>
+      <p className="nota">
         Escolha de um lado a base de comparação, que é o grupo de alunos que você quer olhar, e do outro o curso que
         quer saber se eles compraram também. Pode marcar mais de uma turma em cada lado. O painel cruza por e-mail,
         telefone e nome, e traz junto o mesmo recorte do ano anterior, com as turmas equivalentes, para você ver se
@@ -120,7 +124,7 @@ export default function Upsell() {
       )}
 
       {base.length === 0 || alvo.length === 0 ? (
-        <p className="mudo" style={{ marginTop: 24 }}>
+        <p className="rodape">
           Marque pelo menos uma turma de cada lado para ver o resultado.
         </p>
       ) : buscando || !atual ? (
@@ -142,9 +146,11 @@ export default function Upsell() {
             <div>
               <div className="rotulo">Taxa de upsell</div>
               <div className="valor num">{pct(atual.taxa)}</div>
-              {variacao != null && (
-                <div className={"mudo " + (variacao >= 0 ? "ok" : "alerta")}>
-                  {(variacao > 0 ? "+" : "") + pct(variacao)} contra o ano anterior
+              {pontos != null && (
+                <div className={"mudo num " + (pontos >= 0 ? "ok" : "alerta")}>
+                  {(pontos > 0 ? "+" : "") + pct(pontos)
+                    .replace("%", " ponto" + (Math.abs(pontos * 100) === 1 ? "" : "s"))}
+                  {" contra "}{pct(anterior!.taxa)}{" no ano anterior"}
                 </div>
               )}
             </div>
@@ -188,7 +194,7 @@ export default function Upsell() {
               </tbody>
             </table>
           </div>
-          <p className="mudo" style={{ marginTop: 14 }}>
+          <p className="rodape">
             A turma equivalente do ano anterior é a mesma do mesmo produto e semestre, um ano atrás. Se a turma
             anterior ainda estava vendendo quando o recorte foi feito, o número dela ainda vai crescer, então a
             comparação fica conservadora. O cruzamento é por pessoa, não por matrícula: quem comprou o destino duas

@@ -28,11 +28,11 @@ function Tela({ admin }: { admin: boolean }) {
   }, []);
 
   const abas: Aba[] = [
-    { id: "captacao", nome: "Captação" },
-    { id: "anuncios", nome: "Anúncios" },
-    { id: "passagem", nome: "Passagem para o CRM", marcador: passagem },
-    { id: "paginas", nome: "Páginas a classificar", marcador: paginas },
-    { id: "etiquetas", nome: "Etiquetas a classificar", marcador: etiquetas },
+    { id: "captacao", nome: "Captação", oque: "Quantos leads entraram por dia e por página, contra a meta de captação da campanha." },
+    { id: "anuncios", nome: "Anúncios", oque: "Quem chegou por peça de clique para WhatsApp, e quantas conversas cada peça precisa para sair uma matrícula." },
+    { id: "passagem", nome: "Passagem para o CRM", marcador: passagem, oque: "Se o lead que o formulário captou virou mesmo negociação no comercial. Formulário sem fluxo capta e ninguém recebe." },
+    { id: "paginas", nome: "Páginas a classificar", marcador: paginas, oque: "Páginas que estão captando e ainda não foram ligadas a um curso. Sem isso o lead não entra na conta de nenhuma campanha." },
+    { id: "etiquetas", nome: "Etiquetas a classificar", marcador: etiquetas, oque: "Etiquetas que chegam do RD e ainda não têm curso de destino apontado." },
   ];
   const { aba, escolher } = useAba(abas);
 

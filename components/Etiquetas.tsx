@@ -50,9 +50,9 @@ export default function Etiquetas({ admin }: { admin: boolean }) {
 
   return (
     <>
-      <div className="rotulo">029 · Etiquetas</div>
+      <div className="rotulo">Etiquetas</div>
       <h1>Etiqueta para curso</h1>
-      <p className="mudo num" style={{ marginTop: -8, marginBottom: 16 }}>
+      <p className="carimbo num">
         Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
       </p>
 
@@ -72,7 +72,7 @@ export default function Etiquetas({ admin }: { admin: boolean }) {
       </div>
 
       <h2><span className="idx">030</span> Esperando a sua decisão</h2>
-      <p className="mudo" style={{ marginBottom: 12 }}>
+      <p className="nota">
         A etiqueta é o sinal mais barato que existe na base: vem preenchida em quase toda conversão e é o próprio
         marketing que escreve. Falta dizer a qual curso cada uma pertence. As que já traziam o nome do curso foram
         apontadas sozinhas; sobram as que só você sabe. Enquanto uma etiqueta não tem curso, o lead que só tem ela
@@ -148,7 +148,7 @@ export default function Etiquetas({ admin }: { admin: boolean }) {
           </table>
         </div>
       )}
-      <p className="mudo" style={{ marginTop: 14 }}>
+      <p className="rodape">
         A etiqueta é o segundo degrau da classificação de curso, depois da campanha do CRM e antes do anúncio e da
         primeira frase da pessoa no WhatsApp. Apontar uma etiqueta aqui vale para trás também: na próxima rodada da
         classificação, que roda a cada quinze minutos, os leads antigos que só tinham ela passam a ter curso.

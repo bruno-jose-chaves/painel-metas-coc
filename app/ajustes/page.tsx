@@ -6,8 +6,8 @@ import Configuracao from "@/components/telas/Configuracao";
 
 // O que é ajuste de sistema sai do caminho de quem só quer ver número.
 const ABAS: Aba[] = [
-  { id: "campanhas", nome: "Campanhas e metas" },
-  { id: "sistema", nome: "Acesso e integrações" },
+  { id: "campanhas", nome: "Campanhas e metas", oque: "Cadastro de campanha, fases, metas de venda e de captação, produtos e turmas por ano." },
+  { id: "sistema", nome: "Acesso e integrações", oque: "Quem entra no painel, estado das integrações, última sincronização e saúde dos dados." },
 ];
 
 function Tela({ admin }: { admin: boolean }) {

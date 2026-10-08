@@ -51,9 +51,9 @@ export default function Leads() {
 
   return (
     <>
-      <div className="rotulo">015 · Leads</div>
+      <div className="rotulo">Leads</div>
       <h1>De onde vem o lead</h1>
-      <p className="mudo num" style={{ marginTop: -8, marginBottom: 16 }}>
+      <p className="carimbo num">
         Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
       </p>
 
@@ -88,7 +88,7 @@ export default function Leads() {
       </div>
 
       {campanha && (
-        <p className="mudo" style={{ marginTop: -4, marginBottom: 16 }}>
+        <p className="nota">
           Filtrado por {campanhas.find((c) => c.id === campanha)?.nome}. Só entram as páginas e formulários
           ligados a esse curso, pela regra automática ou pelo que foi apontado em Pendências.
           O bloco do Agente de Pré-vendas não separa por curso e continua mostrando o total.
@@ -157,7 +157,7 @@ export default function Leads() {
               </tbody>
             </table>
           </div>
-          <p className="mudo" style={{ marginTop: 10 }}>
+          <p className="rodape">
             Cada conversão traz as tags que a pessoa tinha naquele momento. É daqui que sai, na próxima versão, o de para de tag para curso de destino.
           </p>
         </>
@@ -184,7 +184,7 @@ export default function Leads() {
         </div>
       )}
 
-      <p className="mudo" style={{ marginTop: 24 }}>
+      <p className="rodape">
         O RD só conta visita nas páginas hospedadas por ele. Quando a página é feita em HTML no site de vocês e usa um formulário embutido do RD, a conversão é registrada mas a visita acontece fora do alcance dele. Por isso o formulário embutido aparece sem visita e sem taxa.
       </p>
       <p className="mudo">

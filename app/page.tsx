@@ -7,8 +7,8 @@ import Gestao from "@/components/telas/Gestao";
 // A primeira tela responde "como estamos hoje". O resumo é o que todo mundo vê;
 // a operação do dia, com lead novo, requentado e conversa, é leitura de diretoria.
 const ABAS: Aba[] = [
-  { id: "resumo", nome: "Resumo" },
-  { id: "operacao", nome: "Operação do dia" },
+  { id: "resumo", nome: "Resumo", oque: "Matrículas, faturamento e leads do período, e o cartão de cada campanha no ar com meta, ritmo e projeção." },
+  { id: "operacao", nome: "Operação do dia", oque: "Lead novo, lead requentado e conversa do dia, pessoa por pessoa. Leitura de diretoria." },
 ];
 
 function Tela({ admin }: { admin: boolean }) {

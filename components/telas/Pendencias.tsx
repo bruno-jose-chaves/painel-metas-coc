@@ -57,9 +57,9 @@ export default function Pendencias({ admin }: { admin: boolean }) {
 
   return (
     <>
-      <div className="rotulo">020 · Pendências</div>
+      <div className="rotulo">Pendências</div>
       <h1>O que falta classificar</h1>
-      <p className="mudo num" style={{ marginTop: -8, marginBottom: 16 }}>
+      <p className="carimbo num">
         Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
       </p>
 
@@ -80,7 +80,7 @@ export default function Pendencias({ admin }: { admin: boolean }) {
       </div>
 
       <h2><span className="idx">021</span> Esperando a sua decisão</h2>
-      <p className="mudo" style={{ marginBottom: 12 }}>
+      <p className="nota">
         Campanhas do CRM e formulários que o painel não conseguiu ligar a um curso. Enquanto não forem apontados,
         esses leads ficam fora dos filtros por curso. O maior volume vem primeiro, então resolver os primeiros já
         fecha a maior parte do buraco. A lista olha de 01/08/2026 em diante: o que aparece com nome de 2025 é peça

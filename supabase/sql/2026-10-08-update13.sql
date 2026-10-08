@@ -1,0 +1,46 @@
+-- Update 13 — Vale olhar hoje, e acerto da leitura de upsell
+-- Aplicado direto no banco em 08/10/2026. Este arquivo é o registro.
+
+-- 1. painel_insights() — o que está na estrela do canto superior direito.
+--    SECURITY DEFINER com guarda is_autorizado(), sem grant para anon.
+--    Nove geradores, todos com data de validade: o item só existe enquanto o
+--    fato existe, e some sozinho quando alguém resolve. Isso é o que separa
+--    lembrete útil de mural que ninguém lê mais.
+--
+--    resposta_pendente   última mensagem da conversa é do cliente há mais de
+--                        6 horas. Traz o nome, há quanto tempo, quantas
+--                        mensagens dele, e o dono do lead no CRM.
+--    lead_voltou         cliente mandou mensagem depois de 14 dias ou mais
+--                        calado. Quem reabre conversa está decidindo.
+--    fase_virando        o preço de uma campanha ativa muda em até 3 dias.
+--    campanha_atras      campanha abaixo da projeção, traduzida em quantos
+--                        alunos por dia útil faltam contra o que vem fazendo.
+--    upsell_aberto       alunos de Semi e Extensivo do ano que ainda não
+--                        compraram o intensivo que está vendendo agora, com
+--                        quanto isso vale ao ticket da turma.
+--    anuncio_sem_retorno peça com 25+ conversas e nenhuma matrícula em 30 dias.
+--    passagem_fraca      formulário captando com quase nada chegando no CRM.
+--    dado_faltando       dia dos últimos 14 sem conversão importada do RD.
+--    engajado_parado     4+ mensagens do cliente e a negociação parada na mesma
+--                        etapa há mais de 7 dias.
+--
+--    Identidade: o evento de conversa do Pigeon não traz contato_id, traz
+--    telefone; a negociação do RD não traz telefone nem nome, traz contato_id.
+--    O elo é telefone -> rd_contatos -> rd_negociacoes.
+--
+--    dono_do_lead(usuario_id, nome) — nem todo responsável no RD é do
+--    comercial. Conta de integração e de diretoria também carregam negociação,
+--    e mostrar esse nome manda cobrar a pessoa errada. Quem não é comercial
+--    aparece como "sem dono no comercial" ou "Agente de Pré-vendas".
+--
+--    Helpers de texto: ha_quanto(), plural(), virgula(), conta_msgs().
+
+-- 2. Correção na leitura do upsell
+--    O bloco de resultado comparava a taxa de hoje com a do ano anterior em
+--    porcentagem da porcentagem: de 13,6% para 9,0% dava "-33,7%". É verdade
+--    aritmética e mentira prática. Passou a mostrar a diferença em pontos
+--    percentuais e a taxa do ano anterior ao lado: "-4,6 pontos contra 13,6%
+--    no ano anterior".
+
+-- 3. Cron
+--    pigeon-mensagens passou de */2 para */30 agora que a fila está vazia.

@@ -103,7 +103,7 @@ export default function Cadastro({ admin }: { admin: boolean }) {
 
   return (
     <>
-      <div className="rotulo">001 · Campanhas</div>
+      <div className="rotulo">Campanhas</div>
       <h1>Cadastro de campanhas</h1>
 
       <div className="filtros">
@@ -227,7 +227,7 @@ export default function Cadastro({ admin }: { admin: boolean }) {
       </button>
 
       <h2><span className="idx">006</span> Turmas por ano</h2>
-      <p className="mudo" style={{ marginBottom: 16 }}>
+      <p className="nota">
         Turma é o produto de um ano específico: "Semi Extensivo" é produto, "Semi Extensivo 2026/2" é turma. É o que
         permite comparar maçã com maçã entre anos e escolher o recorte certo na análise de upsell. A janela de venda
         define a qual turma cada matrícula pertence, e foi tirada do comportamento real da base. Se alguma janela

@@ -116,7 +116,7 @@ const origemMat = [
   { origem: "[ACAFE 26/2] LIVE", negocios: 430, matriculas: 23, matriculas_unicas: 9, conversao: 0.0535, faturamento: 14682.7, ticket_medio: 638.38, dias_medio: 15.2 },
 ];
 
-const rotas = {
+const rotas0 = {
   "rpc/painel_funil": funil,
   "rpc/painel_turmas": [
     { id: "metodo-acafe-2026-2", produto_id: "metodo-acafe", produto: "Método de Aprovação ACAFE", ano: 2026, semestre: 2, nome: "Método ACAFE 2026/2", venda_de: "2026-07-01", venda_ate: "2026-12-31", alunos: 201, faturamento: 127923.76 },
@@ -210,6 +210,16 @@ const rotas = {
   metas: [{ nivel: 2, alunos: 263, faturamento: 185673 }],
   fases: fases,
   "rpc/painel_origem_matriculas": origemMat,
+  "rpc/painel_insights": [
+    { chave: "resposta:1", tipo: "resposta_pendente", publico: "comercial", prioridade: 1,
+      titulo: "Ingrid Prigol falou e ficou sem resposta",
+      detalhe: "A última mensagem da conversa é do cliente, há 31h.",
+      numero: "há 31h", pessoa: "João Pedro Beraldo", link: "/comercial/?v=gestao" },
+    { chave: "ritmo:acafe", tipo: "campanha_atras", publico: "diretoria", prioridade: 2,
+      titulo: "Método ACAFE 2º/2026 está atrás do ritmo",
+      detalhe: "Faltam 60 alunos para a meta e 18 dias de campanha.",
+      numero: "60 alunos", pessoa: null, link: "/campanha/" },
+  ],
   "rpc/painel_ritmo": ritmo,
   "rpc/painel_curva": curva,
   "rpc/painel_projecao": projecao,
@@ -239,8 +249,8 @@ const ctx = await b.newContext({ viewport: { width: 1280, height: 1000 } });
 await ctx.route(`**/${REF}.supabase.co/**`, (route) => {
   const url = new URL(route.request().url());
   const alvo = url.pathname.replace("/rest/v1/", "");
-  const chave = Object.keys(rotas).find((k) => alvo === k);
-  const corpo = chave ? rotas[chave] : [];
+  const chave = Object.keys(rotas0).find((k) => alvo === k);
+  const corpo = chave ? rotas0[chave] : [];
   route.fulfill({
     status: 200,
     contentType: "application/json",
@@ -301,6 +311,40 @@ for (const [rota, esperado] of telas) {
     erros.length ? "| ERRO: " + erros.join(" ~ ").slice(0, 300) : ""
   );
   await pg.screenshot({ path: `/tmp/claude-0/tela${rota.replace(/\//g, "_")}.png`, fullPage: true });
+}
+
+
+// Retratos para olho humano: notebook, que é onde a maioria usa, e telefone.
+// A conferência acima diz que renderizou; estas dizem se dá para ler.
+const retratos = [
+  ["notebook", 1280, 800, ["/", "/campanha/", "/comercial/", "/marketing/?v=passagem", "/campanha/?v=upsell"]],
+  ["telefone", 390, 844, ["/", "/campanha/", "/comercial/"]],
+];
+for (const [nome, width, height, rotas] of retratos) {
+  const c2 = await b.newContext({ viewport: { width, height } });
+  await c2.route(`**/${REF}.supabase.co/**`, (route) => {
+    const alvo = new URL(route.request().url()).pathname.replace("/rest/v1/", "");
+    const chave = Object.keys(rotas0).find((k) => alvo === k);
+    route.fulfill({ status: 200, contentType: "application/json",
+      headers: { "content-range": "0-1/2", "access-control-allow-origin": "*" },
+      body: JSON.stringify(chave ? rotas0[chave] : []) });
+  });
+  await c2.addInitScript(([ref, s]) => localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(s)), [REF, sessao]);
+  const p2 = await c2.newPage();
+  for (const r of rotas) {
+    await p2.goto("http://127.0.0.1:4599" + r, { waitUntil: "networkidle" });
+    await p2.waitForTimeout(600);
+    await p2.screenshot({ path: `/tmp/claude-0/${nome}${r.replace(/[/?=]/g, "_")}.png` });
+    await p2.evaluate(() => window.scrollTo(0, 700));
+    await p2.waitForTimeout(400);
+    await p2.screenshot({ path: `/tmp/claude-0/${nome}${r.replace(/[/?=]/g, "_")}-rolado.png` });
+  }
+  // A gaveta de insights, aberta.
+  await p2.goto("http://127.0.0.1:4599/", { waitUntil: "networkidle" });
+  await p2.click(".estrela");
+  await p2.waitForTimeout(400);
+  await p2.screenshot({ path: `/tmp/claude-0/${nome}-insights.png` });
+  await c2.close();
 }
 
 await b.close();

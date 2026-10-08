@@ -51,9 +51,9 @@ export default function Anuncios() {
 
   return (
     <>
-      <div className="rotulo">027 · Anúncios</div>
+      <div className="rotulo">Anúncios</div>
       <h1>Quem chega pelo anúncio</h1>
-      <p className="mudo num" style={{ marginTop: -8, marginBottom: 16 }}>
+      <p className="carimbo num">
         Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
       </p>
 
@@ -87,7 +87,7 @@ export default function Anuncios() {
       </div>
 
       <h2><span className="idx">028</span> Peça por peça</h2>
-      <p className="mudo" style={{ marginBottom: 16 }}>
+      <p className="nota">
         O lead de anúncio de clique para WhatsApp não passa por formulário, então o RD não o vê. Quem registra é o
         Pigeon, que guarda a peça que originou a conversa. A matrícula é ligada por telefone e só conta quando aconteceu
         depois da conversa e dentro da janela de atribuição do curso vendido: 45 dias no intensivo, 60 no Semi e no
@@ -142,7 +142,7 @@ export default function Anuncios() {
           </table>
         </div>
       )}
-      <p className="mudo" style={{ marginTop: 14 }}>
+      <p className="rodape">
         Pessoas por matrícula não é custo: para custo falta a verba de cada peça, que o painel não recebe. O que esta
         coluna diz é quantas conversas a peça precisa gerar para sair uma matrícula, o que já separa peça que traz
         volume de peça que traz aluno.

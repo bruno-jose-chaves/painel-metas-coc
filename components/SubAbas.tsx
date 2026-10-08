@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 
-export type Aba = { id: string; nome: string; marcador?: number | null };
+export type Aba = { id: string; nome: string; oque?: string; marcador?: number | null };
 
 // Subnavegação de uma área. Guarda a escolha no endereço, então recarregar a
 // página ou mandar o link para alguém cai na mesma visão.
@@ -34,14 +34,28 @@ export default function SubAbas({
   aba: string;
   aoEscolher: (id: string) => void;
 }) {
+  // A linha embaixo das abas não é enfeite: "Passagem", "Captação" e
+  // "Pendências" são nomes curtos que só fazem sentido para quem construiu a
+  // tela. Dizer em uma frase o que tem dentro evita a pessoa abrir aba por aba
+  // procurando o número que ela quer.
+  const descricao = abas.find((a) => a.id === aba)?.oque;
+
   return (
-    <nav className="subnav">
-      {abas.map((a) => (
-        <button key={a.id} className={aba === a.id ? "ativo" : ""} onClick={() => aoEscolher(a.id)}>
-          {a.nome}
-          {a.marcador != null && a.marcador > 0 && <span className="marcador">{a.marcador}</span>}
-        </button>
-      ))}
-    </nav>
+    <div className="subnav-caixa">
+      <nav className="subnav">
+        {abas.map((a) => (
+          <button
+            key={a.id}
+            className={aba === a.id ? "ativo" : ""}
+            onClick={() => aoEscolher(a.id)}
+            title={a.oque}
+          >
+            {a.nome}
+            {a.marcador != null && a.marcador > 0 && <span className="marcador">{a.marcador}</span>}
+          </button>
+        ))}
+      </nav>
+      {descricao && <p className="subnav-oque">{descricao}</p>}
+    </div>
   );
 }
