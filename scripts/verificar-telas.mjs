@@ -118,6 +118,15 @@ const origemMat = [
 
 const rotas = {
   "rpc/painel_funil": funil,
+  "rpc/painel_passagem_crm": [
+    { identificador: "live-acafe-21-a-23-do-09", conversoes: 1031, campanhas: ["[ACAFE 26/2] LIVE"], pessoas_crm: 707, taxa: 0.6857, situacao: "atencao", primeira: "2026-08-06", ultima: "2026-10-06", diagnostico: "Parte dos inscritos não virou negociação.", sugestao: null },
+    { identificador: "reservas-metodo-acafe-26-2", conversoes: 513, campanhas: [], pessoas_crm: 0, taxa: null, situacao: "sem_fluxo", primeira: "2026-08-25", ultima: "2026-10-07", diagnostico: "Nenhum fluxo apontado para este formulário.", sugestao: "RESERVA MÉTODO ACAFE 2026/2" },
+  ],
+  "rpc/painel_passagem_dia": [
+    { dia: "2026-10-05", conversoes: 96, negocios: 61, razao: 0.635 },
+    { dia: "2026-10-06", conversoes: 86, negocios: 55, razao: 0.64 },
+    { dia: "2026-10-07", conversoes: 113, negocios: 63, razao: 0.558 },
+  ],
   "rpc/painel_cobertura_marketing": [
     { de: "2025-05-21", ate: "2026-10-08", dias_cobertos: 506, dias_faltando: 0, buraco_de: null, buraco_ate: null },
   ],
@@ -255,6 +264,7 @@ const telas = [
   ["/marketing/?v=paginas", "O que falta classificar"],
   ["/marketing/?v=etiquetas", "Etiqueta para curso"],
   ["/marketing/?v=anuncios", "Quem chega pelo anúncio"],
+  ["/marketing/?v=passagem", "Do marketing para o comercial"],
   ["/?v=operacao", "Quem chegou no período"],
   ["/", "Metas de captação"],
   ["/campanha/", "Da origem à matrícula"],

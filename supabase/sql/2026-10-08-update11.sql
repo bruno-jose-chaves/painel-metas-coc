@@ -1,0 +1,35 @@
+-- Update 11. Aplicado direto no banco em 08/10/2026.
+
+-- VALIDAÇÃO DE PASSAGEM DO MARKETING PARA O CRM
+-- Ter formulário não faz o lead chegar no comercial: é preciso um fluxo no RD
+-- Marketing criando a negociação, e o nome desse fluxo é o que o comercial vê
+-- como campanha. Formulário publicado sem fluxo capta no marketing e ninguém
+-- recebe. Antes isso só aparecia quando alguém estranhava o silêncio.
+--
+--   painel_passagem_crm(p_desde, p_ate)
+--     Por formulário: conversões no marketing contra pessoas que entraram no
+--     CRM pela campanha ligada a ele. Situação: ok, atencao, alerta ou
+--     sem_fluxo. Quem não tem fluxo apontado ganha uma sugestão por semelhança
+--     de nome, que é atalho e não decisão.
+--
+--   painel_passagem_dia(p_de, p_ate)
+--     Leitura global que não depende de regra: captação do marketing contra
+--     negociações criadas, dia a dia. A distância entre as linhas mudando de
+--     repente é o sinal de fluxo quebrado.
+--
+--   passagem_fraca(p_de, p_ate, p_minimo, p_corte)
+--     Quantos formulários estão passando abaixo do corte. Alimenta o aviso do
+--     resumo diário. Soma as pessoas de TODAS as campanhas ligadas ao
+--     formulário: olhar campanha a campanha dava alarme falso, porque o fluxo
+--     do RD renomeia a campanha e os nomes antigos ficam com zero.
+
+-- RESUMO DIÁRIO COM AVISO DE SAÚDE DO DADO
+-- Bloco "Atenção no dado", antes dos números, com duas verificações:
+--   dias dos últimos 14 ainda sem conversão importada do RD
+--   formulários captando com quase ninguém chegando no CRM
+-- O bloco só aparece quando há algo a dizer.
+
+-- ESTADO ATUAL DA PASSAGEM, EM 60 DIAS
+--   live-acafe-21-a-23-do-09   1.031 conversões, 707 pessoas, 69%
+--   portal-das-lives-ufsc        469 conversões, 313 pessoas, 67%
+--   os demais formulários ainda sem fluxo apontado, então sem como conferir
