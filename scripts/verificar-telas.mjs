@@ -118,6 +118,9 @@ const origemMat = [
 
 const rotas = {
   "rpc/painel_funil": funil,
+  "rpc/painel_cobertura_marketing": [
+    { de: "2025-05-21", ate: "2026-10-08", dias_cobertos: 506, dias_faltando: 0, buraco_de: null, buraco_ate: null },
+  ],
   "rpc/painel_sugestoes": [
     { tipo: "parado_30d", titulo: "Negócios abertos parados há mais de 30 dias", detalhe: "O funil não fecha", quantos: 9200, severidade: "alta", o_que_fazer: "Abrir cada um no CRM e decidir" },
     { tipo: "venda_sem_vendedor", titulo: "Matrículas na planilha sem vendedor", detalhe: "Ficam fora do ranking", quantos: 54, severidade: "alta", o_que_fazer: "Preencher a coluna de vendedor" },
@@ -177,9 +180,9 @@ const rotas = {
   ],
   "rpc/painel_resumo_periodo": [{ alunos: 52, faturamento: 35034.8, ticket_medio: 673.75, leads: 1003, cancelados: 0, dias: 7, melhor_dia: "2026-09-30", melhor_dia_alunos: 20 }],
   "rpc/painel_metas_leads": [
-    { indicador: "leads", rotulo: "Leads captados", meta: 3400, realizado: 1907, atingido: 0.5609, esperado_hoje: 2105, situacao: "atencao", identificadores: ["live-acafe-21-a-23-do-09"], por_crm: 680, por_formulario: 453, tem_regra: true },
-    { indicador: "inscritos_lives", rotulo: "Inscritos nas lives", meta: 1050, realizado: 571, atingido: 0.5438, esperado_hoje: 650, situacao: "atencao", identificadores: ["live-acafe-21-a-23-do-09"], por_crm: 680, por_formulario: 453, tem_regra: true },
-    { indicador: "reservas", rotulo: "Reservas", meta: 300, realizado: 280, atingido: 0.9333, esperado_hoje: 186, situacao: "no_ritmo" },
+    { indicador: "leads", rotulo: "Leads captados", meta: 3400, realizado: 1907, atingido: 0.5609, esperado_hoje: 2105, situacao: "atencao", identificadores: ["live-acafe-21-a-23-do-09"], por_crm: 680, por_formulario: 453, tem_regra: true, desde: "2026-08-07" },
+    { indicador: "inscritos_lives", rotulo: "Inscritos nas lives", meta: 1050, realizado: 571, atingido: 0.5438, esperado_hoje: 650, situacao: "atencao", identificadores: ["live-acafe-21-a-23-do-09"], por_crm: 680, por_formulario: 453, tem_regra: true, desde: "2026-08-07" },
+    { indicador: "reservas", rotulo: "Reservas", meta: 300, realizado: 280, atingido: 0.9333, esperado_hoje: 186, situacao: "no_ritmo", desde: "2026-08-25" },
   ],
   "rpc/painel_tags": [{ tag: "ufsc-simulado", leads: 112, conversoes: 140 }, { tag: "acafe-live", leads: 83, conversoes: 95 }],
   "rpc/painel_higiene": [{ motivo: "Lead duplicado", descartadas: 98, fatia_do_total: 0.69 }],

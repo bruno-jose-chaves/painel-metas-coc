@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase, SUPABASE_URL } from "@/lib/supabase";
-import { dataHora, num } from "@/lib/formato";
+import { dataHora, dataCurta, num } from "@/lib/formato";
 
 type Status = { servico: string; app_configurado: boolean; conectado: boolean; expira_em: string | null; atualizado_em: string | null };
 type Sync = { id: number; fonte: string; terminado_em: string | null; lidas: number; importadas: number; rejeitadas: number; status: string };
@@ -10,6 +10,12 @@ type Pedido = { email: string; nome: string | null; mensagem: string | null; cri
 
 const NOMES: Record<string, string> = { rd_crm: "RD Station CRM", rd_marketing: "RD Station Marketing", planilha: "Planilha Coc Online - Comercial" };
 const ROTA: Record<string, string> = { rd_crm: "crm", rd_marketing: "marketing" };
+
+type Cobertura = {
+  de: string | null; ate: string | null;
+  dias_cobertos: number; dias_faltando: number;
+  buraco_de: string | null; buraco_ate: string | null;
+};
 
 function AppRD({ servico, status, recarregar }: { servico: "rd_crm" | "rd_marketing"; status?: Status; recarregar: () => void }) {
   const [cid, setCid] = useState("");
@@ -53,6 +59,7 @@ function AppRD({ servico, status, recarregar }: { servico: "rd_crm" | "rd_market
 
 export default function Configuracao({ admin }: { admin: boolean }) {
   const [status, setStatus] = useState<Status[]>([]);
+  const [cobertura, setCobertura] = useState<Cobertura | null>(null);
   const [syncs, setSyncs] = useState<Sync[]>([]);
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [novo, setNovo] = useState({ email: "", nome: "", papel: "leitor", senha: "" });
@@ -68,6 +75,8 @@ export default function Configuracao({ admin }: { admin: boolean }) {
 
   const carregar = () => {
     supabase.rpc("integracoes_status").then(({ data }) => setStatus((data as Status[]) ?? []));
+    supabase.rpc("painel_cobertura_marketing")
+      .then(({ data }) => setCobertura(((data as Cobertura[]) ?? [])[0] ?? null));
     supabase.from("sincronizacoes").select("*").order("id", { ascending: false }).limit(15).then(({ data }) => setSyncs((data as Sync[]) ?? []));
     supabase.from("usuarios_autorizados").select("email,nome,papel").order("email").then(({ data }) => setUsuarios((data as Usuario[]) ?? []));
     supabase.from("solicitacoes_acesso").select("email,nome,mensagem,criada_em,situacao")
@@ -267,6 +276,39 @@ export default function Configuracao({ admin }: { admin: boolean }) {
           </>
         )}
       </div>
+
+      <h2><span className="idx">007</span> Cobertura do RD Marketing</h2>
+      <p className="mudo" style={{ marginBottom: 14 }}>
+        As conversões do RD Marketing vêm dia a dia. Um dia que não foi buscado não aparece em lugar nenhum e faz todo
+        número de captação ficar menor do que é, sem avisar. Foi o que aconteceu entre 04/09 e 26/09: vinte e três dias
+        sumiram e a live do ACAFE mostrava 543 inscrições em vez de 1.031. Agora cada dia buscado fica registrado e o
+        que falta volta para a fila sozinho.
+      </p>
+      {!cobertura ? <p className="rotulo">Carregando</p> : (
+        <div className="faixa">
+          <div>
+            <div className="rotulo">Dias cobertos</div>
+            <div className="valor num">{num(cobertura.dias_cobertos)}</div>
+            <div className="mudo num">{dataCurta(cobertura.de)} a {dataCurta(cobertura.ate)}</div>
+          </div>
+          <div>
+            <div className="rotulo">Dias na fila</div>
+            <div className="valor num">{num(cobertura.dias_faltando)}</div>
+            <div className="mudo">
+              {Number(cobertura.dias_faltando) === 0
+                ? "nada faltando"
+                : "a importação busca 25 por volta, a cada cinco minutos"}
+            </div>
+          </div>
+          {Number(cobertura.dias_faltando) > 0 && (
+            <div>
+              <div className="rotulo">Mais recente faltando</div>
+              <div className="valor num">{dataCurta(cobertura.buraco_ate)}</div>
+              <div className="mudo">a fila começa pelo mais novo</div>
+            </div>
+          )}
+        </div>
+      )}
 
       <h2><span className="idx">003</span> Pedidos de acesso</h2>
       {!pedidos ? <p className="rotulo">Carregando</p> : pedidos.length === 0 ? (

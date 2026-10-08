@@ -136,16 +136,23 @@ async function sincronizarRecurso(tk: string, chave: string, caminho: string, gr
 }
 
 // ---------- Marketing: conversões por ativo por dia ----------
+// Cada dia buscado é registrado em rd_mkt_dias. O que não foi buscado continua
+// na fila até ser. A versão anterior andava com um ponteiro único e, quando o
+// tempo da função acabava no meio de um lote, o ponteiro pulava o lote inteiro:
+// foi assim que 04/09 a 26/09 de 2026 sumiu sem deixar rastro.
 async function sincronizarMarketing() {
   let tk = await token("rd_marketing");
   if (!tk) return;
-  const est = await estado("mkt_conversoes");
+
   const hoje = new Date(Date.now() - 3 * 3600_000); // horário de Brasília
   const iso = (d: Date) => d.toISOString().slice(0, 10);
-  const dias: string[] = [iso(hoje), iso(new Date(hoje.getTime() - 86400_000))];
-  let recuo = est.recuo_ate ? new Date(est.recuo_ate) : new Date(hoje.getTime() - 2 * 86400_000);
-  const limite = new Date("2025-01-01");
-  for (let i = 0; i < 25 && recuo >= limite; i++) { dias.push(iso(recuo)); recuo = new Date(recuo.getTime() - 86400_000); }
+
+  // Os dois últimos dias sempre, porque o RD ainda está fechando o número.
+  const recentes = [iso(hoje), iso(new Date(hoje.getTime() - 86400_000))];
+  const { data: pendentes } = await db.rpc("rd_mkt_fila", { p_quantos: 25 });
+  const fila = (pendentes ?? []).map((x: { dia: string }) => x.dia);
+  const dias = [...new Set([...recentes, ...fila])];
+
   let n = 0;
   for (const dia of dias) {
     if (!temTempo()) break;
@@ -157,7 +164,10 @@ async function sincronizarMarketing() {
       tk = novo;
       r = await fetch(`https://api.rd.services/platform/analytics/conversions?start_date=${dia}&end_date=${dia}`, { headers: { Authorization: `Bearer ${tk}` } });
     }
-    if (!r.ok) { log.push(`marketing ${dia}: ${r.status}`); break; }
+    // Erro em um dia não pode derrubar o resto da fila nem marcar o dia como
+    // buscado: ele volta na próxima volta.
+    if (!r.ok) { log.push(`marketing ${dia}: ${r.status}`); await dormir(500); continue; }
+
     const j = await r.json();
     const linhas = (j.conversions ?? []).filter((c: any) => c.conversion_count > 0 || Number(c.visits_count) > 0).map((c: any) => ({
       dia, asset_id: c.asset_id, identificador: c.asset_identifier, tipo: c.assets_type,
@@ -165,10 +175,21 @@ async function sincronizarMarketing() {
     }));
     await db.from("rd_conversoes_diarias").delete().eq("dia", dia);
     if (linhas.length) await db.from("rd_conversoes_diarias").insert(linhas);
+
+    // Só aqui o dia conta como buscado, depois de gravado.
+    await db.from("rd_mkt_dias").upsert({
+      dia,
+      buscado_em: new Date().toISOString(),
+      linhas: linhas.length,
+      conversoes: linhas.reduce((t: number, l: any) => t + Number(l.conversoes ?? 0), 0),
+    }, { onConflict: "dia" });
+
     n++;
     await dormir(300);
   }
-  await salvarEstado("mkt_conversoes", { recuo_ate: iso(recuo), ultima: new Date().toISOString() });
+
+  const { count: faltam } = await db.from("rd_mkt_dias").select("dia", { count: "exact", head: true });
+  await salvarEstado("mkt_conversoes", { ultima: new Date().toISOString(), dias_cobertos: faltam ?? 0 });
   log.push(`marketing: ${n} dias`);
 }
 

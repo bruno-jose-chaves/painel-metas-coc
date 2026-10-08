@@ -24,7 +24,7 @@ type Resumo7 = {
 type MetaLead = {
   indicador: string; rotulo: string; meta: number; realizado: number;
   atingido: number | null; esperado_hoje: number; situacao: string; identificadores: string[] | null;
-  por_crm: number; por_formulario: number; tem_regra: boolean;
+  por_crm: number; por_formulario: number; tem_regra: boolean; desde: string | null;
 };
 
 type Janela = { id: string; nome: string; dias?: number; semana?: boolean };
@@ -279,8 +279,13 @@ export default function Visao() {
                       </div>
                       {m.tem_regra && Number(m.por_crm) > 0 && Number(m.por_formulario) > 0 ? (
                         <div className="ids" style={{ marginTop: 4 }}>
-                          {num(m.por_crm)} pelo CRM, por pessoa · {num(m.por_formulario)} conversões no formulário ·
-                          vale o do CRM, porque os dois caminhos se cruzam
+                          {num(m.por_crm)} pessoas pelo CRM · {num(m.por_formulario)} conversões no formulário ·
+                          vale o do CRM, que conta gente, enquanto o formulário conta cada envio
+                        </div>
+                      ) : null}
+                      {m.desde ? (
+                        <div className="ids" style={{ marginTop: 4 }}>
+                          contando desde {dataCurta(m.desde)}, que é quando a captação começou
                         </div>
                       ) : null}
                       {m.identificadores?.length ? (
@@ -296,6 +301,10 @@ export default function Visao() {
           </div>
           <p className="mudo" style={{ marginTop: 16 }}>
             Abaixo de cada barra estão as páginas que entraram na conta, para o número poder ser conferido.
+            Leads captados e inscritos nas lives contam unidades diferentes de propósito: o CRM conta pessoa, o
+            formulário conta envio, e quem preenche duas vezes aparece duas vezes no segundo. Quando os dois existem,
+            vale o do CRM. A contagem começa no primeiro dia em que o formulário da campanha registrou inscrição, que
+            costuma ser antes de a campanha abrir.
             Só entra conversão cujo nome da página casa com o curso da campanha: antes disso as duas campanhas mostravam o mesmo número.
             Leads captados conta todas as conversões do período da campanha. Inscritos nas lives e reservas contam as
             conversões das páginas com esse nome. O traço vermelho é onde a meta espera que o número esteja hoje.
