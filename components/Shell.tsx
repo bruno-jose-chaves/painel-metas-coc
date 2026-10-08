@@ -10,6 +10,7 @@ const MENU = [
   { href: "/vendas/", nome: "Vendas" },
   { href: "/time/", nome: "Time comercial" },
   { href: "/leads/", nome: "Leads" },
+  { href: "/pendencias/", nome: "Pendências" },
   { href: "/campanhas/", nome: "Cadastro" },
   { href: "/configuracao/", nome: "Configuração" },
 ];

@@ -117,6 +117,17 @@ const origemMat = [
 
 const rotas = {
   "rpc/painel_funil": funil,
+  "rpc/painel_pendencias": [
+    { tipo: "campanha_crm", valor: "SEMI 26/2 Leads PréVest", volume: 236, matriculas: 9, primeira: "2026-08-01", ultima: "2026-10-06", sugestao: null },
+    { tipo: "formulario", valor: "inscricoes-prevest-26-2", volume: 254, matriculas: 0, primeira: "2026-08-26", ultima: "2026-09-30", sugestao: null },
+  ],
+  "rpc/painel_upsell_origem": [
+    { curso_origem: "Metodo de Aprovação Acafe/2", produto_origem: "metodo-acafe", pessoas: 64, faturamento: 39074, dias_medio: 92 },
+    { curso_origem: "Semiextensivo COC MED Matutino/2", produto_origem: "semi-extensivo", pessoas: 9, faturamento: 5322, dias_medio: 115 },
+  ],
+  "captacao_regras": [
+    { id: 1, campanha_id: "acafe-2026-2", indicador: "inscritos_lives", tipo: "campanha_crm", valor: "[ACAFE 26/2] LIVE" },
+  ],
   "rpc/painel_recompra": [
     { indicador: "rematricula", rotulo: "Rematrícula", pessoas: 92, base: 676, taxa: 0.4623, faturamento: 56158.52 },
     { indicador: "curso_longo", rotulo: "Também tem curso longo", pessoas: 23, base: 273, taxa: 0.1156, faturamento: 14155.42 },
@@ -125,8 +136,8 @@ const rotas = {
   ],
   "rpc/painel_resumo_periodo": [{ alunos: 52, faturamento: 35034.8, ticket_medio: 673.75, leads: 1003, cancelados: 0, dias: 7, melhor_dia: "2026-09-30", melhor_dia_alunos: 20 }],
   "rpc/painel_metas_leads": [
-    { indicador: "leads", rotulo: "Leads captados", meta: 3400, realizado: 1907, atingido: 0.5609, esperado_hoje: 2105, situacao: "atencao", identificadores: ["live-acafe-21-a-23-do-09"] },
-    { indicador: "inscritos_lives", rotulo: "Inscritos nas lives", meta: 1050, realizado: 571, atingido: 0.5438, esperado_hoje: 650, situacao: "atencao", identificadores: ["live-acafe-21-a-23-do-09"] },
+    { indicador: "leads", rotulo: "Leads captados", meta: 3400, realizado: 1907, atingido: 0.5609, esperado_hoje: 2105, situacao: "atencao", identificadores: ["live-acafe-21-a-23-do-09"], por_crm: 680, por_formulario: 453, tem_regra: true },
+    { indicador: "inscritos_lives", rotulo: "Inscritos nas lives", meta: 1050, realizado: 571, atingido: 0.5438, esperado_hoje: 650, situacao: "atencao", identificadores: ["live-acafe-21-a-23-do-09"], por_crm: 680, por_formulario: 453, tem_regra: true },
     { indicador: "reservas", rotulo: "Reservas", meta: 300, realizado: 280, atingido: 0.9333, esperado_hoje: 186, situacao: "no_ritmo" },
   ],
   "rpc/painel_tags": [{ tag: "ufsc-simulado", leads: 112, conversoes: 140 }, { tag: "acafe-live", leads: 83, conversoes: 95 }],
@@ -196,6 +207,7 @@ pg.on("pageerror", (e) => erros.push("pageerror: " + e.message));
 
 const telas = [
   ["/campanhas/", "Cadastro de campanhas"],
+  ["/pendencias/", "O que falta classificar"],
   ["/configuracao/", "Pedidos de acesso"],
   ["/", "Metas de captação"],
   ["/campanha/", "Da origem à matrícula"],

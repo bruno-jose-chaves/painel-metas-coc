@@ -25,6 +25,7 @@ type Resumo7 = {
 type MetaLead = {
   indicador: string; rotulo: string; meta: number; realizado: number;
   atingido: number | null; esperado_hoje: number; situacao: string; identificadores: string[] | null;
+  por_crm: number; por_formulario: number; tem_regra: boolean;
 };
 
 type Janela = { id: string; nome: string; dias?: number; semana?: boolean };
@@ -270,6 +271,12 @@ function Visao() {
                         <span>{num(m.realizado)} de {num(m.meta)} · {pct(ating)}</span>
                         <span>esperado hoje: {num(m.esperado_hoje)}</span>
                       </div>
+                      {m.tem_regra && Number(m.por_crm) > 0 && Number(m.por_formulario) > 0 ? (
+                        <div className="rotulo" style={{ marginTop: 4 }}>
+                          {num(m.por_crm)} pelo CRM, por pessoa · {num(m.por_formulario)} conversões no formulário ·
+                          vale o do CRM, porque os dois caminhos se cruzam
+                        </div>
+                      ) : null}
                       {m.identificadores?.length ? (
                         <div className="rotulo" style={{ marginTop: 4, wordBreak: "break-word", lineHeight: 1.5 }}>
                           {m.identificadores.join(" · ")}

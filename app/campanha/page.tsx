@@ -41,6 +41,10 @@ type Recompra = {
   indicador: string; rotulo: string; pessoas: number; base: number;
   taxa: number | null; faturamento: number | null;
 };
+type UpsellOrigem = {
+  curso_origem: string; produto_origem: string | null; pessoas: number;
+  faturamento: number; dias_medio: number | null;
+};
 type Cenario = {
   nivel: number; ativa: boolean; alunos: number; faturamento: number;
   atingido: number | null; falta: number; ritmo_dia: number | null;
@@ -64,6 +68,7 @@ function Tela() {
   const [origens, setOrigens] = useState<Origem[] | null>(null);
   const [porOrigem, setPorOrigem] = useState<"campanha" | "fonte">("campanha");
   const [recompra, setRecompra] = useState<Recompra[] | null>(null);
+  const [origemUpsell, setOrigemUpsell] = useState<UpsellOrigem[] | null>(null);
 
   useEffect(() => {
     supabase.from("resumo_campanhas").select("*").order("inicio").then(({ data }) => {
@@ -75,7 +80,7 @@ function Tela() {
 
   useEffect(() => {
     if (!id) return;
-    setFases(null); setPontos(null); setProj(null); setCenarios(null); setFunil(null); setOrigens(null); setRecompra(null);
+    setFases(null); setPontos(null); setProj(null); setCenarios(null); setFunil(null); setOrigens(null); setRecompra(null); setOrigemUpsell(null);
     const p = { p_campanha: id };
     supabase.rpc("painel_fases", p).then(({ data }) => setFases((data as Fase[]) ?? []));
     supabase.rpc("painel_curva", p).then(({ data }) => setPontos((data as Ponto[]) ?? []));
@@ -83,6 +88,7 @@ function Tela() {
     supabase.rpc("painel_cenarios", p).then(({ data }) => setCenarios((data as Cenario[]) ?? []));
     supabase.rpc("painel_funil", p).then(({ data }) => setFunil(((data as Funil[]) ?? [])[0] ?? null));
     supabase.rpc("painel_recompra", p).then(({ data }) => setRecompra((data as Recompra[]) ?? []));
+    supabase.rpc("painel_upsell_origem", p).then(({ data }) => setOrigemUpsell((data as UpsellOrigem[]) ?? []));
   }, [id, volta]);
 
   useEffect(() => {
@@ -431,6 +437,40 @@ function Tela() {
             Rematrícula é quem fez o mesmo curso na edição anterior e voltou. As outras linhas olham se a pessoa também
             tem curso longo ou o outro intensivo. A mesma pessoa é reconhecida por e-mail, telefone ou nome.
             As faixas se sobrepõem de propósito: alguém pode ser rematrícula e ter curso longo ao mesmo tempo.
+          </p>
+        </>
+      )}
+
+      {origemUpsell && origemUpsell.length > 0 && (
+        <>
+          <h3 style={{ fontSize: 15, margin: "28px 0 8px" }}>De onde essas pessoas vieram</h3>
+          <div className="rolar">
+            <table className="tabela">
+              <thead>
+                <tr><th>Curso anterior</th><th className="n">Pessoas</th><th style={{ minWidth: 120 }} />
+                  <th className="n">Faturamento aqui</th><th className="n">Dias até voltar</th></tr>
+              </thead>
+              <tbody>
+                {origemUpsell.map((o, i) => {
+                  const maior = Math.max(1, ...origemUpsell.map((x) => Number(x.pessoas)));
+                  return (
+                    <tr key={o.curso_origem}>
+                      <td style={{ maxWidth: 320, wordBreak: "break-word" }}>
+                        {i < 3 ? <b>{o.curso_origem}</b> : o.curso_origem}
+                      </td>
+                      <td className="n"><b>{num(o.pessoas)}</b></td>
+                      <td><div className="mini"><i style={{ width: `${(Number(o.pessoas) / maior) * 100}%` }} /></div></td>
+                      <td className="n">{brl(o.faturamento)}</td>
+                      <td className="n">{o.dias_medio == null ? "-" : num(o.dias_medio)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <p className="mudo" style={{ marginTop: 10 }}>
+            Os três primeiros são de onde mais vem gente. Dias até voltar é quanto tempo passou entre a compra
+            anterior e esta, o que indica em que momento vale disparar a oferta para a turma daquele curso.
           </p>
         </>
       )}
