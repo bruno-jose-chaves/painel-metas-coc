@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import Shell from "@/components/Shell";
 import SeletorPeriodo from "@/components/Periodo";
 import Curva from "@/components/Curva";
 import { supabase } from "@/lib/supabase";
@@ -11,7 +10,7 @@ import { hojeSP, somaDias, ultimosDias, type Periodo } from "@/lib/periodo";
 type Linha = { indicador: string; rotulo: string; valor: number; detalhe: string | null };
 type Dia = { dia: string; conversas_novas: number; requentados: number; leads_novos: number };
 
-function Tela() {
+export default function Gestao() {
   const { volta, em, minutos } = useAtualizacao();
   const [periodo, setPeriodo] = useState<Periodo>(ultimosDias(7));
   const [linhas, setLinhas] = useState<Linha[] | null>(null);
@@ -180,21 +179,5 @@ function Tela() {
         </>
       )}
     </>
-  );
-}
-
-export default function Page() {
-  return (
-    <Shell>
-      {({ admin }) =>
-        admin ? <Tela /> : (
-          <>
-            <div className="rotulo">023 · Gestão</div>
-            <h1>Tela da diretoria</h1>
-            <p className="mudo">Esta tela é restrita à diretoria. Fale com o Bruno se precisar de acesso.</p>
-          </>
-        )
-      }
-    </Shell>
   );
 }

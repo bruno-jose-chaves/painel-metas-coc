@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import Shell from "@/components/Shell";
 import { supabase } from "@/lib/supabase";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta } from "@/lib/formato";
@@ -15,7 +14,7 @@ type Campanha = { id: string; nome: string };
 
 const PAGINA = 100;
 
-function Tela() {
+export default function Vendas() {
   const { volta, em, minutos } = useAtualizacao();
   const [campanhas, setCampanhas] = useState<Campanha[]>([]);
   const [campanha, setCampanha] = useState("");
@@ -203,8 +202,4 @@ function descontoDe(l: Venda) {
   const venda = Number(l.valor_venda ?? 0);
   if (!tabela || venda >= tabela) return null;
   return (tabela - venda) / tabela;
-}
-
-export default function Page() {
-  return <Shell>{() => <Tela />}</Shell>;
 }

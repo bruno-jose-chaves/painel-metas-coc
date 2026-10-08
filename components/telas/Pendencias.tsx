@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import Shell from "@/components/Shell";
 import { supabase } from "@/lib/supabase";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, dataCurta } from "@/lib/formato";
@@ -19,7 +18,7 @@ const INDICADORES = [
   { id: "reservas", nome: "Reservas" },
 ];
 
-function Tela({ admin }: { admin: boolean }) {
+export default function Pendencias({ admin }: { admin: boolean }) {
   const { volta, em, minutos } = useAtualizacao();
   const [lista, setLista] = useState<Pendencia[] | null>(null);
   const [campanhas, setCampanhas] = useState<Campanha[]>([]);
@@ -168,8 +167,4 @@ function Tela({ admin }: { admin: boolean }) {
       )}
     </>
   );
-}
-
-export default function Page() {
-  return <Shell>{({ admin }) => <Tela admin={admin} />}</Shell>;
 }

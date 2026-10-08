@@ -118,6 +118,26 @@ const origemMat = [
 
 const rotas = {
   "rpc/painel_funil": funil,
+  "rpc/painel_anuncios": [
+    { anuncio: "CONHEÇA O MISSÃO UFSC", rede: "FACEBOOK", anuncio_id: "120251055072430636", pessoas: 93, conversas: 114, matriculas: 4, faturamento: 3669.4, pessoas_por_matricula: 23.3, link: "https://fb.me/4M8bdg6JW" },
+    { anuncio: "CURSINHO 100% GRÁTIS", rede: "FACEBOOK", anuncio_id: "120239805365180636", pessoas: 41, conversas: 55, matriculas: 9, faturamento: 15834.2, pessoas_por_matricula: 4.6, link: null },
+  ],
+  "rpc/painel_etiquetas_pendentes": [
+    { etiqueta: "reativação", pessoas: 63, conversoes: 206, primeira: "2026-02-10", ultima: "2026-10-01", sugestao: null },
+    { etiqueta: "concoc 26/1", pessoas: 15, conversoes: 46, primeira: "2026-03-02", ultima: "2026-09-18", sugestao: null },
+  ],
+  etiqueta_regras: [
+    { id: 1, etiqueta: "ufsc-live", produto_id: "missao-ufsc" },
+    { id: 2, etiqueta: "acafe", produto_id: "metodo-acafe" },
+  ],
+  "rpc/painel_historico_anos": [
+    { ano: 2025, alunos: 529, faturamento: 315000, ticket_medio: 597, desconto_medio: 0.1819, primeiro: "2025-01-14", ultimo: "2025-10-27", alunos_ate_hoje: 520, variacao_alunos: 0.831, variacao_ticket: -0.0524 },
+    { ano: 2026, alunos: 401, faturamento: 251000, ticket_medio: 627, desconto_medio: 0.0736, primeiro: "2026-03-31", ultimo: "2026-10-07", alunos_ate_hoje: 401, variacao_alunos: -0.2288, variacao_ticket: 0.0503 },
+  ],
+  "rpc/painel_historico_curva": [
+    { semana: 38, ano: 2025, acumulado: 420 }, { semana: 39, ano: 2025, acumulado: 470 }, { semana: 40, ano: 2025, acumulado: 520 },
+    { semana: 38, ano: 2026, acumulado: 330 }, { semana: 39, ano: 2026, acumulado: 372 }, { semana: 40, ano: 2026, acumulado: 401 },
+  ],
   "rpc/painel_gestao": [
     { indicador: "leads_novos", rotulo: "Leads novos", valor: 1300, detalhe: "negociação criada sem conversa nos 20 dias anteriores" },
     { indicador: "leads_conhecidos", rotulo: "Leads que já falavam com a gente", valor: 441, detalhe: "negociação criada com conversa recente no Pigeon" },
@@ -220,15 +240,18 @@ pg.on("console", (m) => { if (m.type() === "error") erros.push(m.text()); });
 pg.on("pageerror", (e) => erros.push("pageerror: " + e.message));
 
 const telas = [
-  ["/campanhas/", "Cadastro de campanhas"],
-  ["/pendencias/", "O que falta classificar"],
-  ["/gestao/", "Quem chegou no período"],
-  ["/configuracao/", "Pedidos de acesso"],
+  ["/ajustes/", "Cadastro de campanhas"],
+  ["/ajustes/?v=sistema", "Pedidos de acesso"],
+  ["/marketing/?v=paginas", "O que falta classificar"],
+  ["/marketing/?v=etiquetas", "Etiqueta para curso"],
+  ["/marketing/?v=anuncios", "Quem chega pelo anúncio"],
+  ["/?v=operacao", "Quem chegou no período"],
   ["/", "Metas de captação"],
   ["/campanha/", "Da origem à matrícula"],
-  ["/vendas/", "Lançamentos"],
-  ["/time/", "Agente de Pré-vendas"],
-  ["/leads/", "Formulário embutido"],
+  ["/campanha/?v=historico", "O mesmo curso, ano a ano"],
+  ["/comercial/?v=lancamentos", "Lançamentos"],
+  ["/comercial/", "Agente de Pré-vendas"],
+  ["/marketing/", "Formulário embutido"],
 ];
 
 let falhou = false;

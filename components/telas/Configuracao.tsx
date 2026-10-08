@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import Shell from "@/components/Shell";
 import { supabase, SUPABASE_URL } from "@/lib/supabase";
 import { dataHora, num } from "@/lib/formato";
 
@@ -52,7 +51,7 @@ function AppRD({ servico, status, recarregar }: { servico: "rd_crm" | "rd_market
   );
 }
 
-function Config({ admin }: { admin: boolean }) {
+export default function Configuracao({ admin }: { admin: boolean }) {
   const [status, setStatus] = useState<Status[]>([]);
   const [syncs, setSyncs] = useState<Sync[]>([]);
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
@@ -371,8 +370,4 @@ function Config({ admin }: { admin: boolean }) {
       </div>
     </>
   );
-}
-
-export default function Page() {
-  return <Shell>{({ admin }) => <Config admin={admin} />}</Shell>;
 }

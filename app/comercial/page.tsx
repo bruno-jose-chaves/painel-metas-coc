@@ -1,12 +1,14 @@
 "use client";
 import Shell from "@/components/Shell";
 import SubAbas, { useAba, type Aba } from "@/components/SubAbas";
-import Campanha from "@/components/telas/Campanha";
-import Historico from "@/components/Historico";
+import Time from "@/components/telas/Time";
+import Vendas from "@/components/telas/Vendas";
 
+// Time e Lançamentos respondem à mesma pergunta por ângulos diferentes: quem
+// está entregando, e o que exatamente foi vendido.
 const ABAS: Aba[] = [
-  { id: "atual", nome: "Campanha em curso" },
-  { id: "historico", nome: "Histórico entre anos" },
+  { id: "time", nome: "Time" },
+  { id: "lancamentos", nome: "Lançamentos" },
 ];
 
 function Tela() {
@@ -14,7 +16,7 @@ function Tela() {
   return (
     <>
       <SubAbas abas={ABAS} aba={aba} aoEscolher={escolher} />
-      {aba === "atual" ? <Campanha /> : <Historico />}
+      {aba === "time" ? <Time /> : <Vendas />}
     </>
   );
 }

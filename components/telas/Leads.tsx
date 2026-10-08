@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import Shell from "@/components/Shell";
 import FiltroCampanha, { type Campanha } from "@/components/FiltroCampanha";
 import Curva from "@/components/Curva";
 import { supabase } from "@/lib/supabase";
@@ -16,7 +15,7 @@ type Tag = { tag: string; leads: number; conversoes: number };
 
 const TIPO: Record<string, string> = { landing_page: "Landing page do RD", formulario: "Formulário embutido" };
 
-function Tela() {
+export default function Leads() {
   const { volta, em, minutos } = useAtualizacao();
   const [periodo, setPeriodo] = useState<Periodo>(ultimosDias(30));
   const [campanhas, setCampanhas] = useState<Campanha[]>([]);
@@ -198,8 +197,4 @@ function Tela() {
       </p>
     </>
   );
-}
-
-export default function Page() {
-  return <Shell>{() => <Tela />}</Shell>;
 }

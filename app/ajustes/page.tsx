@@ -1,23 +1,21 @@
 "use client";
 import Shell from "@/components/Shell";
 import SubAbas, { useAba, type Aba } from "@/components/SubAbas";
-import Visao from "@/components/telas/Visao";
-import Gestao from "@/components/telas/Gestao";
+import Cadastro from "@/components/telas/Cadastro";
+import Configuracao from "@/components/telas/Configuracao";
 
-// A primeira tela responde "como estamos hoje". O resumo é o que todo mundo vê;
-// a operação do dia, com lead novo, requentado e conversa, é leitura de diretoria.
+// O que é ajuste de sistema sai do caminho de quem só quer ver número.
 const ABAS: Aba[] = [
-  { id: "resumo", nome: "Resumo" },
-  { id: "operacao", nome: "Operação do dia" },
+  { id: "campanhas", nome: "Campanhas e metas" },
+  { id: "sistema", nome: "Acesso e integrações" },
 ];
 
 function Tela({ admin }: { admin: boolean }) {
   const { aba, escolher } = useAba(ABAS);
-  if (!admin) return <Visao />;
   return (
     <>
       <SubAbas abas={ABAS} aba={aba} aoEscolher={escolher} />
-      {aba === "resumo" ? <Visao /> : <Gestao />}
+      {aba === "campanhas" ? <Cadastro admin={admin} /> : <Configuracao admin={admin} />}
     </>
   );
 }

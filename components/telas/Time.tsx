@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import Shell from "@/components/Shell";
 import FiltroCampanha, { type Campanha } from "@/components/FiltroCampanha";
 import { supabase } from "@/lib/supabase";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
@@ -21,7 +20,7 @@ type PreVenda = {
   entregues: number; ganhos: number; ganhos_de_antes: number; parados_7d: number; parados_30d: number;
 };
 
-function Tela() {
+export default function Time() {
   const { volta, em, minutos } = useAtualizacao();
   const [periodo, setPeriodo] = useState<Periodo>(ultimosDias(30));
   const [campanhas, setCampanhas] = useState<Campanha[]>([]);
@@ -244,8 +243,4 @@ function Tela() {
       )}
     </>
   );
-}
-
-export default function Page() {
-  return <Shell>{() => <Tela />}</Shell>;
 }

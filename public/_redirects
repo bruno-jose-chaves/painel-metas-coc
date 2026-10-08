@@ -1,1 +1,20 @@
-/index.html    /         301
+# Sintaxe Cloudflare Pages. O "!" do Netlify invalida a regra em silêncio, então
+# não entra aqui.
+
+/index.html      /                           301
+
+# As nove abas antigas viraram cinco áreas. Link guardado continua funcionando.
+/vendas/*        /comercial/?v=lancamentos   301
+/vendas          /comercial/?v=lancamentos   301
+/time/*          /comercial/                 301
+/time            /comercial/                 301
+/leads/*         /marketing/                 301
+/leads           /marketing/                 301
+/pendencias/*    /marketing/?v=paginas       301
+/pendencias      /marketing/?v=paginas       301
+/gestao/*        /?v=operacao                301
+/gestao          /?v=operacao                301
+/campanhas/*     /ajustes/                   301
+/campanhas       /ajustes/                   301
+/configuracao/*  /ajustes/?v=sistema         301
+/configuracao    /ajustes/?v=sistema         301

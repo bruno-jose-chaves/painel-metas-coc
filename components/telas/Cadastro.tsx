@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import Shell from "@/components/Shell";
 import { supabase } from "@/lib/supabase";
 import { brl, num, dataCurta } from "@/lib/formato";
 
@@ -24,7 +23,7 @@ const metasVazias = (): Meta[] => [0, 1, 2, 3].map((nivel) => ({ nivel, alunos: 
 const faseVazia = (ordem: number): Fase =>
   ({ ordem, nome: "", inicio: "", fim: "", preco: 0, meta_alunos: 0, bonus: null });
 
-function Editor({ admin }: { admin: boolean }) {
+export default function Cadastro({ admin }: { admin: boolean }) {
   const [lista, setLista] = useState<Campanha[] | null>(null);
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [sel, setSel] = useState<string>("");
@@ -239,8 +238,4 @@ function Editor({ admin }: { admin: boolean }) {
       </div>
     </>
   );
-}
-
-export default function Page() {
-  return <Shell>{({ admin }) => <Editor admin={admin} />}</Shell>;
 }
