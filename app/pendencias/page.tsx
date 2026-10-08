@@ -25,9 +25,10 @@ function Tela({ admin }: { admin: boolean }) {
   const [campanhas, setCampanhas] = useState<Campanha[]>([]);
   const [regras, setRegras] = useState<Regra[]>([]);
   const [aviso, setAviso] = useState("");
+  const [tudo, setTudo] = useState(false);
 
   function carregar() {
-    supabase.rpc("painel_pendencias", { p_desde: "2026-08-01" })
+    supabase.rpc("painel_pendencias", { p_desde: "2026-08-01", p_minimo: tudo ? 1 : 10 })
       .then(({ data }) => setLista((data as Pendencia[]) ?? []));
     supabase.from("captacao_regras").select("*").order("campanha_id")
       .then(({ data }) => setRegras((data as Regra[]) ?? []));
@@ -37,7 +38,7 @@ function Tela({ admin }: { admin: boolean }) {
     supabase.from("resumo_campanhas").select("id,nome,produto_id").order("inicio")
       .then(({ data }) => setCampanhas((data as Campanha[]) ?? []));
     carregar();
-  }, [volta]);
+  }, [volta, tudo]);
 
   async function apontar(p: Pendencia, campanhaId: string, indicador: string) {
     const { error } = await supabase.from("captacao_regras").insert({
@@ -80,11 +81,16 @@ function Tela({ admin }: { admin: boolean }) {
       </div>
 
       <h2><span className="idx">021</span> Esperando a sua decisão</h2>
-      <p className="mudo" style={{ marginBottom: 16 }}>
+      <p className="mudo" style={{ marginBottom: 12 }}>
         Campanhas do CRM e formulários que o painel não conseguiu ligar a um curso. Enquanto não forem apontados,
         esses leads ficam fora dos filtros por curso. O maior volume vem primeiro, então resolver os primeiros já
-        fecha a maior parte do buraco.
+        fecha a maior parte do buraco. A lista olha de 01/08/2026 em diante: o que aparece com nome de 2025 é peça
+        antiga que continua no ar e segue trazendo lead agora, e a coluna de período mostra a data real.
       </p>
+      <div className="atalhos" style={{ marginBottom: 16 }}>
+        <button className={!tudo ? "ativo" : ""} onClick={() => setTudo(false)}>Com volume (10 ou mais)</button>
+        <button className={tudo ? "ativo" : ""} onClick={() => setTudo(true)}>Tudo, inclusive a cauda</button>
+      </div>
       {!lista ? <p className="rotulo">Carregando</p> : lista.length === 0 ? (
         <p className="mudo">Nada pendente. Tudo classificado.</p>
       ) : (

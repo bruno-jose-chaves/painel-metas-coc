@@ -79,6 +79,12 @@ function Tela() {
         </div>
       </div>
 
+      <p className="mudo" style={{ marginBottom: 16, marginTop: 4 }}>
+        O histórico de conversa importado do Pigeon começa em 01/08/2026. As regras de 15 e 20 dias valem
+        cheias de 21/08 em diante. Antes disso o painel conta menos lead conhecido e menos requentado do que
+        o real, porque não tem como ver a conversa que veio antes do corte.
+      </p>
+
       <h2><span className="idx">024</span> Quem chegou no período</h2>
       <p className="mudo" style={{ marginBottom: 16 }}>
         Lead novo é negociação criada sem nenhuma conversa nos 20 dias anteriores — gente que entrou agora.
