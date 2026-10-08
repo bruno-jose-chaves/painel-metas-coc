@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Shell from "@/components/Shell";
-import SeletorPeriodo from "@/components/Periodo";
+import FiltroCampanha, { type Campanha } from "@/components/FiltroCampanha";
 import Curva from "@/components/Curva";
 import { supabase } from "@/lib/supabase";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
@@ -12,7 +12,6 @@ type Dia = { dia: string; conversoes: number; conversoes_lp: number; visitas: nu
 type Origem = { identificador: string; tipo: string; conversoes: number; visitas: number; taxa: number | null };
 type Fonte = { fonte: string; negocios: number; ganhas: number; conversao: number | null };
 type PreVenda = { captados: number; aquecidos: number; entregues: number; sem_contato: number; parados_7d: number; parados_30d: number };
-type Campanha = { id: string; nome: string; inicio: string; fim: string };
 type Tag = { tag: string; leads: number; conversoes: number };
 
 const TIPO: Record<string, string> = { landing_page: "Landing page do RD", formulario: "Formulário embutido" };
@@ -21,6 +20,7 @@ function Tela() {
   const { volta, em, minutos } = useAtualizacao();
   const [periodo, setPeriodo] = useState<Periodo>(ultimosDias(30));
   const [campanhas, setCampanhas] = useState<Campanha[]>([]);
+  const [campanha, setCampanha] = useState<string | null>(null);
   const [dias, setDias] = useState<Dia[] | null>(null);
   const [origens, setOrigens] = useState<Origem[] | null>(null);
   const [fontes, setFontes] = useState<Fonte[] | null>(null);
@@ -28,19 +28,22 @@ function Tela() {
   const [tags, setTags] = useState<Tag[] | null>(null);
 
   useEffect(() => {
-    supabase.from("resumo_campanhas").select("id,nome,inicio,fim").order("inicio")
+    supabase.from("resumo_campanhas").select("id,nome,inicio,fim,produto_id").order("inicio")
       .then(({ data }) => setCampanhas((data as Campanha[]) ?? []));
   }, [volta]);
 
+  const produto = campanhas.find((c) => c.id === campanha)?.produto_id ?? null;
+
   useEffect(() => {
-    const p = { p_de: periodo.de, p_ate: periodo.ate };
+    const p = { p_de: periodo.de, p_ate: periodo.ate, p_produto: produto };
     setDias(null); setOrigens(null); setFontes(null); setApv(null); setTags(null);
     supabase.rpc("painel_leads_dia", p).then(({ data }) => setDias((data as Dia[]) ?? []));
     supabase.rpc("painel_leads_origem", p).then(({ data }) => setOrigens((data as Origem[]) ?? []));
     supabase.rpc("painel_fontes", p).then(({ data }) => setFontes((data as Fonte[]) ?? []));
-    supabase.rpc("painel_pre_venda", p).then(({ data }) => setApv(((data as PreVenda[]) ?? [])[0] ?? null));
+    supabase.rpc("painel_pre_venda", { p_de: periodo.de, p_ate: periodo.ate })
+      .then(({ data }) => setApv(((data as PreVenda[]) ?? [])[0] ?? null));
     supabase.rpc("painel_tags", p).then(({ data }) => setTags((data as Tag[]) ?? []));
-  }, [periodo, volta]);
+  }, [periodo, produto, volta]);
 
   const totalConv = dias?.reduce((s, d) => s + Number(d.conversoes), 0) ?? 0;
   const totalConvLp = dias?.reduce((s, d) => s + Number(d.conversoes_lp), 0) ?? 0;
@@ -55,10 +58,12 @@ function Tela() {
         Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
       </p>
 
-      <SeletorPeriodo
-        valor={periodo}
-        aoMudar={setPeriodo}
-        atalhos={campanhas.map((c) => ({ nome: c.nome, de: c.inicio, ate: c.fim }))}
+      <FiltroCampanha
+        campanhas={campanhas}
+        campanha={campanha}
+        aoMudarCampanha={setCampanha}
+        periodo={periodo}
+        aoMudarPeriodo={setPeriodo}
       />
 
       <div className="faixa">
@@ -83,6 +88,13 @@ function Tela() {
         </div>
       </div>
 
+      {campanha && (
+        <p className="mudo" style={{ marginTop: -4, marginBottom: 16 }}>
+          Filtrado por {campanhas.find((c) => c.id === campanha)?.nome}. Só entram as páginas e formulários
+          ligados a esse curso, pela regra automática ou pelo que foi apontado em Pendências.
+          O bloco do Agente de Pré-vendas não separa por curso e continua mostrando o total.
+        </p>
+      )}
       <h2><span className="idx">016</span> Conversões por dia</h2>
       {!dias ? <p className="rotulo">Carregando</p> : dias.length === 0 ? (
         <p className="mudo">Sem conversões registradas no período.</p>

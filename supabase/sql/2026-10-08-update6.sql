@@ -25,3 +25,11 @@
 --    classificado sem esperar a próxima sessão.
 
 -- Versão antiga renomeada e sem permissão: painel_metas_leads_v2.
+
+-- 6. Leads por curso (T9)
+--    painel_leads_dia, painel_leads_origem, painel_fontes e painel_tags passam a
+--    aceitar p_produto. Auxiliar formulario_do_curso(identificador, produto):
+--    vale primeiro a regra apontada na tela de Pendências, depois o nome do
+--    próprio formulário. Assim o que você aponta uma vez vale em toda a tela.
+--    Versões antigas renomeadas: painel_leads_dia_v2, painel_leads_origem_v1,
+--    painel_fontes_v1, painel_tags_v1.
