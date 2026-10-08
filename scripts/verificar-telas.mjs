@@ -118,6 +118,13 @@ const origemMat = [
 
 const rotas = {
   "rpc/painel_funil": funil,
+  "rpc/painel_sugestoes": [
+    { tipo: "parado_30d", titulo: "Negócios abertos parados há mais de 30 dias", detalhe: "O funil não fecha", quantos: 9200, severidade: "alta", o_que_fazer: "Abrir cada um no CRM e decidir" },
+    { tipo: "venda_sem_vendedor", titulo: "Matrículas na planilha sem vendedor", detalhe: "Ficam fora do ranking", quantos: 54, severidade: "alta", o_que_fazer: "Preencher a coluna de vendedor" },
+  ],
+  "rpc/painel_sugestoes_casos": [
+    { quem: "Fulano de Tal", quando: "2026-08-14", onde: "João Pedro Beraldo", observacao: "1° Contato Feito · parado há 55 dias" },
+  ],
   "rpc/painel_anuncios": [
     { anuncio: "CONHEÇA O MISSÃO UFSC", rede: "FACEBOOK", anuncio_id: "120251055072430636", pessoas: 93, conversas: 114, matriculas: 4, faturamento: 3669.4, pessoas_por_matricula: 23.3, link: "https://fb.me/4M8bdg6JW" },
     { anuncio: "CURSINHO 100% GRÁTIS", rede: "FACEBOOK", anuncio_id: "120239805365180636", pessoas: 41, conversas: 55, matriculas: 9, faturamento: 15834.2, pessoas_por_matricula: 4.6, link: null },
@@ -131,8 +138,8 @@ const rotas = {
     { id: 2, etiqueta: "acafe", produto_id: "metodo-acafe" },
   ],
   "rpc/painel_historico_anos": [
-    { ano: 2025, alunos: 529, faturamento: 315000, ticket_medio: 597, desconto_medio: 0.1819, primeiro: "2025-01-14", ultimo: "2025-10-27", alunos_ate_hoje: 520, variacao_alunos: 0.831, variacao_ticket: -0.0524 },
-    { ano: 2026, alunos: 401, faturamento: 251000, ticket_medio: 627, desconto_medio: 0.0736, primeiro: "2026-03-31", ultimo: "2026-10-07", alunos_ate_hoje: 401, variacao_alunos: -0.2288, variacao_ticket: 0.0503 },
+    { ano: 2025, temporada: "2", rotulo: "2025 · 2º semestre", alunos: 262, faturamento: 315000, ticket_medio: 597, desconto_medio: 0.1819, primeiro: "2025-01-14", ultimo: "2025-10-27", alunos_ate_hoje: 520, variacao_alunos: 0.831, variacao_ticket: -0.0524 },
+    { ano: 2026, temporada: "2", rotulo: "2026 · 2º semestre", alunos: 200, faturamento: 251000, ticket_medio: 627, desconto_medio: 0.0736, primeiro: "2026-03-31", ultimo: "2026-10-07", alunos_ate_hoje: 401, variacao_alunos: -0.2288, variacao_ticket: 0.0503 },
   ],
   "rpc/painel_historico_curva": [
     { semana: 38, ano: 2025, acumulado: 420 }, { semana: 39, ano: 2025, acumulado: 470 }, { semana: 40, ano: 2025, acumulado: 520 },
@@ -178,7 +185,7 @@ const rotas = {
   "rpc/painel_higiene": [{ motivo: "Lead duplicado", descartadas: 98, fatia_do_total: 0.69 }],
   "rpc/solicitar_acesso": "registrada",
   solicitacoes_acesso: [{ email: "novo@coconline.com.br", nome: "Pessoa Nova", mensagem: "acompanhar metas", criada_em: "2026-10-02T12:00:00Z", situacao: "pendente" }],
-  produtos: [{ id: "metodo-acafe", nome: "Método de Aprovação ACAFE" }, { id: "semi-extensivo", nome: "Semi Extensivo" }],
+  produtos: [{ id: "metodo-acafe", nome: "Método de Aprovação ACAFE", ordem: 1, duas_temporadas: true }, { id: "semi-extensivo", nome: "Semi Extensivo", ordem: 2, duas_temporadas: true }],
   metas: [{ nivel: 2, alunos: 263, faturamento: 185673 }],
   fases: fases,
   "rpc/painel_origem_matriculas": origemMat,
@@ -250,6 +257,7 @@ const telas = [
   ["/campanha/", "Da origem à matrícula"],
   ["/campanha/?v=historico", "O mesmo curso, ano a ano"],
   ["/comercial/?v=lancamentos", "Lançamentos"],
+  ["/comercial/?v=conferir", "O que vale conferir"],
   ["/comercial/", "Agente de Pré-vendas"],
   ["/marketing/", "Formulário embutido"],
 ];

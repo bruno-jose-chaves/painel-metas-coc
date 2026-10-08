@@ -37,19 +37,19 @@ export default function Shell({ children }: { children: (ctx: { admin: boolean; 
       if (!vivo) return;
       if (!s) {
         vazias.current += 1;
-        // Dá duas chances antes de desistir: pede a sessão de novo depois de um
-        // instante, que é tempo de a renovação terminar.
-        if (vazias.current < 3) {
-          setTimeout(async () => {
-            if (!vivo) return;
-            const { data } = await supabase.auth.getSession();
-            if (data.session) { vazias.current = 0; checar(data.session); return; }
-            if (vazias.current >= 3) { setEstado("sem_sessao"); router.replace("/login/"); }
-          }, 1200);
+        // Três tentativas de 600ms antes de desistir. Isso dá tempo de uma
+        // renovação de token terminar, que é o que tropeça quando o computador
+        // dorme, sem deixar quem não está logado preso numa tela de carregando.
+        if (vazias.current >= 3) {
+          setEstado("sem_sessao");
+          router.replace("/login/");
           return;
         }
-        setEstado("sem_sessao");
-        router.replace("/login/");
+        setTimeout(async () => {
+          if (!vivo) return;
+          const { data } = await supabase.auth.getSession();
+          checar(data.session);
+        }, 600);
         return;
       }
       vazias.current = 0;

@@ -89,8 +89,9 @@ export default function Anuncios() {
       <h2><span className="idx">028</span> Peça por peça</h2>
       <p className="mudo" style={{ marginBottom: 16 }}>
         O lead de anúncio de clique para WhatsApp não passa por formulário, então o RD não o vê. Quem registra é o
-        Pigeon, que guarda a peça que originou a conversa. A matrícula é ligada por telefone, até sessenta dias depois
-        do contato.
+        Pigeon, que guarda a peça que originou a conversa. A matrícula é ligada por telefone e só conta quando aconteceu
+        depois da conversa e dentro da janela de atribuição do curso vendido: 45 dias no intensivo, 60 no Semi e no
+        Extensivo.
       </p>
       {!lista ? <p className="rotulo">Carregando</p> : lista.length === 0 ? (
         <p className="mudo">
