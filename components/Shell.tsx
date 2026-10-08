@@ -4,12 +4,13 @@ import { usePathname, useRouter } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 
-const MENU = [
+const MENU: { href: string; nome: string; soAdmin?: boolean }[] = [
   { href: "/", nome: "Visão geral" },
   { href: "/campanha/", nome: "Campanha" },
   { href: "/vendas/", nome: "Vendas" },
   { href: "/time/", nome: "Time comercial" },
   { href: "/leads/", nome: "Leads" },
+  { href: "/gestao/", nome: "Gestão", soAdmin: true },
   { href: "/pendencias/", nome: "Pendências" },
   { href: "/campanhas/", nome: "Cadastro" },
   { href: "/configuracao/", nome: "Configuração" },
@@ -60,7 +61,7 @@ export default function Shell({ children }: { children: (ctx: { admin: boolean; 
       <header className="topo"><div className="topo-in">
         <a className="marca" href="/">COC <span>METAS</span></a>
         <nav className="nav">
-          {MENU.map((m) => (
+          {MENU.filter((m) => admin || !m.soAdmin).map((m) => (
             <a key={m.href} href={m.href} className={path === m.href || path + "/" === m.href ? "ativo" : ""}>{m.nome}</a>
           ))}
         </nav>

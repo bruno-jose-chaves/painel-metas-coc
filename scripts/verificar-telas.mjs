@@ -117,6 +117,19 @@ const origemMat = [
 
 const rotas = {
   "rpc/painel_funil": funil,
+  "rpc/painel_gestao": [
+    { indicador: "leads_novos", rotulo: "Leads novos", valor: 1300, detalhe: "negociação criada sem conversa nos 20 dias anteriores" },
+    { indicador: "leads_conhecidos", rotulo: "Leads que já falavam com a gente", valor: 441, detalhe: "negociação criada com conversa recente no Pigeon" },
+    { indicador: "requentados", rotulo: "Leads requentados", valor: 59, detalhe: "voltaram a falar depois de mais de 15 dias parados" },
+    { indicador: "conversas_novas", rotulo: "Conversas abertas no período", valor: 2692, detalhe: "atendimentos que começaram no período" },
+    { indicador: "conversas_andamento", rotulo: "Conversas em andamento", valor: 168, detalhe: "começaram antes e tiveram movimento no período" },
+    { indicador: "primeira_conversa", rotulo: "Primeira conversa na vida", valor: 2248, detalhe: "contato que nunca tinha falado com a gente antes" },
+  ],
+  "rpc/painel_gestao_dia": [
+    { dia: "2026-10-06", conversas_novas: 46, requentados: 1, leads_novos: 43 },
+    { dia: "2026-10-07", conversas_novas: 175, requentados: 11, leads_novos: 44 },
+    { dia: "2026-10-08", conversas_novas: 5, requentados: 0, leads_novos: 12 },
+  ],
   "rpc/painel_pendencias": [
     { tipo: "campanha_crm", valor: "SEMI 26/2 Leads PréVest", volume: 236, matriculas: 9, primeira: "2026-08-01", ultima: "2026-10-06", sugestao: null },
     { tipo: "formulario", valor: "inscricoes-prevest-26-2", volume: 254, matriculas: 0, primeira: "2026-08-26", ultima: "2026-09-30", sugestao: null },
@@ -208,6 +221,7 @@ pg.on("pageerror", (e) => erros.push("pageerror: " + e.message));
 const telas = [
   ["/campanhas/", "Cadastro de campanhas"],
   ["/pendencias/", "O que falta classificar"],
+  ["/gestao/", "Quem chegou no período"],
   ["/configuracao/", "Pedidos de acesso"],
   ["/", "Metas de captação"],
   ["/campanha/", "Da origem à matrícula"],
