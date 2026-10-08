@@ -129,7 +129,7 @@ function Tela() {
       )}
       <p className="mudo" style={{ marginTop: 10 }}>
         Conversão é ganhas sobre o funil inteiro do período: ganhas mais perdidas mais o que ainda está em aberto. Contar só o que já foi decidido inflava o número, porque a maior parte do funil ainda não decidiu.
-        Venda automática é a matrícula fechada sem vendedor na planilha, ou seja a compra que o aluno fez sozinho pelo site. Ela entra no faturamento, mas fica fora do ranking.
+        Venda automática é a matrícula fechada sem vendedor na planilha, ou seja a compra que o aluno fez sozinho pelo site. Ela entra no faturamento, mas fica fora do ranking. O ranking conta só a venda lançada dentro do período acima: campanha com reserva vendida antes do início aparece menor aqui do que no cartão da campanha, que traz o total cheio.
       </p>
 
       <h2><span className="idx">010</span> Negócios em aberto e tempo parado</h2>

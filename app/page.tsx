@@ -84,10 +84,12 @@ function Visao() {
   const [janela, setJanela] = useState<Janela>(JANELAS[0]);
   const [periodo, setPeriodo] = useState<Resumo7 | null>(null);
   const [metasLeads, setMetasLeads] = useState<Record<string, MetaLead[]>>({});
+  const [metasProntas, setMetasProntas] = useState(false);
 
   useEffect(() => {
     supabase.from("resumo_campanhas").select("*").order("inicio").then(({ data }) => {
       const lista = (data as Resumo[]) ?? [];
+      let respondidas = 0;
       setDados(lista);
       lista.forEach((c) => {
         supabase.rpc("painel_projecao", { p_campanha: c.id }).then(({ data: pr }) => {
@@ -97,8 +99,11 @@ function Visao() {
         supabase.rpc("painel_metas_leads", { p_campanha: c.id }).then(({ data: ml }) => {
           const linhas = (ml as MetaLead[]) ?? [];
           if (linhas.length) setMetasLeads((atual) => ({ ...atual, [c.id]: linhas }));
+          respondidas += 1;
+          if (respondidas >= lista.length) setMetasProntas(true);
         });
       });
+      if (lista.length === 0) setMetasProntas(true);
     });
     supabase.rpc("painel_ritmo").then(({ data }) => setRitmo((data as Ritmo[]) ?? []));
     supabase.from("sincronizacoes").select("terminado_em").eq("status", "ok").like("fonte", "planilha:%")
@@ -241,7 +246,9 @@ function Visao() {
 
 
       <h2><span className="idx">003</span> Metas de captação</h2>
-      {Object.keys(metasLeads).length === 0 ? (
+      {!metasProntas ? (
+        <p className="rotulo">Carregando</p>
+      ) : Object.keys(metasLeads).length === 0 ? (
         <p className="mudo">Nenhuma meta de captação cadastrada.</p>
       ) : (
         <>

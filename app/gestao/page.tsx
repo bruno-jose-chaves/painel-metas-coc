@@ -60,22 +60,22 @@ function Tela() {
         <div>
           <div className="rotulo">Leads novos</div>
           <div className="valor num">{linhas ? num(novos) : "..."}</div>
-          <div className="mudo">{umDia ? "nunca tinham falado com a gente" : `${num(Math.round(media(novos)))} por dia`}</div>
+          <div className="mudo">{!linhas ? "" : umDia ? "nunca tinham falado com a gente" : `${num(Math.round(media(novos)))} por dia útil ou não`}</div>
         </div>
         <div>
           <div className="rotulo">Leads requentados</div>
           <div className="valor num">{linhas ? num(requentados) : "..."}</div>
-          <div className="mudo">voltaram depois de 15 dias parados</div>
+          <div className="mudo">{linhas ? "voltaram depois de 15 dias parados" : ""}</div>
         </div>
         <div>
           <div className="rotulo">Conversas abertas</div>
           <div className="valor num">{linhas ? num(conversasNovas) : "..."}</div>
-          <div className="mudo">{umDia ? "atendimentos iniciados" : `${num(Math.round(media(conversasNovas)))} por dia`}</div>
+          <div className="mudo">{!linhas ? "" : umDia ? "atendimentos iniciados" : `${num(Math.round(media(conversasNovas)))} por dia`}</div>
         </div>
         <div>
           <div className="rotulo">Conversas em andamento</div>
           <div className="valor num">{linhas ? num(andamento) : "..."}</div>
-          <div className="mudo">começaram antes e tiveram movimento</div>
+          <div className="mudo">{linhas ? "começaram antes e tiveram movimento" : ""}</div>
         </div>
       </div>
 

@@ -57,7 +57,7 @@ function Config({ admin }: { admin: boolean }) {
   const [syncs, setSyncs] = useState<Sync[]>([]);
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [novo, setNovo] = useState({ email: "", nome: "", papel: "leitor", senha: "" });
-  const [pedidos, setPedidos] = useState<Pedido[]>([]);
+  const [pedidos, setPedidos] = useState<Pedido[] | null>(null);
   const [editando, setEditando] = useState<string | null>(null);
   const [n8n, setN8n] = useState({ url: "https://n8n.coconline.com.br", chave: "" });
   const [n8nMsg, setN8nMsg] = useState("");
@@ -270,7 +270,7 @@ function Config({ admin }: { admin: boolean }) {
       </div>
 
       <h2><span className="idx">003</span> Pedidos de acesso</h2>
-      {pedidos.length === 0 ? (
+      {!pedidos ? <p className="rotulo">Carregando</p> : pedidos.length === 0 ? (
         <p className="mudo">Nenhum pedido esperando resposta.</p>
       ) : (
         <div className="bloco">

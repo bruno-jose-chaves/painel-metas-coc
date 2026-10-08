@@ -23,7 +23,7 @@ function Tela({ admin }: { admin: boolean }) {
   const { volta, em, minutos } = useAtualizacao();
   const [lista, setLista] = useState<Pendencia[] | null>(null);
   const [campanhas, setCampanhas] = useState<Campanha[]>([]);
-  const [regras, setRegras] = useState<Regra[]>([]);
+  const [regras, setRegras] = useState<Regra[] | null>(null);
   const [aviso, setAviso] = useState("");
   const [tudo, setTudo] = useState(false);
 
@@ -76,7 +76,7 @@ function Tela({ admin }: { admin: boolean }) {
         </div>
         <div>
           <div className="rotulo">Regras já apontadas</div>
-          <div className="valor num">{num(regras.length)}</div>
+          <div className="valor num">{regras ? num(regras.length) : "..."}</div>
         </div>
       </div>
 
@@ -144,7 +144,7 @@ function Tela({ admin }: { admin: boolean }) {
       {aviso && <div className="aviso ok" style={{ marginTop: 12 }}>{aviso}</div>}
 
       <h2><span className="idx">022</span> Regras já apontadas</h2>
-      {regras.length === 0 ? (
+      {!regras ? <p className="rotulo">Carregando</p> : regras.length === 0 ? (
         <p className="mudo">Nenhuma regra cadastrada. O painel está usando só a regra automática pelo nome do curso.</p>
       ) : (
         <div className="rolar">

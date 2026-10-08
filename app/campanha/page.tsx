@@ -54,7 +54,9 @@ const SITUACAO: Record<string, string> = {
   no_ritmo: "No ritmo", atencao: "Atenção", atras: "Atrás",
   nao_iniciada: "Não iniciada", encerrada: "Encerrada",
 };
-const ESTADO: Record<string, string> = { atual: "Em curso", encerrada: "Encerrada", futura: "A seguir" };
+const ESTADO: Record<string, string> = {
+  atual: "Em curso", encerrada: "Encerrada", futura: "A seguir", anterior: "Fora da escada",
+};
 
 function Tela() {
   const { volta, em, minutos } = useAtualizacao();
@@ -292,7 +294,7 @@ function Tela() {
             <tfoot>
               <tr>
                 <td colSpan={3}>Total</td>
-                <td className="n">{num(fases.reduce((s, f) => s + f.meta_alunos, 0))}</td>
+                <td className="n">{num(fases.reduce((s, f) => s + Number(f.meta_alunos ?? 0), 0))}</td>
                 <td className="n">{num(fases.reduce((s, f) => s + Number(f.alunos), 0))}</td>
                 <td className="n" />
                 <td className="n">{brl(fases.reduce((s, f) => s + Number(f.faturamento), 0))}</td>

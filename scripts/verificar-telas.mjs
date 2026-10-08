@@ -28,6 +28,7 @@ const resumo = [
 ];
 
 const fases = [
+  { ordem: 0, nome: "Antes da campanha", inicio: "2026-06-30", fim: "2026-08-24", preco: null, bonus: "Reserva e venda lançadas antes da primeira fase", meta_alunos: 0, alunos: 60, faturamento: 35272, ticket_medio: 588, estado: "anterior" },
   { ordem: 1, nome: "Pré-venda / Reserva", inicio: "2026-08-25", fim: "2026-09-07", preco: 594.8, bonus: "Lote 100 vagas", meta_alunos: 64, alunos: 44, faturamento: 26475.6, ticket_medio: 601.7, estado: "encerrada" },
   { ordem: 2, nome: "Abertura oficial", inicio: "2026-09-08", fim: "2026-09-27", preco: 694.8, bonus: "Carrinho aberto", meta_alunos: 62, alunos: 43, faturamento: 28580.7, ticket_medio: 664.6, estado: "encerrada" },
   { ordem: 3, nome: "Lives de Lançamento", inicio: "2026-09-28", fim: "2026-09-30", preco: 694.8, bonus: "3 noites ao vivo", meta_alunos: 71, alunos: 28, faturamento: 19357.2, ticket_medio: 691.3, estado: "atual" },

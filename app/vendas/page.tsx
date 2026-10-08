@@ -166,7 +166,7 @@ function Tela() {
                     <td>{l.vendedor ?? "-"}</td>
                     <td>{l.status ?? "-"}</td>
                     <td className="n">{brl(l.valor_tabela, 2)}</td>
-                    <td className="n">{pct(l.desconto_pct == null ? null : Number(l.desconto_pct))}</td>
+                    <td className="n">{pct(descontoDe(l))}</td>
                     <td className="n"><b>{brl(l.valor_venda, 2)}</b></td>
                     <td className="mudo">{l.cidade ?? "-"}{l.estado ? `/${l.estado}` : ""}</td>
                   </tr>
@@ -191,6 +191,18 @@ function Tela() {
       </p>
     </>
   );
+}
+
+// A planilha quase nunca traz a coluna de desconto preenchida: 250 das 272
+// matrículas das campanhas de 2026 vinham sem ela, embora a venda esteja abaixo
+// da tabela. Quando falta, calcula pela diferença entre tabela e venda, que é a
+// mesma conta usada no desconto médio do topo da tela.
+function descontoDe(l: Venda) {
+  if (l.desconto_pct != null) return Number(l.desconto_pct);
+  const tabela = Number(l.valor_tabela ?? 0);
+  const venda = Number(l.valor_venda ?? 0);
+  if (!tabela || venda >= tabela) return null;
+  return (tabela - venda) / tabela;
 }
 
 export default function Page() {
