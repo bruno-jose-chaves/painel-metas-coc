@@ -39,7 +39,8 @@ export default function Leads() {
     supabase.rpc("painel_leads_dia", p).then(({ data }) => setDias((data as Dia[]) ?? []));
     supabase.rpc("painel_leads_origem", p).then(({ data }) => setOrigens((data as Origem[]) ?? []));
     supabase.rpc("painel_fontes", p).then(({ data }) => setFontes((data as Fonte[]) ?? []));
-    supabase.rpc("painel_pre_venda", { p_de: periodo.de, p_ate: periodo.ate })
+    // Respeita o curso escolhido como todo o resto da tela.
+    supabase.rpc("painel_pre_venda", p)
       .then(({ data }) => setApv(((data as PreVenda[]) ?? [])[0] ?? null));
     supabase.rpc("painel_tags", p).then(({ data }) => setTags((data as Tag[]) ?? []));
   }, [periodo, produto, volta]);

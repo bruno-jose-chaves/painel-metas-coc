@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import FiltroCampanha, { type Campanha } from "@/components/FiltroCampanha";
+import Curva from "@/components/Curva";
+import Detalhe, { type Recorte } from "@/components/Detalhe";
 import { supabase } from "@/lib/supabase";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta } from "@/lib/formato";
@@ -15,6 +17,7 @@ type Parado = {
   ate_3d: number; d4_7: number; d8_15: number; d16_30: number; mais_30: number; dias_medio: number;
 };
 type Motivo = { motivo: string; perdidas: number; fatia: number };
+type DiaVenda = { dia: string; alunos: number; faturamento: number; acumulado: number };
 type PreVenda = {
   captados: number; contatados: number; sem_contato: number;
   entregues: number; ganhos: number; ganhos_de_antes: number; parados_7d: number; parados_30d: number;
@@ -29,6 +32,8 @@ export default function Time() {
   const [parados, setParados] = useState<Parado[] | null>(null);
   const [motivos, setMotivos] = useState<Motivo[] | null>(null);
   const [apv, setApv] = useState<PreVenda | null>(null);
+  const [diasVenda, setDiasVenda] = useState<DiaVenda[] | null>(null);
+  const [detalhe, setDetalhe] = useState<{ titulo: string; recorte: Recorte } | null>(null);
 
   useEffect(() => {
     supabase.from("resumo_campanhas").select("id,nome,inicio,fim,produto_id").order("inicio")
@@ -39,14 +44,20 @@ export default function Time() {
 
   useEffect(() => {
     const p = { p_de: periodo.de, p_ate: periodo.ate };
-    setTime(null); setParados(null); setMotivos(null); setApv(null);
+    setTime(null); setParados(null); setMotivos(null); setApv(null); setDiasVenda(null);
     supabase.rpc("painel_time_comercial", { ...p, p_produto: produto })
       .then(({ data }) => setTime((data as Linha[]) ?? []));
     supabase.rpc("painel_parados", { ...p, p_trilha: "comercial", p_produto: produto })
       .then(({ data }) => setParados((data as Parado[]) ?? []));
     supabase.rpc("painel_motivos_perda", { ...p, p_produto: produto })
       .then(({ data }) => setMotivos((data as Motivo[]) ?? []));
-    supabase.rpc("painel_pre_venda", p).then(({ data }) => setApv(((data as PreVenda[]) ?? [])[0] ?? null));
+    // O bloco do pré-vendas também respeita o curso escolhido. Antes ele era o
+    // único da tela que ignorava o filtro, e quem lia achava que o número era
+    // daquele curso.
+    supabase.rpc("painel_pre_venda", { ...p, p_produto: produto })
+      .then(({ data }) => setApv(((data as PreVenda[]) ?? [])[0] ?? null));
+    supabase.rpc("painel_vendas_periodo", { ...p, p_produto: produto })
+      .then(({ data }) => setDiasVenda((data as DiaVenda[]) ?? []));
   }, [periodo, produto, volta]);
 
   const totalFat = time?.reduce((s, l) => s + Number(l.faturamento), 0) ?? 0;
@@ -78,7 +89,60 @@ export default function Time() {
         vale a coluna Alunos.
       </p>
 
+      <h2><span className="idx">008</span> Vendas dia a dia</h2>
+      <p className="nota">
+        Matrícula por dia no período e no curso escolhidos acima, com o acumulado por cima. A linha cheia é o
+        que entrou em cada dia; a tracejada é o total somado, que é onde se enxerga aceleração ou freio.
+      </p>
+      {!diasVenda ? <p className="rotulo">Carregando</p> : diasVenda.length === 0 ? (
+        <p className="mudo">Sem venda no período.</p>
+      ) : (
+        <>
+          <div className="faixa" style={{ marginBottom: 16 }}>
+            <div>
+              <div className="rotulo">Matrículas no período</div>
+              <div className="valor num">{num(diasVenda.reduce((s, d) => s + Number(d.alunos), 0))}</div>
+            </div>
+            <div>
+              <div className="rotulo">Faturamento</div>
+              <div className="valor num">{brl(diasVenda.reduce((s, d) => s + Number(d.faturamento), 0))}</div>
+            </div>
+            <div>
+              <div className="rotulo">Média por dia</div>
+              <div className="valor num">
+                {(diasVenda.reduce((s, d) => s + Number(d.alunos), 0) / Math.max(1, diasVenda.length))
+                  .toFixed(1).replace(".", ",")}
+              </div>
+            </div>
+            <div>
+              <div className="rotulo">Melhor dia</div>
+              <div className="valor num">
+                {num(Math.max(0, ...diasVenda.map((d) => Number(d.alunos))))}
+              </div>
+              <div className="mudo num">
+                {dataCurta(diasVenda.reduce((m, d) => (Number(d.alunos) > Number(m.alunos) ? d : m), diasVenda[0]).dia)}
+              </div>
+            </div>
+          </div>
+          <Curva
+            rotulos={diasVenda.map((d) => dataCurta(d.dia))}
+            series={[
+              { nome: "Matrículas no dia", cor: "#121211", pontos: diasVenda.map((d) => Number(d.alunos)) },
+            ]}
+            altura={200}
+          />
+          <Curva
+            rotulos={diasVenda.map((d) => dataCurta(d.dia))}
+            series={[
+              { nome: "Acumulado no período", cor: "#76746D", tracejada: true, pontos: diasVenda.map((d) => Number(d.acumulado)) },
+            ]}
+            altura={160}
+          />
+        </>
+      )}
+
       <h2><span className="idx">009</span> Ranking de vendas</h2>
+      <p className="nota">Clique na linha de um vendedor para ver as matrículas dele no período.</p>
       {!time ? <p className="rotulo">Carregando</p> : time.length === 0 ? (
         <p className="mudo">Nenhuma atividade comercial no período.</p>
       ) : (
@@ -93,7 +157,14 @@ export default function Time() {
             </thead>
             <tbody>
               {time.map((l, i) => (
-                <tr key={l.responsavel}>
+                <tr
+                  key={l.responsavel}
+                  className="abre"
+                  onClick={() => setDetalhe({
+                    titulo: l.responsavel + ", " + dataCurta(periodo.de) + " a " + dataCurta(periodo.ate),
+                    recorte: { p_de: periodo.de, p_ate: periodo.ate, p_produto: produto, p_vendedor: l.responsavel },
+                  })}
+                >
                   <td className="num mudo">{l.responsavel === "Venda automática" ? "" : i + 1}</td>
                   <td>
                     <b>{l.responsavel}</b>
@@ -240,6 +311,9 @@ export default function Time() {
             Sem essa separação a entrega do agente aparecia muito menor do que é.
           </p>
         </>
+      )}
+      {detalhe && (
+        <Detalhe titulo={detalhe.titulo} recorte={detalhe.recorte} aoFechar={() => setDetalhe(null)} />
       )}
     </>
   );

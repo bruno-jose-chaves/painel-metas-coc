@@ -7,19 +7,18 @@ import { useIndicadores, useDestinos, partirDestino, type Indicador, type Destin
 
 type Pendencia = {
   tipo: string; valor: string; volume: number; matriculas: number;
-  primeira: string; ultima: string; sugestao: string | null;
+  primeira: string; ultima: string;
+  sugestao_produto: string | null; sugestao_produto_nome: string | null;
+  sugestao_indicador: string | null; sugestao_confianca: string | null;
 };
 type Campanha = { id: string; nome: string; produto_id: string | null };
 type Regra = {
-  id: number; campanha_id: string | null; turma_id: string | null;
+  id: number; campanha_id: string | null; turma_id: string | null; produto_id: string | null;
   indicador: string; tipo: string; valor: string;
 };
 
 const TIPO: Record<string, string> = { campanha_crm: "Campanha no CRM", formulario: "Formulário" };
 
-// Nome com cara de material rico já abre o formulário no indicador certo. É
-// palpite, não decisão: a pessoa confirma.
-const pareceMaterialRico = (v: string) => /material[\s-]?rico|mr[\s-]/i.test(v);
 
 export default function Pendencias({ admin }: { admin: boolean }) {
   const { volta, em, minutos } = useAtualizacao();
@@ -45,6 +44,29 @@ export default function Pendencias({ admin }: { admin: boolean }) {
     carregar();
   }, [volta, tudo]);
 
+  // Aplica o palpite que o nome já dá. O destino é o produto, não a campanha:
+  // "material rico do ACAFE" vale todo ano, e a data do lead resolve a turma.
+  async function aceitarSugestao(p: Pendencia) {
+    if (!p.sugestao_produto) return;
+    await apontar(p, "p:" + p.sugestao_produto, p.sugestao_indicador ?? "leads");
+  }
+
+  async function aceitarTodas() {
+    const comPalpite = (lista ?? []).filter((p) => p.sugestao_produto);
+    if (comPalpite.length === 0) return;
+    const linhas = comPalpite.map((p) => ({
+      ...partirDestino("p:" + p.sugestao_produto),
+      indicador: p.sugestao_indicador ?? "leads",
+      tipo: p.tipo,
+      valor: p.valor,
+    }));
+    const { error } = await supabase.from("captacao_regras").insert(linhas);
+    if (error) { setAviso(error.message); return; }
+    setLista((atual) => (atual ?? []).filter((x) => !x.sugestao_produto));
+    setAviso(`${comPalpite.length} regra${comPalpite.length > 1 ? "s" : ""} criada${comPalpite.length > 1 ? "s" : ""} pelo nome.`);
+    carregar();
+  }
+
   async function apontar(p: Pendencia, destino: string, indicador: string) {
     const { error } = await supabase.from("captacao_regras").insert({
       ...partirDestino(destino), indicador, tipo: p.tipo, valor: p.valor,
@@ -68,6 +90,7 @@ export default function Pendencias({ admin }: { admin: boolean }) {
   }
 
   const total = lista?.reduce((s, p) => s + Number(p.volume), 0) ?? 0;
+  const comPalpite = lista?.filter((p) => p.sugestao_produto).length ?? 0;
 
   return (
     <>
@@ -100,9 +123,16 @@ export default function Pendencias({ admin }: { admin: boolean }) {
         fecha a maior parte do buraco. A lista olha de 01/08/2026 em diante: o que aparece com nome de 2025 é peça
         antiga que continua no ar e segue trazendo lead agora, e a coluna de período mostra a data real.
       </p>
-      <div className="atalhos" style={{ marginBottom: 16 }}>
-        <button className={!tudo ? "ativo" : ""} onClick={() => setTudo(false)}>Com volume (10 ou mais)</button>
-        <button className={tudo ? "ativo" : ""} onClick={() => setTudo(true)}>Tudo, inclusive a cauda</button>
+      <div className="filtros">
+        <div className="atalhos">
+          <button className={!tudo ? "ativo" : ""} onClick={() => setTudo(false)}>Com volume (10 ou mais)</button>
+          <button className={tudo ? "ativo" : ""} onClick={() => setTudo(true)}>Tudo, inclusive a cauda</button>
+        </div>
+        {admin && comPalpite > 0 && (
+          <button className="btn" style={{ marginLeft: "auto" }} onClick={aceitarTodas}>
+            Aceitar os {comPalpite} palpites do nome
+          </button>
+        )}
       </div>
       {!lista ? <p className="rotulo">Carregando</p> : lista.length === 0 ? (
         <p className="mudo">Nada pendente. Tudo classificado.</p>
@@ -120,7 +150,9 @@ export default function Pendencias({ admin }: { admin: boolean }) {
                 <tr key={p.tipo + p.valor}>
                   <td style={{ maxWidth: 360, wordBreak: "break-word" }}>
                     <b>{p.valor}</b>
-                    {p.sugestao && <div className="rotulo">parece {p.sugestao}</div>}
+                    {p.sugestao_confianca && p.sugestao_produto && (
+                      <div className="rotulo">{p.sugestao_confianca}</div>
+                    )}
                   </td>
                   <td className="mudo">{TIPO[p.tipo] ?? p.tipo}</td>
                   <td className="n"><b>{num(p.volume)}</b></td>
@@ -136,14 +168,23 @@ export default function Pendencias({ admin }: { admin: boolean }) {
                         <Apontar
                           destinos={destinos}
                           indicadores={indicadores}
-                          indicadorInicial={pareceMaterialRico(p.valor) ? "material_rico" : "leads"}
+                          destinoInicial={p.sugestao_produto ? "p:" + p.sugestao_produto : ""}
+                          indicadorInicial={p.sugestao_indicador ?? "leads"}
                           aoConfirmar={(d, i) => apontar(p, d, i)}
                           aoCancelar={() => setApontando(null)}
                         />
                       ) : (
-                        <button className="btn claro" onClick={() => setApontando(p.tipo + p.valor)}>
-                          Apontar
-                        </button>
+                        <div style={{ display: "grid", gap: 6 }}>
+                          {p.sugestao_produto && (
+                            <button className="btn" onClick={() => aceitarSugestao(p)}>
+                              {p.sugestao_produto_nome} ·{" "}
+                              {indicadores.find((i) => i.id === p.sugestao_indicador)?.nome ?? p.sugestao_indicador}
+                            </button>
+                          )}
+                          <button className="btn claro" onClick={() => setApontando(p.tipo + p.valor)}>
+                            {p.sugestao_produto ? "Outro destino" : "Apontar"}
+                          </button>
+                        </div>
                       )}
                     </td>
                   )}
@@ -157,7 +198,9 @@ export default function Pendencias({ admin }: { admin: boolean }) {
 
       <h2><span className="idx">022</span> Regras já apontadas</h2>
       <p className="nota">
-        {indicadores.map((i) => i.nome + ": " + (i.ajuda ?? "")).join(" ")}
+        Regra apontada para <b>curso</b> vale para qualquer ano: a data do lead decide sozinha a turma e a
+        campanha, e ninguém precisa repontar nada em janeiro. Apontar para turma ou campanha só faz sentido
+        quando a regra é mesmo daquele ano. {indicadores.map((i) => i.nome + ": " + (i.ajuda ?? "")).join(" ")}
       </p>
       {!regras ? <p className="rotulo">Carregando</p> : regras.length === 0 ? (
         <p className="mudo">Nenhuma regra cadastrada. O painel está usando só a regra automática pelo nome do curso.</p>
@@ -173,7 +216,9 @@ export default function Pendencias({ admin }: { admin: boolean }) {
                   <td>
                     {r.turma_id
                       ? destinos.find((d) => d.id === "t:" + r.turma_id)?.nome ?? r.turma_id
-                      : campanhas.find((c) => c.id === r.campanha_id)?.nome ?? r.campanha_id}
+                      : r.produto_id
+                        ? (destinos.find((d) => d.id === "p:" + r.produto_id)?.nome ?? r.produto_id) + " · qualquer ano"
+                        : campanhas.find((c) => c.id === r.campanha_id)?.nome ?? r.campanha_id}
                   </td>
                   <td>{indicadores.find((i) => i.id === r.indicador)?.nome ?? r.indicador}</td>
                   <td className="mudo">{TIPO[r.tipo] ?? r.tipo}</td>
@@ -192,15 +237,16 @@ export default function Pendencias({ admin }: { admin: boolean }) {
 // Dois campos e um botão, em vez de uma lista com campanha vezes indicador.
 // Com turma no meio seriam dezenas de opções em um menu só.
 function Apontar({
-  destinos, indicadores, indicadorInicial, aoConfirmar, aoCancelar,
+  destinos, indicadores, destinoInicial, indicadorInicial, aoConfirmar, aoCancelar,
 }: {
   destinos: Destino[];
   indicadores: Indicador[];
+  destinoInicial: string;
   indicadorInicial: string;
   aoConfirmar: (destino: string, indicador: string) => void;
   aoCancelar: () => void;
 }) {
-  const [destino, setDestino] = useState("");
+  const [destino, setDestino] = useState(destinoInicial);
   const [indicador, setIndicador] = useState(indicadorInicial);
   const grupos = Array.from(new Set(destinos.map((d) => d.grupo)));
   const escolhido = indicadores.find((i) => i.id === indicador);

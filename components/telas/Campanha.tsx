@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Curva from "@/components/Curva";
+import Detalhe, { type Recorte } from "@/components/Detalhe";
 import { supabase } from "@/lib/supabase";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta } from "@/lib/formato";
@@ -19,6 +20,12 @@ type Resumo = {
 type Fase = {
   ordem: number; nome: string; inicio: string; fim: string; preco: number; bonus: string | null;
   meta_alunos: number; alunos: number; faturamento: number; ticket_medio: number | null; estado: string;
+  saldo_anterior: number; meta_ajustada: number | null; falta_na_fase: number | null;
+};
+type Ritmo = {
+  campanha_id: string; alunos: number; media_7: number; media_28: number; media_campanha: number;
+  necessario_dia: number; falta: number; dias_restantes: number; dias_uteis_restantes: number;
+  projecao_restante: number;
 };
 type Ponto = { dia: string; d: number; realizado: number | null; meta: number; anterior: number };
 type Projecao = {
@@ -66,6 +73,8 @@ export default function Campanha() {
   const [proj, setProj] = useState<Projecao | null>(null);
   const [cenarios, setCenarios] = useState<Cenario[] | null>(null);
   const [funil, setFunil] = useState<Funil | null>(null);
+  const [ritmo, setRitmo] = useState<Ritmo | null>(null);
+  const [detalhe, setDetalhe] = useState<{ titulo: string; recorte: Recorte } | null>(null);
   const [origens, setOrigens] = useState<Origem[] | null>(null);
   const [porOrigem, setPorOrigem] = useState<"campanha" | "fonte">("campanha");
   const [recompra, setRecompra] = useState<Recompra[] | null>(null);
@@ -88,6 +97,8 @@ export default function Campanha() {
     supabase.rpc("painel_projecao", p).then(({ data }) => setProj(((data as Projecao[]) ?? [])[0] ?? null));
     supabase.rpc("painel_cenarios", p).then(({ data }) => setCenarios((data as Cenario[]) ?? []));
     supabase.rpc("painel_funil", p).then(({ data }) => setFunil(((data as Funil[]) ?? [])[0] ?? null));
+    supabase.rpc("painel_ritmo").then(({ data }) =>
+      setRitmo(((data as Ritmo[]) ?? []).find((r) => r.campanha_id === id) ?? null));
     supabase.rpc("painel_recompra", p).then(({ data }) => setRecompra((data as Recompra[]) ?? []));
     supabase.rpc("painel_upsell_origem", p).then(({ data }) => setOrigemUpsell((data as UpsellOrigem[]) ?? []));
   }, [id, volta]);
@@ -213,32 +224,56 @@ export default function Campanha() {
               </div>
             </article>
 
+            {/* O cartão comparava o que falta por dia corrido com a média da
+                campanha inteira, e dava a impressão de folga: 3,24 contra
+                4,62. Os dois números não se comparam. A média da campanha
+                inclui o pico de lançamento, que não volta, e dia corrido
+                inclui domingo, em que ninguém vende. Agora a conta é por dia
+                útil contra o ritmo das últimas semanas, e a leitura que decide
+                é a última: quanto o resto da campanha costuma render contra o
+                que a meta pede. */}
             <article className="card">
               <div className="card-top">
                 <div>
-                  <div className="rotulo">Quanto precisa entrar por dia</div>
+                  <div className="rotulo">Quanto precisa entrar por dia útil</div>
                   <h3>Ritmo</h3>
                 </div>
+                {ritmo && (
+                  <span className={"selo " + (Number(ritmo.media_7) >= Number(ritmo.necessario_dia) ? "no_ritmo" : "atras")}>
+                    {Number(ritmo.media_7) >= Number(ritmo.necessario_dia) ? "Dá no ritmo atual" : "Acima do ritmo atual"}
+                  </span>
+                )}
               </div>
-              <div className="grande num">{num(proj.ritmo_necessario)} <small>alunos por dia</small></div>
+              <div className="grande num">
+                {ritmo ? num(ritmo.necessario_dia) : num(proj.ritmo_necessario)} <small>alunos por dia útil</small>
+              </div>
               <div className="legenda num">
-                <span>hoje está em {num(proj.ritmo_atual)} por dia</span>
-                <span>{num(proj.dias_restantes)} dias de venda</span>
+                <span>
+                  {ritmo ? `últimos 7 dias: ${num(ritmo.media_7)} por dia` : `${num(proj.dias_restantes)} dias de venda`}
+                </span>
+                <span>
+                  {ritmo ? `${num(ritmo.dias_uteis_restantes)} dias úteis restantes` : ""}
+                </span>
               </div>
               <div className="grade">
                 <div>
-                  <div className="rotulo">Falta para a meta</div>
+                  <div className="rotulo">A meta pede</div>
                   <div className="v num">{num(proj.falta_alunos)} alunos</div>
                 </div>
                 <div>
-                  <div className="rotulo">Atenção</div>
-                  <div className="v" style={{ fontSize: 14, fontWeight: 500, lineHeight: 1.45 }}>
-                    {Number(proj.fracao) >= 0.5
-                      ? "O ritmo por dia parece confortável, mas " + pct(Number(proj.fracao)) + " da curva já passou. O que sobra de campanha rende bem menos do que a média sugere."
-                      : "A campanha ainda está no começo da curva, então a projeção vai se firmar nas próximas semanas."}
+                  <div className="rotulo">O resto da campanha costuma render</div>
+                  <div className="v num">
+                    {ritmo ? num(ritmo.projecao_restante) + " alunos" : "-"}
                   </div>
                 </div>
               </div>
+              {ritmo && (
+                <div className="ids" style={{ marginTop: 12 }}>
+                  {Number(ritmo.projecao_restante) >= Number(ritmo.falta)
+                    ? `Pela curva do ano anterior, o que sobra de campanha dá conta do que falta.`
+                    : `Pela curva do ano anterior, sobram ${num(ritmo.projecao_restante)} alunos no que resta da campanha e a meta pede ${num(ritmo.falta)}. O buraco é de ${num(Number(ritmo.falta) - Number(ritmo.projecao_restante))}. A média da campanha inteira, ${num(ritmo.media_campanha)} por dia, inclui o pico de lançamento e não volta.`}
+                </div>
+              )}
             </article>
           </div>
           {Number(proj.fracao) < 0.35 && (
@@ -262,28 +297,63 @@ export default function Campanha() {
       ) : <p className="rotulo">Carregando</p>}
 
       <h2><span className="idx">004</span> Escada de preço por fase</h2>
+      <p className="nota">
+        A <b>meta ajustada</b> é a meta da fase mais o que as fases anteriores deixaram de trazer, ou menos o que
+        trouxeram a mais. Fase que vende abaixo não some: o buraco cai na próxima, porque a meta da campanha não
+        muda. Se cada fase bater a ajustada, a campanha fecha exatamente na meta. Em fase encerrada a coluna fica
+        vazia, porque ajustar meta de fase que já acabou é reescrever o passado. Clique na linha para ver as
+        matrículas da fase.
+      </p>
       {!fases ? <p className="rotulo">Carregando</p> : (
         <div className="rolar">
           <table className="tabela">
             <thead>
               <tr>
                 <th>Fase</th><th>Período</th><th className="n">Preço</th>
-                <th className="n">Meta</th><th className="n">Alunos</th><th className="n">Atingido</th>
+                <th className="n">Meta</th><th className="n">Meta ajustada</th>
+                <th className="n">Alunos</th><th className="n">Atingido</th>
                 <th className="n">Faturamento</th><th className="n">Ticket</th><th>Bônus</th>
               </tr>
             </thead>
             <tbody>
               {fases.map((f) => (
-                <tr key={f.ordem} className={f.estado === "atual" ? "destaque" : undefined}>
+                <tr
+                  key={f.ordem}
+                  className={(f.estado === "atual" ? "destaque " : "") + "abre"}
+                  onClick={() => setDetalhe({
+                    titulo: f.nome + " · " + c.nome,
+                    recorte: f.ordem === 0
+                      ? { p_campanha: id, p_ate: f.fim }
+                      : { p_campanha: id, p_fase: f.ordem },
+                  })}
+                >
                   <td>
                     <b>{f.nome}</b>
                     <div className="rotulo">{ESTADO[f.estado] ?? f.estado}</div>
                   </td>
                   <td className="num">{dataCurta(f.inicio)} a {dataCurta(f.fim)}</td>
                   <td className="n">{brl(f.preco, 2)}</td>
-                  <td className="n">{num(f.meta_alunos)}</td>
+                  <td className="n">{f.meta_alunos ? num(f.meta_alunos) : "-"}</td>
+                  <td className="n">
+                    {f.meta_ajustada == null ? "-" : (
+                      <>
+                        <b>{num(f.meta_ajustada)}</b>
+                        <div className="ids">
+                          {f.saldo_anterior === 0
+                            ? "em dia com as anteriores"
+                            : f.saldo_anterior > 0
+                              ? `${num(f.saldo_anterior)} a mais vindos de antes`
+                              : `${num(-f.saldo_anterior)} em atraso vindos de antes`}
+                        </div>
+                      </>
+                    )}
+                  </td>
                   <td className="n">{num(f.alunos)}</td>
-                  <td className="n">{f.meta_alunos ? pct(f.alunos / f.meta_alunos) : "-"}</td>
+                  <td className="n">
+                    {f.meta_ajustada
+                      ? pct(f.alunos / f.meta_ajustada)
+                      : f.meta_alunos ? pct(f.alunos / f.meta_alunos) : "-"}
+                  </td>
                   <td className="n">{brl(f.faturamento)}</td>
                   <td className="n">{brl(f.ticket_medio)}</td>
                   <td className="mudo">{f.bonus ?? "-"}</td>
@@ -294,6 +364,7 @@ export default function Campanha() {
               <tr>
                 <td colSpan={3}>Total</td>
                 <td className="n">{num(fases.reduce((s, f) => s + Number(f.meta_alunos ?? 0), 0))}</td>
+                <td className="n" />
                 <td className="n">{num(fases.reduce((s, f) => s + Number(f.alunos), 0))}</td>
                 <td className="n" />
                 <td className="n">{brl(fases.reduce((s, f) => s + Number(f.faturamento), 0))}</td>
@@ -520,6 +591,9 @@ export default function Campanha() {
             </div>
           </div>
         </>
+      )}
+      {detalhe && (
+        <Detalhe titulo={detalhe.titulo} recorte={detalhe.recorte} aoFechar={() => setDetalhe(null)} />
       )}
     </>
   );

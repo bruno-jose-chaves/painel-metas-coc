@@ -840,6 +840,14 @@ h3 { letter-spacing: -.02em; }
 @keyframes aparecer { from { opacity: 0 } }
 @keyframes entrar { from { transform: translateX(14px); opacity: .4 } }
 
+.gaveta.larga { width: min(840px, 100vw); }
+
+/* Linha que abre o detalhe. O cursor e o sublinhado no hover avisam que dá
+   para clicar, sem transformar a tabela inteira em botão. */
+.tabela tr.abre { cursor: pointer; }
+.tabela tr.abre:hover td { background: var(--lima-suave); }
+.tabela tr.abre td:first-child { position: relative; }
+
 .gaveta-topo {
   display: flex;
   justify-content: space-between;
@@ -855,6 +863,8 @@ h3 { letter-spacing: -.02em; }
   gap: 10px;
   align-content: start;
 }
+
+.gaveta-corpo .rolar { background: var(--superficie); }
 
 .insight {
   background: var(--superficie);

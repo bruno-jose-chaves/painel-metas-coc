@@ -28,11 +28,11 @@ const resumo = [
 ];
 
 const fases = [
-  { ordem: 0, nome: "Antes da campanha", inicio: "2026-06-30", fim: "2026-08-24", preco: null, bonus: "Reserva e venda lançadas antes da primeira fase", meta_alunos: 0, alunos: 60, faturamento: 35272, ticket_medio: 588, estado: "anterior" },
-  { ordem: 1, nome: "Pré-venda / Reserva", inicio: "2026-08-25", fim: "2026-09-07", preco: 594.8, bonus: "Lote 100 vagas", meta_alunos: 64, alunos: 44, faturamento: 26475.6, ticket_medio: 601.7, estado: "encerrada" },
-  { ordem: 2, nome: "Abertura oficial", inicio: "2026-09-08", fim: "2026-09-27", preco: 694.8, bonus: "Carrinho aberto", meta_alunos: 62, alunos: 43, faturamento: 28580.7, ticket_medio: 664.6, estado: "encerrada" },
-  { ordem: 3, nome: "Lives de Lançamento", inicio: "2026-09-28", fim: "2026-09-30", preco: 694.8, bonus: "3 noites ao vivo", meta_alunos: 71, alunos: 28, faturamento: 19357.2, ticket_medio: 691.3, estado: "atual" },
-  { ordem: 4, nome: "Pós-live", inicio: "2026-10-01", fim: "2026-10-11", preco: 794.8, bonus: "Semana Extra", meta_alunos: 36, alunos: 0, faturamento: 0, ticket_medio: null, estado: "futura" },
+  { ordem: 0, nome: "Antes da campanha", inicio: "2026-06-30", fim: "2026-08-24", preco: null, bonus: "Reserva e venda lançadas antes da primeira fase", meta_alunos: 0, alunos: 60, faturamento: 35272, ticket_medio: 588, estado: "anterior", saldo_anterior: 0, meta_ajustada: null, falta_na_fase: null },
+  { ordem: 1, nome: "Pré-venda / Reserva", inicio: "2026-08-25", fim: "2026-09-07", preco: 594.8, bonus: "Lote 100 vagas", meta_alunos: 64, alunos: 44, faturamento: 26475.6, ticket_medio: 601.7, estado: "encerrada", saldo_anterior: -8, meta_ajustada: null, falta_na_fase: null },
+  { ordem: 2, nome: "Abertura oficial", inicio: "2026-09-08", fim: "2026-09-27", preco: 694.8, bonus: "Carrinho aberto", meta_alunos: 62, alunos: 43, faturamento: 28580.7, ticket_medio: 664.6, estado: "encerrada", saldo_anterior: -8, meta_ajustada: null, falta_na_fase: null },
+  { ordem: 3, nome: "Lives de Lançamento", inicio: "2026-09-28", fim: "2026-09-30", preco: 694.8, bonus: "3 noites ao vivo", meta_alunos: 71, alunos: 28, faturamento: 19357.2, ticket_medio: 691.3, estado: "atual", saldo_anterior: -8, meta_ajustada: 44, falta_na_fase: 25 },
+  { ordem: 4, nome: "Pós-live", inicio: "2026-10-01", fim: "2026-10-11", preco: 794.8, bonus: "Semana Extra", meta_alunos: 36, alunos: 0, faturamento: 0, ticket_medio: null, estado: "futura", saldo_anterior: -8, meta_ajustada: 44, falta_na_fase: 25 },
 ];
 
 const vendasDia = [
@@ -178,6 +178,22 @@ const rotas0 = {
     { dia: "2026-10-06", conversas_novas: 46, requentados: 1, leads_novos: 43 },
     { dia: "2026-10-07", conversas_novas: 175, requentados: 11, leads_novos: 44 },
     { dia: "2026-10-08", conversas_novas: 5, requentados: 0, leads_novos: 12 },
+  ],
+  produtos: [
+    { id: "metodo-acafe", nome: "Método de Aprovação ACAFE", ordem: 1 },
+    { id: "missao-ufsc", nome: "Missão UFSC", ordem: 2 },
+  ],
+  "rpc/painel_vendas_periodo": [
+    { dia: "2026-09-28", alunos: 9, faturamento: 6253, acumulado: 100 },
+    { dia: "2026-09-29", alunos: 4, faturamento: 2779, acumulado: 104 },
+    { dia: "2026-09-30", alunos: 6, faturamento: 4100, acumulado: 110 },
+  ],
+  "rpc/painel_vendas_detalhe": [
+    { data: "2026-09-30", aluno: "Fulana de Tal", curso: "Método ACAFE", vendedor: "Márcia",
+      valor_tabela: 894.8, desconto: 0.11, valor_venda: 794.9, cidade: "Blumenau", turma: "Método ACAFE 2026/2" },
+  ],
+  "rpc/sugerir_regra": [
+    { produto_id: "missao-ufsc", produto: "Missão UFSC", indicador: "material_rico", confianca: "o nome diz o curso e o tipo" },
   ],
   "rpc/painel_pendencias": [
     { tipo: "campanha_crm", valor: "SEMI 26/2 Leads PréVest", volume: 236, matriculas: 9, primeira: "2026-08-01", ultima: "2026-10-06", sugestao: null },
