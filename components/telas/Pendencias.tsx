@@ -3,20 +3,23 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, dataCurta } from "@/lib/formato";
+import { useIndicadores, useDestinos, partirDestino, type Indicador, type Destino } from "@/lib/indicadores";
 
 type Pendencia = {
   tipo: string; valor: string; volume: number; matriculas: number;
   primeira: string; ultima: string; sugestao: string | null;
 };
 type Campanha = { id: string; nome: string; produto_id: string | null };
-type Regra = { id: number; campanha_id: string; indicador: string; tipo: string; valor: string };
+type Regra = {
+  id: number; campanha_id: string | null; turma_id: string | null;
+  indicador: string; tipo: string; valor: string;
+};
 
 const TIPO: Record<string, string> = { campanha_crm: "Campanha no CRM", formulario: "Formulário" };
-const INDICADORES = [
-  { id: "leads", nome: "Leads captados" },
-  { id: "inscritos_lives", nome: "Inscritos nas lives" },
-  { id: "reservas", nome: "Reservas" },
-];
+
+// Nome com cara de material rico já abre o formulário no indicador certo. É
+// palpite, não decisão: a pessoa confirma.
+const pareceMaterialRico = (v: string) => /material[\s-]?rico|mr[\s-]/i.test(v);
 
 export default function Pendencias({ admin }: { admin: boolean }) {
   const { volta, em, minutos } = useAtualizacao();
@@ -25,6 +28,9 @@ export default function Pendencias({ admin }: { admin: boolean }) {
   const [regras, setRegras] = useState<Regra[] | null>(null);
   const [aviso, setAviso] = useState("");
   const [tudo, setTudo] = useState(false);
+  const [apontando, setApontando] = useState<string | null>(null);
+  const indicadores = useIndicadores();
+  const destinos = useDestinos();
 
   function carregar() {
     supabase.rpc("painel_pendencias", { p_desde: "2026-08-01", p_minimo: tudo ? 1 : 10 })
@@ -39,12 +45,20 @@ export default function Pendencias({ admin }: { admin: boolean }) {
     carregar();
   }, [volta, tudo]);
 
-  async function apontar(p: Pendencia, campanhaId: string, indicador: string) {
+  async function apontar(p: Pendencia, destino: string, indicador: string) {
     const { error } = await supabase.from("captacao_regras").insert({
-      campanha_id: campanhaId, indicador, tipo: p.tipo, valor: p.valor,
+      ...partirDestino(destino), indicador, tipo: p.tipo, valor: p.valor,
     });
-    setAviso(error ? error.message : `"${p.valor}" passou a contar em ${indicador}.`);
-    if (!error) carregar();
+    setApontando(null);
+    if (error) { setAviso(error.message); return; }
+    // Some da lista na hora. Antes só saía depois que a classificação rodava, e
+    // para campanha do CRM nem isso acontecia, porque a classificação ignorava
+    // a decisão apontada aqui. A pessoa apontava e o item continuava ali.
+    setLista((atual) => (atual ?? []).filter((x) => !(x.tipo === p.tipo && x.valor === p.valor)));
+    const nome = destinos.find((d) => d.id === destino)?.nome ?? destino;
+    const ind = indicadores.find((i) => i.id === indicador)?.nome ?? indicador;
+    setAviso(`"${p.valor}" passou a contar como ${ind} em ${nome}.`);
+    carregar();
   }
 
   async function remover(id: number) {
@@ -113,25 +127,24 @@ export default function Pendencias({ admin }: { admin: boolean }) {
                   <td className="n">{Number(p.matriculas) > 0 ? num(p.matriculas) : "-"}</td>
                   <td className="mudo num">{dataCurta(p.primeira)} a {dataCurta(p.ultima)}</td>
                   {admin && (
-                    <td>
-                      <select
-                        defaultValue=""
-                        onChange={(e) => {
-                          if (!e.target.value) return;
-                          const [cid, ind] = e.target.value.split("|");
-                          apontar(p, cid, ind);
-                          e.target.value = "";
-                        }}
-                      >
-                        <option value="">escolher</option>
-                        {campanhas.map((c) =>
-                          INDICADORES.map((i) => (
-                            <option key={c.id + i.id} value={c.id + "|" + i.id}>
-                              {c.nome} · {i.nome}
-                            </option>
-                          ))
-                        )}
-                      </select>
+                    <td style={{ minWidth: 200 }}>
+                      {p.valor.startsWith("(sem campanha") ? (
+                        <span className="mudo">
+                          não é uma campanha, é a sobra: negócio que entrou sem campanha nenhuma no CRM
+                        </span>
+                      ) : apontando === p.tipo + p.valor ? (
+                        <Apontar
+                          destinos={destinos}
+                          indicadores={indicadores}
+                          indicadorInicial={pareceMaterialRico(p.valor) ? "material_rico" : "leads"}
+                          aoConfirmar={(d, i) => apontar(p, d, i)}
+                          aoCancelar={() => setApontando(null)}
+                        />
+                      ) : (
+                        <button className="btn claro" onClick={() => setApontando(p.tipo + p.valor)}>
+                          Apontar
+                        </button>
+                      )}
                     </td>
                   )}
                 </tr>
@@ -143,19 +156,26 @@ export default function Pendencias({ admin }: { admin: boolean }) {
       {aviso && <div className="aviso ok" style={{ marginTop: 12 }}>{aviso}</div>}
 
       <h2><span className="idx">022</span> Regras já apontadas</h2>
+      <p className="nota">
+        {indicadores.map((i) => i.nome + ": " + (i.ajuda ?? "")).join(" ")}
+      </p>
       {!regras ? <p className="rotulo">Carregando</p> : regras.length === 0 ? (
         <p className="mudo">Nenhuma regra cadastrada. O painel está usando só a regra automática pelo nome do curso.</p>
       ) : (
         <div className="rolar">
           <table className="tabela">
             <thead>
-              <tr><th>Campanha</th><th>Indicador</th><th>Tipo</th><th>O quê</th>{admin && <th />}</tr>
+              <tr><th>Aponta para</th><th>Indicador</th><th>Tipo</th><th>O quê</th>{admin && <th />}</tr>
             </thead>
             <tbody>
               {regras.map((r) => (
                 <tr key={r.id}>
-                  <td>{campanhas.find((c) => c.id === r.campanha_id)?.nome ?? r.campanha_id}</td>
-                  <td>{INDICADORES.find((i) => i.id === r.indicador)?.nome ?? r.indicador}</td>
+                  <td>
+                    {r.turma_id
+                      ? destinos.find((d) => d.id === "t:" + r.turma_id)?.nome ?? r.turma_id
+                      : campanhas.find((c) => c.id === r.campanha_id)?.nome ?? r.campanha_id}
+                  </td>
+                  <td>{indicadores.find((i) => i.id === r.indicador)?.nome ?? r.indicador}</td>
                   <td className="mudo">{TIPO[r.tipo] ?? r.tipo}</td>
                   <td style={{ wordBreak: "break-word" }}>{r.valor}</td>
                   {admin && <td><button className="btn claro" onClick={() => remover(r.id)}>Tirar</button></td>}
@@ -166,5 +186,49 @@ export default function Pendencias({ admin }: { admin: boolean }) {
         </div>
       )}
     </>
+  );
+}
+
+// Dois campos e um botão, em vez de uma lista com campanha vezes indicador.
+// Com turma no meio seriam dezenas de opções em um menu só.
+function Apontar({
+  destinos, indicadores, indicadorInicial, aoConfirmar, aoCancelar,
+}: {
+  destinos: Destino[];
+  indicadores: Indicador[];
+  indicadorInicial: string;
+  aoConfirmar: (destino: string, indicador: string) => void;
+  aoCancelar: () => void;
+}) {
+  const [destino, setDestino] = useState("");
+  const [indicador, setIndicador] = useState(indicadorInicial);
+  const grupos = Array.from(new Set(destinos.map((d) => d.grupo)));
+  const escolhido = indicadores.find((i) => i.id === indicador);
+
+  return (
+    <div style={{ display: "grid", gap: 6 }}>
+      <select value={destino} onChange={(e) => setDestino(e.target.value)}>
+        <option value="">para qual curso</option>
+        {grupos.map((g) => (
+          <optgroup key={g} label={g}>
+            {destinos.filter((d) => d.grupo === g).map((d) => (
+              <option key={d.id} value={d.id}>{d.nome}</option>
+            ))}
+          </optgroup>
+        ))}
+      </select>
+      <select value={indicador} onChange={(e) => setIndicador(e.target.value)}>
+        {indicadores.map((i) => <option key={i.id} value={i.id}>{i.nome}</option>)}
+      </select>
+      {escolhido && !escolhido.conta_como_lead && (
+        <div className="ids">não entra na conta de leads captados</div>
+      )}
+      <div style={{ display: "flex", gap: 6 }}>
+        <button className="btn" disabled={!destino} onClick={() => aoConfirmar(destino, indicador)}>
+          Apontar
+        </button>
+        <button className="btn claro" onClick={aoCancelar}>Cancelar</button>
+      </div>
+    </div>
   );
 }

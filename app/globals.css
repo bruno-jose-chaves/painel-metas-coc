@@ -659,6 +659,13 @@ h3 { letter-spacing: -.02em; }
   .faixa .valor { font-size: 22px; }
   .card { padding: 18px; }
   .tabela th, .tabela td { padding: 10px 11px; }
+  /* No telefone a tabela não encolhe até a coluna partir a palavra no meio.
+     Ela mantém largura mínima e rola para o lado, que a sombra na borda já
+     anuncia. Ler "inscri coes- prevest- 26-2" em quatro linhas é pior do que
+     arrastar o dedo. */
+  .tabela { min-width: 560px; }
+  .tabela td[style] { word-break: normal !important; }
+  .tabela td, .tabela th { overflow-wrap: break-word; }
   h2 { margin: 34px 0 12px; }
 }
 

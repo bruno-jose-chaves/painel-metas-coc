@@ -210,6 +210,10 @@ const rotas0 = {
   metas: [{ nivel: 2, alunos: 263, faturamento: 185673 }],
   fases: fases,
   "rpc/painel_origem_matriculas": origemMat,
+  indicadores_captacao: [
+    { id: "leads", nome: "Leads captados", ajuda: "Pessoa que entrou no funil do comercial.", conta_como_lead: true, ordem: 10 },
+    { id: "material_rico", nome: "Material rico (lead frio)", ajuda: "Vai para o Agente de Pré-vendas.", conta_como_lead: false, ordem: 40 },
+  ],
   "rpc/painel_insights": [
     { chave: "resposta:1", tipo: "resposta_pendente", publico: "comercial", prioridade: 1,
       titulo: "Ingrid Prigol falou e ficou sem resposta",
@@ -318,7 +322,7 @@ for (const [rota, esperado] of telas) {
 // A conferência acima diz que renderizou; estas dizem se dá para ler.
 const retratos = [
   ["notebook", 1280, 800, ["/", "/campanha/", "/comercial/", "/marketing/?v=passagem", "/campanha/?v=upsell"]],
-  ["telefone", 390, 844, ["/", "/campanha/", "/comercial/"]],
+  ["telefone", 390, 844, ["/", "/campanha/", "/comercial/", "/marketing/?v=paginas", "/campanha/?v=upsell", "/comercial/?v=lancamentos", "/ajustes/"]],
 ];
 for (const [nome, width, height, rotas] of retratos) {
   const c2 = await b.newContext({ viewport: { width, height } });

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export type Aba = { id: string; nome: string; oque?: string; marcador?: number | null };
 
@@ -34,6 +34,15 @@ export default function SubAbas({
   aba: string;
   aoEscolher: (id: string) => void;
 }) {
+  const nav = useRef<HTMLElement>(null);
+
+  // No telefone as abas não cabem todas. Se a ativa está fora da vista, quem
+  // abre o link não vê em que aba está. Então ela se puxa para dentro.
+  useEffect(() => {
+    const alvo = nav.current?.querySelector<HTMLElement>("button.ativo");
+    alvo?.scrollIntoView({ inline: "center", block: "nearest" });
+  }, [aba]);
+
   // A linha embaixo das abas não é enfeite: "Passagem", "Captação" e
   // "Pendências" são nomes curtos que só fazem sentido para quem construiu a
   // tela. Dizer em uma frase o que tem dentro evita a pessoa abrir aba por aba
@@ -42,7 +51,7 @@ export default function SubAbas({
 
   return (
     <div className="subnav-caixa">
-      <nav className="subnav">
+      <nav className="subnav" ref={nav}>
         {abas.map((a) => (
           <button
             key={a.id}

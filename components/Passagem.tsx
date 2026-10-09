@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, pct, dataCurta } from "@/lib/formato";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
+import { useIndicadores, useDestinos, partirDestino, type Indicador, type Destino } from "@/lib/indicadores";
 
 type Linha = {
   identificador: string; conversoes: number; campanhas: string[] | null; pessoas_crm: number;
@@ -13,7 +14,6 @@ type Linha = {
   diagnostico: string; sugestao: string | null;
 };
 type Dia = { dia: string; conversoes: number; negocios: number; razao: number | null };
-type Campanha = { id: string; nome: string };
 
 const SITUACAO: Record<string, string> = {
   alerta: "Não está passando", atencao: "Passando em parte", ok: "Saudável", sem_fluxo: "Sem fluxo apontado",
@@ -21,19 +21,15 @@ const SITUACAO: Record<string, string> = {
 const CLASSE: Record<string, string> = {
   alerta: "atras", atencao: "atencao", ok: "no_ritmo", sem_fluxo: "encerrada",
 };
-const INDICADORES = [
-  { id: "leads", nome: "Leads captados" },
-  { id: "inscritos_lives", nome: "Inscritos nas lives" },
-  { id: "reservas", nome: "Reservas" },
-];
 
 export default function Passagem({ admin }: { admin: boolean }) {
   const { volta, em, minutos } = useAtualizacao();
   const [periodo, setPeriodo] = useState<Periodo>(ultimosDias(60));
   const [lista, setLista] = useState<Linha[] | null>(null);
   const [dias, setDias] = useState<Dia[] | null>(null);
-  const [campanhas, setCampanhas] = useState<Campanha[]>([]);
   const [apontando, setApontando] = useState<string | null>(null);
+  const indicadores = useIndicadores();
+  const destinos = useDestinos();
   const [aviso, setAviso] = useState("");
 
   function carregar() {
@@ -43,19 +39,15 @@ export default function Passagem({ admin }: { admin: boolean }) {
       .then(({ data }) => setDias((data as Dia[]) ?? []));
   }
 
-  useEffect(() => {
-    supabase.from("resumo_campanhas").select("id,nome").order("inicio")
-      .then(({ data }) => setCampanhas((data as Campanha[]) ?? []));
-  }, [volta]);
-
   useEffect(() => { setLista(null); setDias(null); carregar(); }, [periodo, volta]);
 
   // Aponta de uma vez o formulário e a campanha do CRM que ele alimenta: é esse
   // par que permite conferir a passagem.
-  async function apontar(l: Linha, campanhaId: string, indicador: string, campanhaCrm: string) {
+  async function apontar(l: Linha, destino: string, indicador: string, campanhaCrm: string) {
+    const alvo = partirDestino(destino);
     const { error } = await supabase.from("captacao_regras").insert([
-      { campanha_id: campanhaId, indicador, tipo: "formulario", valor: l.identificador },
-      { campanha_id: campanhaId, indicador, tipo: "campanha_crm", valor: campanhaCrm },
+      { ...alvo, indicador, tipo: "formulario", valor: l.identificador },
+      { ...alvo, indicador, tipo: "campanha_crm", valor: campanhaCrm },
     ]);
     setAviso(error ? error.message : `"${l.identificador}" ligado a "${campanhaCrm}".`);
     setApontando(null);
@@ -140,7 +132,8 @@ export default function Passagem({ admin }: { admin: boolean }) {
                       ) : apontando === l.identificador ? (
                         <Apontar
                           linha={l}
-                          campanhas={campanhas}
+                          destinos={destinos}
+                          indicadores={indicadores}
                           aoConfirmar={apontar}
                           aoCancelar={() => setApontando(null)}
                         />
@@ -183,24 +176,33 @@ export default function Passagem({ admin }: { admin: boolean }) {
 }
 
 function Apontar({
-  linha, campanhas, aoConfirmar, aoCancelar,
+  linha, destinos, indicadores, aoConfirmar, aoCancelar,
 }: {
   linha: Linha;
-  campanhas: Campanha[];
-  aoConfirmar: (l: Linha, campanhaId: string, indicador: string, campanhaCrm: string) => void;
+  destinos: Destino[];
+  indicadores: Indicador[];
+  aoConfirmar: (l: Linha, destino: string, indicador: string, campanhaCrm: string) => void;
   aoCancelar: () => void;
 }) {
-  const [campanha, setCampanha] = useState(campanhas[0]?.id ?? "");
+  const [destino, setDestino] = useState("");
   const [indicador, setIndicador] = useState("leads");
   const [campanhaCrm, setCampanhaCrm] = useState(linha.sugestao ?? "");
+  const grupos = Array.from(new Set(destinos.map((d) => d.grupo)));
 
   return (
     <div style={{ display: "grid", gap: 6 }}>
-      <select value={campanha} onChange={(e) => setCampanha(e.target.value)}>
-        {campanhas.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
+      <select value={destino} onChange={(e) => setDestino(e.target.value)}>
+        <option value="">para qual curso</option>
+        {grupos.map((g) => (
+          <optgroup key={g} label={g}>
+            {destinos.filter((d) => d.grupo === g).map((d) => (
+              <option key={d.id} value={d.id}>{d.nome}</option>
+            ))}
+          </optgroup>
+        ))}
       </select>
       <select value={indicador} onChange={(e) => setIndicador(e.target.value)}>
-        {INDICADORES.map((i) => <option key={i.id} value={i.id}>{i.nome}</option>)}
+        {indicadores.map((i) => <option key={i.id} value={i.id}>{i.nome}</option>)}
       </select>
       <input
         value={campanhaCrm}
@@ -210,8 +212,8 @@ function Apontar({
       <div style={{ display: "flex", gap: 6 }}>
         <button
           className="btn"
-          disabled={!campanha || !campanhaCrm.trim()}
-          onClick={() => aoConfirmar(linha, campanha, indicador, campanhaCrm.trim())}
+          disabled={!destino || !campanhaCrm.trim()}
+          onClick={() => aoConfirmar(linha, destino, indicador, campanhaCrm.trim())}
         >
           Ligar
         </button>

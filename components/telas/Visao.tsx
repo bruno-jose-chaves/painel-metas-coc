@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useIndicadores } from "@/lib/indicadores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta, dataHora } from "@/lib/formato";
 import { hojeSP, somaDias } from "@/lib/periodo";
@@ -75,6 +76,7 @@ type Ritmo = {
 
 export default function Visao() {
   const { volta, em, minutos } = useAtualizacao();
+  const indicadores = useIndicadores();
   const [dados, setDados] = useState<Resumo[] | null>(null);
   const [sync, setSync] = useState<string | null>(null);
   const [proj, setProj] = useState<Record<string, Projecao>>({});
@@ -266,20 +268,37 @@ export default function Visao() {
                 {metasLeads[c.id].map((m) => {
                   const ating = m.atingido == null ? 0 : Number(m.atingido);
                   const esperado = m.meta > 0 ? Number(m.esperado_hoje) / m.meta : 0;
+                  const ind = indicadores.find((i) => i.id === m.indicador);
+                  const semMeta = !m.meta;
                   return (
                     <div key={m.indicador} style={{ marginTop: 16 }}>
                       <div className="legenda">
                         <span><b>{m.rotulo}</b></span>
-                        <span className={"selo " + m.situacao} style={{ fontSize: 10 }}>{SITUACAO[m.situacao] ?? m.situacao}</span>
+                        {!semMeta && (
+                          <span className={"selo " + m.situacao} style={{ fontSize: 10 }}>{SITUACAO[m.situacao] ?? m.situacao}</span>
+                        )}
                       </div>
-                      <div className="barra">
-                        <i style={{ width: `${Math.min(ating, 1) * 100}%` }} />
-                        <b style={{ left: `${Math.min(esperado, 1) * 100}%` }} title="Esperado para hoje" />
-                      </div>
-                      <div className="legenda num">
-                        <span>{num(m.realizado)} de {num(m.meta)} · {pct(ating)}</span>
-                        <span>esperado hoje: {num(m.esperado_hoje)}</span>
-                      </div>
+                      {/* Indicador sem meta, como material rico, é acompanhamento
+                          e não cobrança: mostra o número e não desenha barra. */}
+                      {semMeta ? (
+                        <div className="legenda num" style={{ marginTop: 2 }}>
+                          <span><b>{num(m.realizado)}</b> no período</span>
+                          {ind && !ind.conta_como_lead && (
+                            <span className="mudo">fora da conta de leads captados</span>
+                          )}
+                        </div>
+                      ) : (
+                        <>
+                          <div className="barra">
+                            <i style={{ width: `${Math.min(ating, 1) * 100}%` }} />
+                            <b style={{ left: `${Math.min(esperado, 1) * 100}%` }} title="Esperado para hoje" />
+                          </div>
+                          <div className="legenda num">
+                            <span>{num(m.realizado)} de {num(m.meta)} · {pct(ating)}</span>
+                            <span>esperado hoje: {num(m.esperado_hoje)}</span>
+                          </div>
+                        </>
+                      )}
                       {m.tem_regra && Number(m.por_crm) > 0 && Number(m.por_formulario) > 0 ? (
                         <div className="ids" style={{ marginTop: 4 }}>
                           {num(m.por_crm)} pessoas pelo CRM · {num(m.por_formulario)} conversões no formulário ·
@@ -304,6 +323,9 @@ export default function Visao() {
           </div>
           <p className="rodape">
             Abaixo de cada barra estão as páginas que entraram na conta, para o número poder ser conferido.
+            Material rico aparece separado e fora da conta de leads captados: quem baixa material vai para o Agente
+            de Pré-vendas, não para a fila do comercial, e somar os dois inflaria a captação e pioraria a conversão
+            do time sem ninguém ter feito nada errado.
             Leads captados e inscritos nas lives contam unidades diferentes de propósito: o CRM conta pessoa, o
             formulário conta envio, e quem preenche duas vezes aparece duas vezes no segundo. Quando os dois existem,
             vale o do CRM. A contagem começa no primeiro dia em que o formulário da campanha registrou inscrição, que
