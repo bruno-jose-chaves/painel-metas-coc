@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import SeletorPeriodo from "@/components/Periodo";
 import Curva from "@/components/Curva";
 import { supabase } from "@/lib/supabase";
+import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, pct, dataCurta } from "@/lib/formato";
 import { hojeSP, somaDias, ultimosDias, type Periodo } from "@/lib/periodo";
@@ -156,9 +157,9 @@ export default function Gestao() {
           <Curva
             rotulos={dias.map((x) => dataCurta(x.dia))}
             series={[
-              { nome: "Conversas abertas", cor: "#0A0A0A", pontos: dias.map((x) => Number(x.conversas_novas)) },
-              { nome: "Leads novos", cor: "#6B6A66", pontos: dias.map((x) => Number(x.leads_novos)) },
-              { nome: "Requentados", cor: "#6B6A66", tracejada: true, pontos: dias.map((x) => Number(x.requentados)) },
+              { nome: "Conversas abertas", cor: COR.tinta, pontos: dias.map((x) => Number(x.conversas_novas)) },
+              { nome: "Leads novos", cor: COR.cinza, pontos: dias.map((x) => Number(x.leads_novos)) },
+              { nome: "Requentados", cor: COR.cinza, tracejada: true, pontos: dias.map((x) => Number(x.requentados)) },
             ]}
           />
           <div className="rolar" style={{ marginTop: 16 }}>

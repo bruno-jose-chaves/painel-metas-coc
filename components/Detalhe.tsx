@@ -53,7 +53,7 @@ export default function Detalhe({
         <div className="gaveta-topo">
           <div>
             <div className="rotulo">Matrículas</div>
-            <h3 style={{ margin: "4px 0 0", fontSize: 19, fontWeight: 750, letterSpacing: "-.02em" }}>
+            <h3 className="gaveta-titulo">
               {titulo}
             </h3>
             {lista && (

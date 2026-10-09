@@ -99,7 +99,7 @@ export default function Insights() {
             <div className="gaveta-topo">
               <div>
                 <div className="rotulo">Vale olhar hoje</div>
-                <h3 style={{ margin: "4px 0 0", fontSize: 19, fontWeight: 750, letterSpacing: "-.02em" }}>
+                <h3 className="gaveta-titulo">
                   {lista == null ? "Procurando" : lista.length === 0 ? "Nada aberto" : `${lista.length} para olhar`}
                 </h3>
               </div>

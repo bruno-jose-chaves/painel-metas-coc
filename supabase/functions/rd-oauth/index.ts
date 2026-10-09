@@ -6,7 +6,11 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const db = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
-const APP_URL = Deno.env.get("APP_URL") ?? "https://coc-painel-bj26.netlify.app";
+// O endereço de volta do OAuth. O padrão apontava para um subdomínio da Netlify
+// que não é mais nosso: subdomínio abandonado pode ser reivindicado por outra
+// pessoa, e o retorno do OAuth leva parâmetros junto. Padrão agora é o endereço
+// de verdade do painel.
+const APP_URL = Deno.env.get("APP_URL") ?? "https://painel-metas-coc.pages.dev";
 
 const CFG = {
   crm: {
@@ -38,7 +42,7 @@ const CFG = {
 } as const;
 
 const voltar = (resultado: string, msg = "") =>
-  Response.redirect(`${APP_URL}/configuracao?rd=${resultado}${msg ? "&msg=" + encodeURIComponent(msg) : ""}`, 302);
+  Response.redirect(`${APP_URL}/ajustes/?v=sistema&rd=${resultado}${msg ? "&msg=" + encodeURIComponent(msg) : ""}`, 302);
 
 Deno.serve(async (req) => {
   const url = new URL(req.url);

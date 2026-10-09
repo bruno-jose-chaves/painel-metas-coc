@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useIndicadores } from "@/lib/indicadores";
+import Detalhe, { type Recorte } from "@/components/Detalhe";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta, dataHora } from "@/lib/formato";
 import { hojeSP, somaDias } from "@/lib/periodo";
@@ -77,6 +78,7 @@ type Ritmo = {
 export default function Visao() {
   const { volta, em, minutos } = useAtualizacao();
   const indicadores = useIndicadores();
+  const [detalhe, setDetalhe] = useState<{ titulo: string; recorte: Recorte } | null>(null);
   const [dados, setDados] = useState<Resumo[] | null>(null);
   const [sync, setSync] = useState<string | null>(null);
   const [proj, setProj] = useState<Record<string, Projecao>>({});
@@ -139,7 +141,15 @@ export default function Visao() {
       </div>
 
       <div className="faixa">
-        <div>
+        <div
+          className={periodo && periodo.alunos > 0 ? "abre" : undefined}
+          onClick={() => {
+            if (!periodo || !periodo.alunos) return;
+            const { de, ate } = intervalo(janela);
+            setDetalhe({ titulo: "Matrículas de " + (de === ate ? dataCurta(ate) : `${dataCurta(de)} a ${dataCurta(ate)}`),
+                         recorte: { p_de: de, p_ate: ate } });
+          }}
+        >
           <div className="rotulo">Matrículas</div>
           <div className="valor num">{periodo ? num(periodo.alunos) : "..."}</div>
           {periodo && periodo.dias > 1 && <div className="mudo num">{num((periodo.alunos / periodo.dias).toFixed(1))} por dia</div>}
@@ -198,7 +208,11 @@ export default function Visao() {
                 <span className={"selo " + c.situacao}>{SITUACAO[c.situacao] ?? c.situacao}</span>
               </div>
 
-              <div className="grande num">{num(c.alunos)} <small>/ {num(c.meta_alunos)} alunos</small></div>
+              <div
+                className="grande num abre"
+                title="Ver as matrículas desta campanha"
+                onClick={() => setDetalhe({ titulo: c.nome, recorte: { p_campanha: c.id } })}
+              >{num(c.alunos)} <small>/ {num(c.meta_alunos)} alunos</small></div>
               <div className="barra" aria-label="Progresso da meta">
                 <i style={{ width: `${Math.min(ating, 1) * 100}%` }} />
                 <b style={{ left: `${Math.min(esperado, 1) * 100}%` }} title="Meta esperada para hoje" />
@@ -300,18 +314,18 @@ export default function Visao() {
                         </>
                       )}
                       {m.tem_regra && Number(m.por_crm) > 0 && Number(m.por_formulario) > 0 ? (
-                        <div className="ids" style={{ marginTop: 4 }}>
+                        <div className="ids">
                           {num(m.por_crm)} pessoas pelo CRM · {num(m.por_formulario)} conversões no formulário ·
                           vale o do CRM, que conta gente, enquanto o formulário conta cada envio
                         </div>
                       ) : null}
                       {m.desde ? (
-                        <div className="ids" style={{ marginTop: 4 }}>
+                        <div className="ids">
                           contando desde {dataCurta(m.desde)}, que é quando a captação começou
                         </div>
                       ) : null}
                       {m.identificadores?.length ? (
-                        <div className="ids" style={{ marginTop: 4 }}>
+                        <div className="ids">
                           {m.identificadores.join(" · ")}
                         </div>
                       ) : null}
@@ -420,6 +434,9 @@ export default function Visao() {
             <b> No ritmo das últimas semanas</b> repete a média de 7 dias até o fim, sem considerar sazonalidade. A <b>projeção</b> no card da campanha pesa a curva do ano anterior e costuma ser a mais próxima do resultado final.
           </p>
         </>
+      )}
+      {detalhe && (
+        <Detalhe titulo={detalhe.titulo} recorte={detalhe.recorte} aoFechar={() => setDetalhe(null)} />
       )}
     </>
   );

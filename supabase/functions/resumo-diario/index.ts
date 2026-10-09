@@ -1,6 +1,9 @@
 // Entrega o resumo do dia em texto pronto para o WhatsApp. O n8n chama este
 // endereço no horário que o Bruno quiser e manda o campo texto para o grupo.
-// Proteção pela mesma chave das outras rotinas, na query ou no cabeçalho.
+// Chave própria, só no cabeçalho. Duas razões. A chave na query entra em log de
+// servidor, em histórico de navegador e em print de tela, e chave que aparece em
+// log é chave queimada. E a chave do cron abre todas as rotinas do painel: quem
+// guardasse a URL do resumo guardaria a chave-mestra. Esta abre só o resumo.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
@@ -9,10 +12,12 @@ const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SE
 
 Deno.serve(async (req) => {
   const url = new URL(req.url);
-  const chave = url.searchParams.get("chave") ?? req.headers.get("x-chave-painel") ?? "";
-  const { data: cred } = await db.rpc("credencial_obter", { p_servico: "cron" });
+  const chave = req.headers.get("x-chave-painel") ?? "";
+  const { data: cred } = await db.rpc("credencial_obter", { p_servico: "resumo" });
   const esperada = cred?.[0]?.access_token;
-  if (!esperada || chave !== esperada) return new Response("não autorizado", { status: 401 });
+  if (!esperada || chave.length !== esperada.length || chave !== esperada) {
+    return new Response("não autorizado", { status: 401 });
+  }
 
   const dia = url.searchParams.get("dia");
   const { data, error } = await db.rpc("resumo_do_dia", { p_dia: dia ?? null });

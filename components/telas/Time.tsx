@@ -4,6 +4,7 @@ import FiltroCampanha, { type Campanha } from "@/components/FiltroCampanha";
 import Curva from "@/components/Curva";
 import Detalhe, { type Recorte } from "@/components/Detalhe";
 import { supabase } from "@/lib/supabase";
+import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta } from "@/lib/formato";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
@@ -33,6 +34,7 @@ export default function Time() {
   const [motivos, setMotivos] = useState<Motivo[] | null>(null);
   const [apv, setApv] = useState<PreVenda | null>(null);
   const [diasVenda, setDiasVenda] = useState<DiaVenda[] | null>(null);
+  const [vista, setVista] = useState<"dia" | "acumulado">("dia");
   const [detalhe, setDetalhe] = useState<{ titulo: string; recorte: Recorte } | null>(null);
 
   useEffect(() => {
@@ -89,10 +91,17 @@ export default function Time() {
         vale a coluna Alunos.
       </p>
 
-      <h2><span className="idx">008</span> Vendas dia a dia</h2>
+      <div className="secao-topo">
+        <h2><span className="idx">008</span> Vendas dia a dia</h2>
+        <div className="atalhos">
+          <button className={vista === "dia" ? "ativo" : ""} onClick={() => setVista("dia")}>Por dia</button>
+          <button className={vista === "acumulado" ? "ativo" : ""} onClick={() => setVista("acumulado")}>Acumulado</button>
+        </div>
+      </div>
       <p className="nota">
-        Matrícula por dia no período e no curso escolhidos acima, com o acumulado por cima. A linha cheia é o
-        que entrou em cada dia; a tracejada é o total somado, que é onde se enxerga aceleração ou freio.
+        Matrícula no período e no curso escolhidos acima. <b>Por dia</b> mostra o que entrou em cada data, que é
+        onde se vê pico e buraco. <b>Acumulado</b> mostra o total somado, que é onde se vê aceleração ou freio.
+        Clique em um ponto para ver as matrículas daquele dia.
       </p>
       {!diasVenda ? <p className="rotulo">Carregando</p> : diasVenda.length === 0 ? (
         <p className="mudo">Sem venda no período.</p>
@@ -124,19 +133,20 @@ export default function Time() {
               </div>
             </div>
           </div>
+          {/* Um gráfico só, com botão para trocar a leitura. Os dois juntos na
+              tela competiam pela atenção e nenhum era lido direito. */}
           <Curva
             rotulos={diasVenda.map((d) => dataCurta(d.dia))}
-            series={[
-              { nome: "Matrículas no dia", cor: "#121211", pontos: diasVenda.map((d) => Number(d.alunos)) },
-            ]}
-            altura={200}
-          />
-          <Curva
-            rotulos={diasVenda.map((d) => dataCurta(d.dia))}
-            series={[
-              { nome: "Acumulado no período", cor: "#76746D", tracejada: true, pontos: diasVenda.map((d) => Number(d.acumulado)) },
-            ]}
-            altura={160}
+            series={[{
+              nome: vista === "dia" ? "Matrículas no dia" : "Acumulado no período",
+              cor: COR.tinta,
+              pontos: diasVenda.map((d) => Number(vista === "dia" ? d.alunos : d.acumulado)),
+            }]}
+            altura={230}
+            aoClicar={(i) => setDetalhe({
+              titulo: "Matrículas de " + dataCurta(diasVenda[i].dia),
+              recorte: { p_de: diasVenda[i].dia, p_ate: diasVenda[i].dia, p_produto: produto },
+            })}
           />
         </>
       )}

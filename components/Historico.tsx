@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import Curva, { type Serie } from "@/components/Curva";
 import { supabase } from "@/lib/supabase";
+import { COR as CORES } from "@/lib/cores";
+import Detalhe, { type Recorte } from "@/components/Detalhe";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta } from "@/lib/formato";
 
@@ -15,7 +17,8 @@ type Ponto = { semana: number; ano: number; acumulado: number };
 type Produto = { id: string; nome: string; duas_temporadas: boolean };
 
 // Preto para o ano corrente, cinza para o anterior, cinza claro para os de trás.
-const COR = ["#121211", "#76746D", "#A8A59C", "#C9C6BE"];
+// Mesma escada de cinzas do resto do site.
+const COR = [CORES.tinta, CORES.cinza, CORES.cinzaClaro, CORES.linha];
 
 const variacao = (v: number | null | undefined) => {
   if (v == null || !Number.isFinite(Number(v))) return "-";
@@ -28,6 +31,7 @@ export default function Historico() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [produto, setProduto] = useState<string | null>(null);
   const [anos, setAnos] = useState<Ano[] | null>(null);
+  const [detalhe, setDetalhe] = useState<{ titulo: string; recorte: Recorte } | null>(null);
   const [curva, setCurva] = useState<Ponto[] | null>(null);
   const [quantos, setQuantos] = useState(3);
   // O Método ACAFE e o Semi têm duas turmas por ano. Comparar ano cheio contra
@@ -161,6 +165,7 @@ export default function Historico() {
       )}
 
       <h2><span className="idx">010</span> Ano por ano</h2>
+      <p className="nota">Clique na linha de um ano para ver as matrículas daquele ano.</p>
       {!anos ? <p className="rotulo">Carregando</p> : anos.length === 0 ? (
         <p className="mudo">Sem histórico para este curso.</p>
       ) : (
@@ -175,7 +180,14 @@ export default function Historico() {
             </thead>
             <tbody>
               {ordenados.map((a) => (
-                <tr key={a.rotulo} className={a.ano === atual?.ano ? "destaque" : undefined}>
+                <tr
+                  key={a.rotulo}
+                  className={(a.ano === atual?.ano ? "destaque " : "") + "abre"}
+                  onClick={() => setDetalhe({
+                    titulo: a.rotulo,
+                    recorte: { p_produto: produto, p_de: a.primeiro, p_ate: a.ultimo },
+                  })}
+                >
                   <td className="num"><b>{a.rotulo}</b></td>
                   <td className="n">{num(a.alunos)}</td>
                   <td className="n"><b>{num(a.alunos_ate_hoje)}</b></td>
@@ -198,6 +210,9 @@ export default function Historico() {
         janeiro a junho e o do 2º de julho a novembro, então somar os dois esconde o que cada turma está fazendo. A coluna de alunos no ano é o fechamento cheio, que para o ano corrente ainda vai crescer. Ticket e
         desconto de 2021 e 2022 aparecem vazios porque a planilha daquela época não trazia valor de tabela.
       </p>
+      {detalhe && (
+        <Detalhe titulo={detalhe.titulo} recorte={detalhe.recorte} aoFechar={() => setDetalhe(null)} />
+      )}
     </>
   );
 }

@@ -42,7 +42,7 @@ function AppRD({ servico, status, recarregar }: { servico: "rd_crm" | "rd_market
         <span className={"selo " + (status?.conectado ? "no_ritmo" : "nao_iniciada")}>{status?.conectado ? "Conectado" : status?.app_configurado ? "App cadastrado" : "Pendente"}</span>
       </div>
       <p className="mudo">URL de callback para cadastrar no App Publisher do RD:</p>
-      <code style={{ display: "block", wordBreak: "break-all", padding: 10, border: "1px solid var(--linha)", background: "#fff", fontSize: 13 }}>{callback}</code>
+      <code style={{ display: "block", wordBreak: "break-all", padding: 10, border: "1px solid var(--linha)", background: "var(--superficie)", fontSize: 13 }}>{callback}</code>
       <form onSubmit={salvar} style={{ marginTop: 16 }}>
         <label className="campo"><span className="rotulo">client_id</span><input value={cid} onChange={(e) => setCid(e.target.value)} required autoComplete="off" /></label>
         <label className="campo"><span className="rotulo">client_secret</span><input value={sec} onChange={(e) => setSec(e.target.value)} required type="password" autoComplete="off" /></label>
@@ -264,7 +264,7 @@ export default function Configuracao({ admin }: { admin: boolean }) {
               método POST, enviando o item inteiro. Ele guarda tudo que chegar, mesmo antes de a gente mapear os campos.
             </p>
             {enderecoConversas ? (
-              <code style={{ display: "block", wordBreak: "break-all", padding: 10, border: "1px solid var(--linha)", background: "#fff", fontSize: 13 }}>
+              <code style={{ display: "block", wordBreak: "break-all", padding: 10, border: "1px solid var(--linha)", background: "var(--superficie)", fontSize: 13 }}>
                 {enderecoConversas}
               </code>
             ) : (

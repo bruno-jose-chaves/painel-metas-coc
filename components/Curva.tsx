@@ -1,4 +1,5 @@
 "use client";
+import { COR } from "@/lib/cores";
 
 export type Serie = { nome: string; cor: string; tracejada?: boolean; pontos: (number | null)[] };
 
@@ -8,11 +9,13 @@ export default function Curva({
   series,
   altura = 220,
   formatar = (v: number) => String(Math.round(v)),
+  aoClicar,
 }: {
   rotulos: string[];
   series: Serie[];
   altura?: number;
   formatar?: (v: number) => string;
+  aoClicar?: (indice: number) => void;
 }) {
   const L = 52, R = 12, T = 12, B = 28;
   const larg = 760, alt = altura;
@@ -39,19 +42,35 @@ export default function Curva({
       <svg viewBox={`0 0 ${larg} ${alt}`} role="img" aria-label="Evolução no período">
         {marcas.map((m) => (
           <g key={m}>
-            <line x1={L} x2={larg - R} y1={escala(m)} y2={escala(m)} stroke="#0A0A0A22" />
-            <text x={L - 8} y={escala(m) + 4} textAnchor="end" fontSize="11" fill="#6B6A66">
+            <line x1={L} x2={larg - R} y1={escala(m)} y2={escala(m)} stroke={COR.linha} />
+            <text x={L - 8} y={escala(m) + 4} textAnchor="end" className="eixo" fill={COR.cinza}>
               {formatar(m)}
             </text>
           </g>
         ))}
         {rotulos.map((r, i) =>
           i % cadaRotulo === 0 ? (
-            <text key={i} x={x(i)} y={alt - 8} textAnchor="middle" fontSize="11" fill="#6B6A66">
+            <text key={i} x={x(i)} y={alt - 8} textAnchor="middle" className="eixo" fill={COR.cinza}>
               {r}
             </text>
           ) : null
         )}
+        {/* Faixa invisível por ponto, para o clique ter onde cair. A linha tem
+            dois pixels de espessura e ninguém acerta dois pixels. */}
+        {aoClicar && rotulos.map((r, i) => (
+          <rect
+            key={"z" + i}
+            x={x(i) - passo / 2}
+            y={T}
+            width={Math.max(passo, 6)}
+            height={alt - T - B}
+            fill="transparent"
+            style={{ cursor: "pointer" }}
+            onClick={() => aoClicar(i)}
+          >
+            <title>{r}</title>
+          </rect>
+        ))}
         {series.map((s) => (
           <path
             key={s.nome}
@@ -63,23 +82,16 @@ export default function Curva({
           />
         ))}
       </svg>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 10, fontSize: 12 }}>
-        {series.map((s) => (
-          <span key={s.nome} style={{ color: "#6B6A66" }}>
-            <i
-              style={{
-                display: "inline-block",
-                width: 14,
-                height: 2,
-                background: s.cor,
-                marginRight: 6,
-                verticalAlign: 4,
-              }}
-            />
-            {s.nome}
-          </span>
-        ))}
-      </div>
+      {series.length > 1 && (
+        <div className="legenda-serie">
+          {series.map((s) => (
+            <span key={s.nome}>
+              <i style={{ background: s.cor }} />
+              {s.nome}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

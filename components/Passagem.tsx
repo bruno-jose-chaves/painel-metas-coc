@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Curva from "@/components/Curva";
 import SeletorPeriodo from "@/components/Periodo";
 import { supabase } from "@/lib/supabase";
+import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, pct, dataCurta } from "@/lib/formato";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
@@ -114,7 +115,7 @@ export default function Passagem({ admin }: { admin: boolean }) {
                   <td style={{ maxWidth: 260, wordBreak: "break-word" }}>
                     <b>{l.identificador}</b>
                     {l.campanhas?.length ? (
-                      <div className="ids" style={{ marginTop: 3 }}>{l.campanhas.join(" · ")}</div>
+                      <div className="ids">{l.campanhas.join(" · ")}</div>
                     ) : null}
                     <div className="rotulo" style={{ marginTop: 3 }}>
                       {dataCurta(l.primeira)} a {dataCurta(l.ultima)}
@@ -165,8 +166,8 @@ export default function Passagem({ admin }: { admin: boolean }) {
         <Curva
           rotulos={dias.map((d) => dataCurta(d.dia))}
           series={[
-            { nome: "Conversões no marketing", cor: "#121211", pontos: dias.map((d) => Number(d.conversoes)) },
-            { nome: "Negociações criadas no CRM", cor: "#76746D", tracejada: true, pontos: dias.map((d) => Number(d.negocios)) },
+            { nome: "Conversões no marketing", cor: COR.tinta, pontos: dias.map((d) => Number(d.conversoes)) },
+            { nome: "Negociações criadas no CRM", cor: COR.cinza, tracejada: true, pontos: dias.map((d) => Number(d.negocios)) },
           ]}
           altura={240}
         />

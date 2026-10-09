@@ -1,0 +1,74 @@
+-- Update 16 — Auditoria de segurança, um gráfico só no Comercial,
+--             paleta única e detalhe clicável em todas as telas de matrícula
+-- Aplicado direto no banco em 10/10/2026. Este arquivo é o registro.
+
+-- ============================ SEGURANÇA ============================
+--
+-- O que estava aberto, em ordem de gravidade.
+--
+-- 1. v_vendas_turma rodava como dona, não como quem chamava, então ignorava a
+--    regra de linha da tabela vendas. O papel anon, que é qualquer pessoa com a
+--    chave pública do site (ela está no JavaScript, é de domínio público),
+--    tinha permissão de ler essa view: nome, e-mail, telefone, cidade e valor
+--    pago de todo aluno. Na prática a leitura falhava, mas por acidente: anon
+--    não tinha permissão de executar turma_da_venda, uma função que a view
+--    chama por dentro. Acidente não é controle.
+--      alter view v_vendas_turma set (security_invoker = true);
+--
+-- 2. anon tinha SELECT em quase toda tabela. A regra de linha barrava as linhas,
+--    mas a permissão não devia existir: a tela de login usa só autenticação e a
+--    função de pedir acesso.
+--      revoke all on all tables in schema public from anon;
+--      alter default privileges ... revoke all on tables from anon;
+--
+-- 3. Toda função do schema era executável por PUBLIC, e PUBLIC inclui anon.
+--    Nove funções vazavam por aí, entre elas painel_pre_venda e curso_do_contato.
+--    Agora: revogado de PUBLIC e de anon em bloco, devolvido ao usuário logado
+--    exatamente o que ele já podia chamar, e anon ficou com uma função só,
+--    solicitar_acesso, que é o que a tela de login precisa.
+--
+-- 4. disparar_funcao lia a chave do cron por dentro e chamava qualquer Edge
+--    Function com a query que recebesse. Qualquer pessoa logada, inclusive um
+--    leitor, podia disparar qualquer rotina. Ganhou guarda de administrador e
+--    validação do nome da função.
+--
+-- 5. integracoes_status, que lista as integrações e quando foram renovadas,
+--    não tinha guarda. Ganhou guarda de administrador.
+--
+-- 6. classificar_leads, gerar_turmas, rd_mkt_fila e vendas_preparar são rotinas
+--    de carga e estavam ao alcance de qualquer logado. Revogadas: quem roda é o
+--    cron, como postgres.
+--
+-- 7. Escrita em dezoito tabelas estava concedida ao usuário logado. A regra de
+--    linha já negava por não haver política de escrita, mas a permissão não
+--    devia estar lá. Revogada.
+--
+-- 8. 110 funções sem search_path fixo. Corrigido em todas.
+--
+-- 9. A rota resumo-diario aceitava a chave na query, e a chave era a do cron,
+--    que abre todas as rotinas. Quem guardasse a URL do resumo guardava a
+--    chave-mestra, e chave em query entra em log de servidor e em histórico de
+--    navegador. Agora: chave própria do serviço resumo, só no cabeçalho
+--    x-chave-painel, e o fluxo do n8n foi atualizado.
+--
+-- 10. rd-oauth voltava por padrão para um subdomínio da Netlify que não é mais
+--     nosso. Subdomínio abandonado pode ser reivindicado por outra pessoa, e o
+--     retorno do OAuth leva parâmetros junto. Padrão agora é o endereço real do
+--     painel, na rota certa.
+--
+-- Conferido depois, com a chave pública, de fora: toda tabela e toda view
+-- respondem "permission denied", e das funções só solicitar_acesso responde.
+-- Conferido como leitor logado: não dispara rotina, não aprova acesso, não
+-- insere regra. Conferido como diretoria: as 45 chamadas das telas respondem.
+--
+-- Fica em aberto, porque é configuração de conta e não de código:
+-- proteção de senha vazada no Supabase Auth continua desligada.
+
+-- ============================ TELAS ============================
+--
+-- painel_vendas_detalhe ganhou p_turma. Com ele o detalhe clicável chegou em:
+--   Hoje        faixa de matrículas do período, e o número de cada campanha
+--   Campanha    faixa de alunos, e a escada de fases
+--   Comercial   ranking de vendedores, e cada ponto do gráfico diário
+--   Histórico   cada linha de ano
+-- É sempre a mesma função recebendo o recorte que gerou o número.

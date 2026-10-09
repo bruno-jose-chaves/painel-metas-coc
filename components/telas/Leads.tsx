@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import FiltroCampanha, { type Campanha } from "@/components/FiltroCampanha";
 import Curva from "@/components/Curva";
 import { supabase } from "@/lib/supabase";
+import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, pct, dataCurta } from "@/lib/formato";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
@@ -102,8 +103,8 @@ export default function Leads() {
         <Curva
           rotulos={dias.map((d) => dataCurta(d.dia))}
           series={[
-            { nome: "Conversões", cor: "#0A0A0A", pontos: dias.map((d) => Number(d.conversoes)) },
-            { nome: "Visitas em landing page", cor: "#6B6A66", tracejada: true, pontos: dias.map((d) => Number(d.visitas)) },
+            { nome: "Conversões", cor: COR.tinta, pontos: dias.map((d) => Number(d.conversoes)) },
+            { nome: "Visitas em landing page", cor: COR.cinza, tracejada: true, pontos: dias.map((d) => Number(d.visitas)) },
           ]}
         />
       )}

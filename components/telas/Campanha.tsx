@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import Curva from "@/components/Curva";
 import Detalhe, { type Recorte } from "@/components/Detalhe";
 import { supabase } from "@/lib/supabase";
+import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta } from "@/lib/formato";
 import { hojeSP } from "@/lib/periodo";
@@ -151,7 +152,10 @@ export default function Campanha() {
       </div>
 
       <div className="faixa">
-        <div>
+        <div
+          className={c.alunos > 0 ? "abre" : undefined}
+          onClick={() => c.alunos > 0 && setDetalhe({ titulo: c.nome, recorte: { p_campanha: id } })}
+        >
           <div className="rotulo">Alunos</div>
           <div className="valor num">{num(c.alunos)}</div>
           <div className="mudo num">meta {num(c.meta_alunos)} · {pct(ating)}</div>
@@ -268,7 +272,7 @@ export default function Campanha() {
                 </div>
               </div>
               {ritmo && (
-                <div className="ids" style={{ marginTop: 12 }}>
+                <div className="ids">
                   {Number(ritmo.projecao_restante) >= Number(ritmo.falta)
                     ? `Pela curva do ano anterior, o que sobra de campanha dá conta do que falta.`
                     : `Pela curva do ano anterior, sobram ${num(ritmo.projecao_restante)} alunos no que resta da campanha e a meta pede ${num(ritmo.falta)}. O buraco é de ${num(Number(ritmo.falta) - Number(ritmo.projecao_restante))}. A média da campanha inteira, ${num(ritmo.media_campanha)} por dia, inclui o pico de lançamento e não volta.`}
@@ -289,9 +293,9 @@ export default function Campanha() {
         <Curva
           rotulos={curva.rotulos}
           series={[
-            { nome: "Alunos acumulados", cor: "#0A0A0A", pontos: curva.real },
-            { nome: `Ritmo da Meta ${c.meta_ativa}`, cor: "#C0341D", tracejada: true, pontos: curva.meta },
-            { nome: `Mesmo dia em ${proj?.ref_ano ?? "ano anterior"}`, cor: "#6B6A66", tracejada: true, pontos: curva.anterior },
+            { nome: "Alunos acumulados", cor: COR.tinta, pontos: curva.real },
+            { nome: `Ritmo da Meta ${c.meta_ativa}`, cor: COR.ruim, tracejada: true, pontos: curva.meta },
+            { nome: `Mesmo dia em ${proj?.ref_ano ?? "ano anterior"}`, cor: COR.cinza, tracejada: true, pontos: curva.anterior },
           ]}
         />
       ) : <p className="rotulo">Carregando</p>}

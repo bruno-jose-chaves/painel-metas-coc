@@ -71,6 +71,7 @@ button { font: inherit; cursor: pointer; }
   color: var(--cinza);
   line-height: 1.7;
   word-break: break-word;
+  margin-top: 4px;
 }
 .mudo { color: var(--cinza); font-size: 14px; }
 .ok { color: var(--ok); }
@@ -579,6 +580,27 @@ h3 { letter-spacing: -.02em; }
 
 .grafico svg { display: block; width: 100%; height: auto; }
 
+/* Tipografia do gráfico junto com a do resto do site, em vez de número solto
+   dentro do SVG. */
+.grafico .eixo { font-size: 11px; font-family: var(--fonte); }
+
+.legenda-serie {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--cinza);
+}
+
+.legenda-serie i {
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  margin-right: 6px;
+  vertical-align: 4px;
+}
+
 .marcos {
   display: grid;
   gap: 0;
@@ -844,9 +866,24 @@ h3 { letter-spacing: -.02em; }
 
 /* Linha que abre o detalhe. O cursor e o sublinhado no hover avisam que dá
    para clicar, sem transformar a tabela inteira em botão. */
+/* Tudo que abre detalhe se comporta igual: o cursor muda e o fundo acende em
+   lima. Linha de tabela, célula da faixa de números ou número grande, é sempre
+   a mesma promessa visual. */
 .tabela tr.abre { cursor: pointer; }
 .tabela tr.abre:hover td { background: var(--lima-suave); }
-.tabela tr.abre td:first-child { position: relative; }
+
+.faixa > div.abre { cursor: pointer; transition: background .12s; }
+.faixa > div.abre:hover { background: var(--lima-suave); }
+
+.grande.abre { cursor: pointer; width: fit-content; border-radius: 6px; transition: background .12s; }
+.grande.abre:hover { background: var(--lima-suave); }
+
+.gaveta-titulo {
+  margin: 4px 0 0;
+  font-size: 19px;
+  font-weight: 750;
+  letter-spacing: -.02em;
+}
 
 .gaveta-topo {
   display: flex;
