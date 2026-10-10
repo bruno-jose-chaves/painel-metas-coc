@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import Ajuda from "@/components/Ajuda";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, dataCurta } from "@/lib/formato";
 
@@ -73,10 +74,14 @@ export default function Etiquetas({ admin }: { admin: boolean }) {
 
       <h2><span className="idx">030</span> Esperando a sua decisão</h2>
       <p className="nota">
-        A etiqueta é o sinal mais barato que existe na base: vem preenchida em quase toda conversão e é o próprio
-        marketing que escreve. Falta dizer a qual curso cada uma pertence. As que já traziam o nome do curso foram
-        apontadas sozinhas; sobram as que só você sabe. Enquanto uma etiqueta não tem curso, o lead que só tem ela
-        fica fora dos filtros por curso.
+        Etiquetas que chegam do RD e ainda não têm curso apontado.
+        <Ajuda titulo="Por que a etiqueta importa"
+          fontes={["Etiquetas: RD Station Marketing (tabela rd_conversoes, campo tags)",
+                   "Regra apontada aqui: tabela etiqueta_regras"]}>
+          A etiqueta é o sinal mais barato que existe na base: vem preenchida em quase toda conversão e é o
+          próprio marketing que escreve. Apontar uma etiqueta para um curso classifica de uma vez todo lead que
+          a carrega.
+        </Ajuda>
       </p>
       <div className="atalhos" style={{ marginBottom: 16 }}>
         <button className={!tudo ? "ativo" : ""} onClick={() => setTudo(false)}>Com volume (5 ou mais)</button>
@@ -149,9 +154,12 @@ export default function Etiquetas({ admin }: { admin: boolean }) {
         </div>
       )}
       <p className="rodape">
-        A etiqueta é o segundo degrau da classificação de curso, depois da campanha do CRM e antes do anúncio e da
-        primeira frase da pessoa no WhatsApp. Apontar uma etiqueta aqui vale para trás também: na próxima rodada da
-        classificação, que roda a cada quinze minutos, os leads antigos que só tinham ela passam a ter curso.
+        A etiqueta é o segundo degrau da classificação de curso.
+        <Ajuda titulo="A ordem da classificação">
+          Primeiro a regra apontada à mão, depois a campanha do CRM, depois a etiqueta, depois o anúncio e a
+          primeira mensagem do cliente. O que foi classificado por um degrau acima não é reclassificado por
+          este.
+        </Ajuda>
       </p>
     </>
   );

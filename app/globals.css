@@ -593,13 +593,59 @@ h3 { letter-spacing: -.02em; }
   color: var(--cinza);
 }
 
-.legenda-serie i {
+.legenda-serie i,
+.balao-linha i {
   display: inline-block;
   width: 14px;
   height: 2px;
   margin-right: 6px;
   vertical-align: 4px;
+  flex: none;
 }
+
+/* Série tracejada é identificada pela textura também, não só pela cor: quem não
+   distingue as duas cores ainda distingue cheia de pontilhada. */
+.legenda-serie i.tracejada,
+.balao-linha i.tracejada {
+  background: none !important;
+  border-top: 2px dashed var(--cinza);
+  height: 0;
+}
+
+/* ---------- balão do gráfico ---------- */
+
+.grafico-area { position: relative; }
+
+.balao {
+  position: absolute;
+  top: 10px;
+  transform: translateX(10px);
+  min-width: 150px;
+  background: var(--superficie);
+  border: 1px solid var(--linha-forte);
+  border-radius: var(--raio-p);
+  box-shadow: var(--sombra-alta);
+  padding: 9px 11px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.balao.esquerda { transform: translateX(-100%) translateX(-10px); }
+
+.balao-linha {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  margin-top: 5px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* O valor é o que a pessoa foi buscar: ele vem primeiro e com peso. O nome da
+   série é apoio. */
+.balao-linha b { font-size: 15px; font-weight: 750; margin-right: 6px; }
+.balao-linha span { color: var(--cinza); font-size: 12.5px; }
+.balao .ids { margin-top: 7px; }
 
 .marcos {
   display: grid;
@@ -817,6 +863,13 @@ h3 { letter-spacing: -.02em; }
 }
 
 .estrela:hover { border-color: var(--tinta); color: var(--tinta); }
+
+.estrela.ajuda-link {
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 750;
+  color: var(--cinza);
+}
 .estrela.tem { color: #8A7B00; border-color: #CFB40455; background: #FBFBE8; }
 
 .estrela .conta {
@@ -993,3 +1046,99 @@ h3 { letter-spacing: -.02em; }
   h1 { margin-bottom: 14px; }
   .nota, .rodape { max-width: none; }
 }
+
+
+/* ---------- Ⓘ de ajuda ---------- */
+
+.ajuda { position: relative; display: inline-block; margin-left: 5px; vertical-align: 1px; }
+
+.ajuda > button {
+  width: 15px;
+  height: 15px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid var(--linha-forte);
+  background: none;
+  color: var(--cinza);
+  font-size: 10.5px;
+  font-weight: 750;
+  font-style: italic;
+  line-height: 13px;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.ajuda > button:hover,
+.ajuda > button[aria-expanded="true"] {
+  border-color: var(--tinta);
+  color: var(--tinta);
+  background: var(--lima-suave);
+}
+
+.ajuda-balao {
+  position: absolute;
+  top: calc(100% + 7px);
+  left: -10px;
+  z-index: 30;
+  display: block;
+  width: max-content;
+  max-width: min(400px, calc(100vw - 32px));
+  background: var(--superficie);
+  border: 1px solid var(--linha-forte);
+  border-radius: var(--raio-p);
+  box-shadow: var(--sombra-alta);
+  padding: 11px 13px;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--tinta-2);
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: normal;
+}
+
+.ajuda-corpo { display: block; margin-top: 4px; }
+
+.ajuda-fontes {
+  display: block;
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid var(--linha);
+}
+
+.ajuda-fontes span { display: block; font-size: 12px; color: var(--cinza); }
+.ajuda-fontes span + span { margin-top: 3px; }
+.ajuda-fontes .rotulo { margin-bottom: 4px; }
+
+/* Perto da borda direita o balão abre para dentro. */
+.secao-topo .ajuda-balao,
+.faixa > div:last-child .ajuda-balao { left: auto; right: -10px; }
+
+@media (max-width: 640px) {
+  .ajuda-balao { left: auto; right: -8px; }
+}
+
+
+/* ---------- escolha do guia ---------- */
+
+.escolha {
+  display: grid;
+  gap: 4px;
+  text-align: left;
+  background: var(--superficie);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+  padding: 16px 18px;
+  transition: border-color .12s, background .12s;
+}
+
+.escolha b { font-size: 15.5px; font-weight: 700; letter-spacing: -.012em; }
+.escolha span { font-size: 13px; color: var(--cinza); }
+.escolha:hover { border-color: var(--linha-forte); }
+
+.escolha.ativa {
+  background: var(--lima-suave);
+  border-color: var(--tinta);
+}
+
+.marcos a { font-weight: 700; }

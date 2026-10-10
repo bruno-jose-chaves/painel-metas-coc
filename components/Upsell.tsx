@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import Ajuda from "@/components/Ajuda";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct } from "@/lib/formato";
 
@@ -98,10 +99,15 @@ export default function Upsell() {
       </p>
 
       <p className="nota">
-        Escolha de um lado a base de comparação, que é o grupo de alunos que você quer olhar, e do outro o curso que
-        quer saber se eles compraram também. Pode marcar mais de uma turma em cada lado. O painel cruza por e-mail,
-        telefone e nome, e traz junto o mesmo recorte do ano anterior, com as turmas equivalentes, para você ver se
-        melhorou ou piorou.
+        Escolha de um lado a base de alunos e do outro o curso que quer saber se eles compraram também.
+        <Ajuda titulo="Como o cruzamento é feito"
+          fontes={["Planilha comercial (tabela vendas), pela turma de cada venda",
+                   "Turma = produto + ano + semestre (tabela turmas)",
+                   "Cruzamento por e-mail, telefone e nome normalizados",
+                   "Conta pessoa, não matrícula: quem comprou o destino duas vezes conta uma"]}>
+          Pode marcar mais de uma turma em cada lado. O painel traz junto o mesmo recorte do ano anterior, com
+          as turmas equivalentes, para você ver se melhorou ou piorou.
+        </Ajuda>
       </p>
 
       {!turmas ? <p className="rotulo">Carregando</p> : (
@@ -195,11 +201,12 @@ export default function Upsell() {
             </table>
           </div>
           <p className="rodape">
-            A turma equivalente do ano anterior é a mesma do mesmo produto e semestre, um ano atrás. Se a turma
-            anterior ainda estava vendendo quando o recorte foi feito, o número dela ainda vai crescer, então a
-            comparação fica conservadora. O cruzamento é por pessoa, não por matrícula: quem comprou o destino duas
-            vezes conta uma.
-          </p>
+        A turma equivalente do ano anterior é a mesma do mesmo produto e semestre, um ano atrás.
+        <Ajuda titulo="Por que a comparação é conservadora">
+          Se a turma anterior ainda estava vendendo quando o recorte foi feito, o número dela ainda vai crescer,
+          então a comparação fica por baixo.
+        </Ajuda>
+      </p>
         </>
       )}
     </>

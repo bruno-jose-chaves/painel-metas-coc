@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Curva from "@/components/Curva";
 import SeletorPeriodo from "@/components/Periodo";
 import { supabase } from "@/lib/supabase";
+import Ajuda from "@/components/Ajuda";
 import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, pct, dataCurta } from "@/lib/formato";
@@ -91,10 +92,15 @@ export default function Passagem({ admin }: { admin: boolean }) {
 
       <h2><span className="idx">035</span> Formulário por formulário</h2>
       <p className="nota">
-        Ter formulário não faz o lead chegar no comercial: é preciso um fluxo no RD Marketing criando a negociação, e o
-        nome desse fluxo é o que o comercial vê como campanha. Quando alguém publica um formulário e esquece o fluxo, a
-        captação aparece no marketing e ninguém recebe o lead. Aqui a conta é direta: quanto o formulário converteu
-        contra quantas pessoas entraram no CRM pela campanha ligada a ele.
+        Ter formulário não faz o lead chegar no comercial: é preciso um fluxo no RD Marketing criando a negociação.
+        <Ajuda titulo="O que esta conta compara"
+          fontes={["Conversões do formulário: RD Station Marketing (tabela rd_conversoes_diarias)",
+                   "Pessoas no CRM: RD Station CRM (tabela rd_negociacoes), pela campanha ligada ao formulário",
+                   "A ligação entre os dois é apontada à mão, na tabela captacao_regras"]}>
+          O nome desse fluxo é o que o comercial vê como campanha. Quando alguém publica um formulário e esquece
+          o fluxo, a captação aparece no marketing e ninguém recebe o lead. Aqui a conta é direta: quanto o
+          formulário converteu contra quantas pessoas entraram no CRM pela campanha ligada a ele.
+        </Ajuda>
       </p>
 
       {!lista ? <p className="rotulo">Carregando</p> : lista.length === 0 ? (
@@ -156,9 +162,14 @@ export default function Passagem({ admin }: { admin: boolean }) {
 
       <h2><span className="idx">036</span> Captação e entrada no CRM, dia a dia</h2>
       <p className="nota">
-        Esta leitura não depende de fluxo apontado nenhum: é tudo que o marketing captou contra tudo que entrou como
-        negociação. As duas linhas não precisam se encostar, porque nem toda conversão vira negociação e quem já está no
-        CRM não entra de novo. O que importa é a distância entre elas mudar de repente, que é o sinal de fluxo quebrado.
+        Esta leitura não depende de fluxo apontado nenhum.
+        <Ajuda titulo="Como ler as duas linhas"
+          fontes={["Conversões: RD Station Marketing (tabela rd_conversoes_diarias)",
+                   "Negociações criadas: RD Station CRM (tabela rd_negociacoes), fora do funil SDR"]}>
+          É tudo que o marketing captou contra tudo que entrou como negociação. As duas linhas não precisam se
+          encostar, porque nem toda conversão vira negociação e quem já está no CRM não entra de novo. O que
+          importa é a distância entre elas mudar de repente, que é o sinal de fluxo quebrado.
+        </Ajuda>
       </p>
       {!dias ? <p className="rotulo">Carregando</p> : dias.length === 0 ? (
         <p className="mudo">Sem dados no período.</p>

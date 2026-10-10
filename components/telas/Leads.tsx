@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import FiltroCampanha, { type Campanha } from "@/components/FiltroCampanha";
 import Curva from "@/components/Curva";
 import { supabase } from "@/lib/supabase";
+import Ajuda from "@/components/Ajuda";
 import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, pct, dataCurta } from "@/lib/formato";
@@ -187,7 +188,12 @@ export default function Leads() {
       )}
 
       <p className="rodape">
-        O RD só conta visita nas páginas hospedadas por ele. Quando a página é feita em HTML no site de vocês e usa um formulário embutido do RD, a conversão é registrada mas a visita acontece fora do alcance dele. Por isso o formulário embutido aparece sem visita e sem taxa.
+        O RD só conta visita nas páginas hospedadas por ele.
+        <Ajuda titulo="Por que a conversão às vezes passa de 100%"
+          fontes={["Visitas e conversões: RD Station Marketing (tabela rd_conversoes_diarias)"]}>
+          Quando a página é feita em HTML no site de vocês e usa um formulário embutido do RD, a conversão é
+          contada e a visita não. Por isso a taxa dessas páginas aparece alta demais, ou a visita aparece zerada.
+        </Ajuda>
       </p>
       <p className="mudo">
         Mesmo nas landing pages do RD a taxa é aproximada: a visita e a conversão podem cair em dias diferentes, e o lead

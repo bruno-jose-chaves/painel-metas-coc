@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import Ajuda from "@/components/Ajuda";
 import { useIndicadores } from "@/lib/indicadores";
 import Detalhe, { type Recorte } from "@/components/Detalhe";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
@@ -336,18 +337,21 @@ export default function Visao() {
             ))}
           </div>
           <p className="rodape">
-            Abaixo de cada barra estão as páginas que entraram na conta, para o número poder ser conferido.
-            Material rico aparece separado e fora da conta de leads captados: quem baixa material vai para o Agente
-            de Pré-vendas, não para a fila do comercial, e somar os dois inflaria a captação e pioraria a conversão
-            do time sem ninguém ter feito nada errado.
-            Leads captados e inscritos nas lives contam unidades diferentes de propósito: o CRM conta pessoa, o
-            formulário conta envio, e quem preenche duas vezes aparece duas vezes no segundo. Quando os dois existem,
-            vale o do CRM. A contagem começa no primeiro dia em que o formulário da campanha registrou inscrição, que
-            costuma ser antes de a campanha abrir.
-            Só entra conversão cujo nome da página casa com o curso da campanha: antes disso as duas campanhas mostravam o mesmo número.
-            Leads captados conta todas as conversões do período da campanha. Inscritos nas lives e reservas contam as
-            conversões das páginas com esse nome. O traço vermelho é onde a meta espera que o número esteja hoje.
-          </p>
+        Abaixo de cada barra estão as páginas que entraram na conta, para o número poder ser conferido.
+        <Ajuda titulo="O que entra em cada indicador"
+          fontes={["Conversões de formulário: RD Station Marketing (tabela rd_conversoes_diarias)",
+                   "Pessoas no CRM: RD Station CRM (tabela rd_negociacoes)",
+                   "Quais formulários contam em cada indicador: tabela captacao_regras",
+                   "Material rico não conta como lead: tabela indicadores_captacao"]}>
+          Material rico aparece separado e fora da conta de leads captados: quem baixa material vai para o
+          Agente de Pré-vendas, não para a fila do comercial, e somar os dois inflaria a captação e pioraria a
+          conversão do time sem ninguém ter feito nada errado. Leads captados e inscritos nas lives contam
+          unidades diferentes de propósito: o CRM conta pessoa, o formulário conta envio, e quem preenche duas
+          vezes aparece duas vezes no segundo. Quando os dois existem, vale o do CRM. A contagem começa no
+          primeiro dia em que o formulário da campanha registrou inscrição, que costuma ser antes de a campanha
+          abrir.
+        </Ajuda>
+      </p>
         </>
       )}
 
@@ -427,8 +431,13 @@ export default function Visao() {
             </table>
           </div>
           <p className="rodape">
-            Média e ritmo contam só dia útil: sábado e domingo somam pouco mais de três por cento das matrículas e, contados, diluem o que a operação precisa bater por dia. Anteriores são as matrículas lançadas antes do início da campanha, que entram no realizado. O período de venda termina uma semana depois do início das aulas, e é essa data que conta como fim da campanha aqui.
-          </p>
+        Média e ritmo contam só dia útil.
+        <Ajuda titulo="Por que só dia útil"
+          fontes={["Planilha comercial (tabela vendas)"]}>
+          Sábado e domingo somam pouco mais de três por cento das matrículas e, contados como dia normal,
+          puxavam a média para baixo e faziam o ritmo necessário parecer menor do que é.
+        </Ajuda>
+      </p>
           <p className="mudo">
             São três leituras diferentes e elas podem discordar. <b>Esperado hoje</b> vem da escada de fases, então uma campanha que concentra venda no fim aparece adiantada no começo.
             <b> No ritmo das últimas semanas</b> repete a média de 7 dias até o fim, sem considerar sazonalidade. A <b>projeção</b> no card da campanha pesa a curva do ano anterior e costuma ser a mais próxima do resultado final.

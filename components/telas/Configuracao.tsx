@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase, SUPABASE_URL } from "@/lib/supabase";
+import Ajuda from "@/components/Ajuda";
 import { dataHora, dataCurta, num } from "@/lib/formato";
 
 type Status = { servico: string; app_configurado: boolean; conectado: boolean; expira_em: string | null; atualizado_em: string | null };
@@ -279,10 +280,13 @@ export default function Configuracao({ admin }: { admin: boolean }) {
 
       <h2><span className="idx">007</span> Cobertura do RD Marketing</h2>
       <p className="nota">
-        As conversões do RD Marketing vêm dia a dia. Um dia que não foi buscado não aparece em lugar nenhum e faz todo
-        número de captação ficar menor do que é, sem avisar. Foi o que aconteceu entre 04/09 e 26/09: vinte e três dias
-        sumiram e a live do ACAFE mostrava 543 inscrições em vez de 1.031. Agora cada dia buscado fica registrado e o
-        que falta volta para a fila sozinho.
+        As conversões do RD Marketing vêm dia a dia, e dia que não foi buscado não aparece em lugar nenhum.
+        <Ajuda titulo="Por que isso importa"
+          fontes={["Dias já buscados: tabela rd_mkt_dias",
+                   "Conversões: tabela rd_conversoes_diarias"]}>
+          Um buraco aqui faz todo número de captação do período ficar por baixo, sem erro visível em lugar
+          nenhum. Por isso a cobertura é acompanhada dia a dia e o buraco vira aviso na estrela.
+        </Ajuda>
       </p>
       {!cobertura ? <p className="rotulo">Carregando</p> : (
         <div className="faixa">

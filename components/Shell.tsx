@@ -124,6 +124,9 @@ export default function Shell({ children }: { children: (ctx: { admin: boolean; 
             </a>
           ))}
         </nav>
+        {/* O ponto de interrogação fica ao lado da estrela: um é o que fazer
+            hoje, o outro é onde olhar. */}
+        <a className="estrela ajuda-link" href="/guia/" title="Por onde começar" aria-label="Por onde começar">?</a>
         <Insights />
         <button className="sair" onClick={sair}>Sair</button>
       </div></header>

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import FiltroCampanha, { type Campanha } from "@/components/FiltroCampanha";
 import Curva from "@/components/Curva";
 import Detalhe, { type Recorte } from "@/components/Detalhe";
+import Ajuda from "@/components/Ajuda";
 import { supabase } from "@/lib/supabase";
 import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
@@ -18,7 +19,16 @@ type Parado = {
   ate_3d: number; d4_7: number; d8_15: number; d16_30: number; mais_30: number; dias_medio: number;
 };
 type Motivo = { motivo: string; perdidas: number; fatia: number };
-type DiaVenda = { dia: string; alunos: number; faturamento: number; acumulado: number };
+type DiaVenda = {
+  dia: string; alunos: number; faturamento: number; acumulado: number;
+  dia_comp: string | null; alunos_comp: number | null; acumulado_comp: number | null;
+  rotulo_comp: string | null;
+};
+const COMPARACOES = [
+  { id: "", nome: "Sem comparação" },
+  { id: "anterior", nome: "Período anterior" },
+  { id: "ano", nome: "Ano passado" },
+] as const;
 type PreVenda = {
   captados: number; contatados: number; sem_contato: number;
   entregues: number; ganhos: number; ganhos_de_antes: number; parados_7d: number; parados_30d: number;
@@ -35,6 +45,7 @@ export default function Time() {
   const [apv, setApv] = useState<PreVenda | null>(null);
   const [diasVenda, setDiasVenda] = useState<DiaVenda[] | null>(null);
   const [vista, setVista] = useState<"dia" | "acumulado">("dia");
+  const [comparar, setComparar] = useState<string>("anterior");
   const [detalhe, setDetalhe] = useState<{ titulo: string; recorte: Recorte } | null>(null);
 
   useEffect(() => {
@@ -58,9 +69,9 @@ export default function Time() {
     // daquele curso.
     supabase.rpc("painel_pre_venda", { ...p, p_produto: produto })
       .then(({ data }) => setApv(((data as PreVenda[]) ?? [])[0] ?? null));
-    supabase.rpc("painel_vendas_periodo", { ...p, p_produto: produto })
+    supabase.rpc("painel_vendas_periodo", { ...p, p_produto: produto, p_comparar: comparar || null })
       .then(({ data }) => setDiasVenda((data as DiaVenda[]) ?? []));
-  }, [periodo, produto, volta]);
+  }, [periodo, produto, comparar, volta]);
 
   const totalFat = time?.reduce((s, l) => s + Number(l.faturamento), 0) ?? 0;
   const maiorFat = Math.max(1, ...(time ?? []).map((l) => Number(l.faturamento)));
@@ -85,23 +96,41 @@ export default function Time() {
         {campanha ? ", só " + (campanhas.find((c) => c.id === campanha)?.nome ?? "") : ", todos os cursos"}.
       </p>
       <p className="nota">
-        <b>Alunos</b> é a planilha comercial, que é a fonte firme: a venda entra no dia em que aconteceu.
-        <b> Ganhas no CRM</b> é outra contagem, do RD, e costuma ficar atrás porque o negócio às vezes é
-        fechado no dia seguinte, e porque nem toda venda tem negócio correspondente. Para cobrança de meta,
-        vale a coluna Alunos.
+        Para cobrança de meta vale a coluna <b>Alunos</b>, não a de ganhas no CRM.
+        <Ajuda titulo="Por que duas contagens"
+          fontes={["Alunos: planilha comercial (tabela vendas)",
+                   "Ganhas no CRM: RD Station CRM (tabela rd_negociacoes, status ganha)",
+                   "As duas se ligam por e-mail, telefone ou nome, na tabela cruzamentos"]}>
+          Alunos é a planilha comercial, que é a fonte firme: a venda entra no dia em que aconteceu.
+          Ganhas no CRM é outra contagem, do RD, e costuma ficar atrás porque o negócio às vezes é fechado no
+          dia seguinte, e porque nem toda venda tem negócio correspondente.
+        </Ajuda>
       </p>
 
       <div className="secao-topo">
         <h2><span className="idx">008</span> Vendas dia a dia</h2>
-        <div className="atalhos">
-          <button className={vista === "dia" ? "ativo" : ""} onClick={() => setVista("dia")}>Por dia</button>
-          <button className={vista === "acumulado" ? "ativo" : ""} onClick={() => setVista("acumulado")}>Acumulado</button>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+          <div className="atalhos">
+            <button className={vista === "dia" ? "ativo" : ""} onClick={() => setVista("dia")}>Por dia</button>
+            <button className={vista === "acumulado" ? "ativo" : ""} onClick={() => setVista("acumulado")}>Acumulado</button>
+          </div>
+          <select value={comparar} onChange={(e) => setComparar(e.target.value)} aria-label="Comparar com">
+            {COMPARACOES.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
+          </select>
         </div>
       </div>
       <p className="nota">
-        Matrícula no período e no curso escolhidos acima. <b>Por dia</b> mostra o que entrou em cada data, que é
-        onde se vê pico e buraco. <b>Acumulado</b> mostra o total somado, que é onde se vê aceleração ou freio.
-        Clique em um ponto para ver as matrículas daquele dia.
+        Matrícula por dia no período e no curso escolhidos acima, com uma linha de comparação ao lado.
+        <Ajuda titulo="Como ler"
+          fontes={["Planilha comercial (tabela vendas), pela data da venda",
+                   "Cancelada não entra",
+                   "Período anterior: a mesma quantidade de dias imediatamente antes",
+                   "Ano passado: as mesmas datas, um ano atrás"]}>
+          <b>Por dia</b> mostra o que entrou em cada data, que é onde se vê pico e buraco.
+          <b> Acumulado</b> mostra o total somado, que é onde se vê aceleração ou freio.
+          A comparação é alinhada por posição no período, dia 1 contra dia 1, não por data do calendário.
+          Clique em um ponto para ver as matrículas daquele dia.
+        </Ajuda>
       </p>
       {!diasVenda ? <p className="rotulo">Carregando</p> : diasVenda.length === 0 ? (
         <p className="mudo">Sem venda no período.</p>
@@ -111,6 +140,17 @@ export default function Time() {
             <div>
               <div className="rotulo">Matrículas no período</div>
               <div className="valor num">{num(diasVenda.reduce((s, d) => s + Number(d.alunos), 0))}</div>
+              {comparar && diasVenda[0]?.rotulo_comp ? (() => {
+                const agora = diasVenda.reduce((s, d) => s + Number(d.alunos), 0);
+                const antes = diasVenda.reduce((s, d) => s + Number(d.alunos_comp ?? 0), 0);
+                const dif = antes > 0 ? agora / antes - 1 : null;
+                return (
+                  <div className={"mudo num " + (dif == null ? "" : dif >= 0 ? "ok" : "alerta")}>
+                    contra {num(antes)} ({diasVenda[0].rotulo_comp})
+                    {dif == null ? "" : ` · ${dif >= 0 ? "+" : ""}${pct(dif)}`}
+                  </div>
+                );
+              })() : null}
             </div>
             <div>
               <div className="rotulo">Faturamento</div>
@@ -137,11 +177,23 @@ export default function Time() {
               tela competiam pela atenção e nenhum era lido direito. */}
           <Curva
             rotulos={diasVenda.map((d) => dataCurta(d.dia))}
-            series={[{
-              nome: vista === "dia" ? "Matrículas no dia" : "Acumulado no período",
-              cor: COR.tinta,
-              pontos: diasVenda.map((d) => Number(vista === "dia" ? d.alunos : d.acumulado)),
-            }]}
+            series={[
+              {
+                nome: vista === "dia" ? "Matrículas no dia" : "Acumulado no período",
+                cor: COR.tinta,
+                pontos: diasVenda.map((d) => Number(vista === "dia" ? d.alunos : d.acumulado)),
+              },
+              ...(comparar && diasVenda[0]?.rotulo_comp ? [{
+                nome: diasVenda[0].rotulo_comp as string,
+                cor: COR.cinza,
+                tracejada: true,
+                pontos: diasVenda.map((d) =>
+                  Number(vista === "dia" ? d.alunos_comp ?? 0 : d.acumulado_comp ?? 0)),
+                rotulos: diasVenda.map((d) =>
+                  `${num(Number(vista === "dia" ? d.alunos_comp ?? 0 : d.acumulado_comp ?? 0))}` +
+                  (d.dia_comp ? ` (${dataCurta(d.dia_comp)})` : "")),
+              }] : []),
+            ]}
             altura={230}
             aoClicar={(i) => setDetalhe({
               titulo: "Matrículas de " + dataCurta(diasVenda[i].dia),
@@ -208,8 +260,16 @@ export default function Time() {
         </div>
       )}
       <p className="rodape">
-        Conversão é ganhas sobre o funil inteiro do período: ganhas mais perdidas mais o que ainda está em aberto. Contar só o que já foi decidido inflava o número, porque a maior parte do funil ainda não decidiu.
-        Venda automática é a matrícula fechada sem vendedor na planilha, ou seja a compra que o aluno fez sozinho pelo site. Ela entra no faturamento, mas fica fora do ranking. O ranking conta só a venda lançada dentro do período acima: campanha com reserva vendida antes do início aparece menor aqui do que no cartão da campanha, que traz o total cheio.
+        <b>Conversão</b> é ganhas sobre o funil inteiro do período, não só sobre o que já foi decidido.
+        <Ajuda titulo="Por que contar o funil inteiro"
+          fontes={["Negociações: RD Station CRM (tabela rd_negociacoes)",
+                   "Alunos e faturamento: planilha comercial (tabela vendas)"]}>
+          Ganhas mais perdidas mais o que ainda está em aberto. Contar só o que já foi decidido inflava o
+          número, porque a maior parte do funil ainda não decidiu. Venda automática é a matrícula fechada sem
+          vendedor na planilha, ou seja a compra que o aluno fez sozinho pelo site: ela entra no faturamento mas
+          fica fora do ranking. O ranking conta só a venda lançada dentro do período acima, então campanha com
+          reserva vendida antes do início aparece menor aqui do que no cartão da campanha.
+        </Ajuda>
       </p>
 
       <h2><span className="idx">010</span> Negócios em aberto e tempo parado</h2>
@@ -314,12 +374,16 @@ export default function Time() {
             </div>
           </div>
           <p className="rodape">
-            O APV é o agente de IA de pré-vendas. Ele captura o lead de material rico no funil SDR e o time comercial abre a negociação no funil principal.
-            Entregue significa que o mesmo contato virou negócio no funil comercial depois de entrar no SDR, que é a leitura confiável da passagem de bastão.
-            Captação e resultado têm janelas diferentes de propósito: captado é quem entrou no SDR dentro do período,
-            e matrícula é a venda fechada dentro do período, mesmo que o agente tenha trabalhado o lead antes, como acontece com reserva de campanha anterior.
-            Sem essa separação a entrega do agente aparecia muito menor do que é.
-          </p>
+        O APV é o agente de IA de pré-vendas: ele captura o lead no funil SDR e o comercial abre a negociação depois.
+        <Ajuda titulo="Como estes números são medidos"
+          fontes={["Funil SDR: RD Station CRM (tabela rd_negociacoes, funil SDR)",
+                   "Entrega: existe negociação do mesmo contato fora do funil SDR, criada depois",
+                   "Curso de um lead de pré-vendas vem do contato, porque o funil SDR não é classificado"]}>
+          Entregue ao comercial é inferido: conta quando o mesmo contato tem negociação fora do SDR criada
+          depois da passagem pelo agente. Enquanto a transferência não for registrada no CRM, o número é
+          aproximação por cima.
+        </Ajuda>
+      </p>
         </>
       )}
       {detalhe && (

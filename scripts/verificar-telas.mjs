@@ -184,9 +184,9 @@ const rotas0 = {
     { id: "missao-ufsc", nome: "Missão UFSC", ordem: 2 },
   ],
   "rpc/painel_vendas_periodo": [
-    { dia: "2026-09-28", alunos: 9, faturamento: 6253, acumulado: 100 },
-    { dia: "2026-09-29", alunos: 4, faturamento: 2779, acumulado: 104 },
-    { dia: "2026-09-30", alunos: 6, faturamento: 4100, acumulado: 110 },
+    { dia: "2026-09-28", alunos: 9, faturamento: 6253, acumulado: 100, dia_comp: "2026-08-29", alunos_comp: 6, acumulado_comp: 71, rotulo_comp: "30 dias anteriores" },
+    { dia: "2026-09-29", alunos: 4, faturamento: 2779, acumulado: 104, dia_comp: "2026-08-30", alunos_comp: 5, acumulado_comp: 76, rotulo_comp: "30 dias anteriores" },
+    { dia: "2026-09-30", alunos: 6, faturamento: 4100, acumulado: 110, dia_comp: "2026-08-31", alunos_comp: 3, acumulado_comp: 79, rotulo_comp: "30 dias anteriores" },
   ],
   "rpc/painel_vendas_detalhe": [
     { data: "2026-09-30", aluno: "Fulana de Tal", curso: "Método ACAFE", vendedor: "Márcia",
@@ -313,6 +313,7 @@ const telas = [
   ["/comercial/?v=conferir", "O que vale conferir"],
   ["/comercial/", "Agente de Pré-vendas"],
   ["/marketing/", "Formulário embutido"],
+  ["/guia/", "O que você quer saber?"],
 ];
 
 let falhou = false;
@@ -337,7 +338,7 @@ for (const [rota, esperado] of telas) {
 // Retratos para olho humano: notebook, que é onde a maioria usa, e telefone.
 // A conferência acima diz que renderizou; estas dizem se dá para ler.
 const retratos = [
-  ["notebook", 1280, 800, ["/", "/campanha/", "/comercial/", "/marketing/?v=passagem", "/campanha/?v=upsell"]],
+  ["notebook", 1280, 800, ["/", "/campanha/", "/comercial/", "/marketing/?v=passagem", "/campanha/?v=upsell", "/guia/"]],
   ["telefone", 390, 844, ["/", "/campanha/", "/comercial/", "/marketing/?v=paginas", "/campanha/?v=upsell", "/comercial/?v=lancamentos", "/ajustes/"]],
 ];
 for (const [nome, width, height, rotas] of retratos) {
@@ -359,6 +360,25 @@ for (const [nome, width, height, rotas] of retratos) {
     await p2.waitForTimeout(400);
     await p2.screenshot({ path: `/tmp/claude-0/${nome}${r.replace(/[/?=]/g, "_")}-rolado.png` });
   }
+  // O balão do gráfico, com o mouse em cima de um ponto.
+  if (nome === "notebook") {
+    await p2.goto("http://127.0.0.1:4599/comercial/", { waitUntil: "networkidle" });
+    await p2.waitForTimeout(500);
+    const alvo = await p2.$(".grafico svg rect[tabindex]");
+    if (alvo) {
+      await alvo.hover();
+      await p2.waitForTimeout(400);
+      await p2.screenshot({ path: `/tmp/claude-0/${nome}-balao.png` });
+    }
+    // E o Ⓘ aberto.
+    const i = await p2.$(".ajuda > button");
+    if (i) {
+      await i.hover();
+      await p2.waitForTimeout(400);
+      await p2.screenshot({ path: `/tmp/claude-0/${nome}-ajuda.png` });
+    }
+  }
+
   // A gaveta de insights, aberta.
   await p2.goto("http://127.0.0.1:4599/", { waitUntil: "networkidle" });
   await p2.click(".estrela");

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import SeletorPeriodo from "@/components/Periodo";
 import Curva from "@/components/Curva";
 import { supabase } from "@/lib/supabase";
+import Ajuda from "@/components/Ajuda";
 import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, pct, dataCurta } from "@/lib/formato";
@@ -80,16 +81,23 @@ export default function Gestao() {
       </div>
 
       <p className="nota">
-        O histórico de conversa importado do Pigeon começa em 01/08/2026. As regras de 15 e 20 dias valem
-        cheias de 21/08 em diante. Antes disso o painel conta menos lead conhecido e menos requentado do que
-        o real, porque não tem como ver a conversa que veio antes do corte.
+        O histórico de conversa importado do Pigeon começa em 01/08/2026.
+        <Ajuda titulo="O que isso limita"
+          fontes={["Conversas e mensagens: Pigeon Post (tabela conversas_eventos)"]}>
+          As regras de 15 e 20 dias valem cheias de 21/08 em diante. Antes disso, quem conversou em julho pode
+          aparecer como lead novo, porque o painel não enxerga a conversa anterior.
+        </Ajuda>
       </p>
 
       <h2><span className="idx">024</span> Quem chegou no período</h2>
       <p className="nota">
-        Lead novo é negociação criada sem nenhuma conversa nos 20 dias anteriores — gente que entrou agora.
-        Quem já falava com a gente antes de virar negociação aparece separado, porque não é captação nova:
-        é o funil andando.
+        <b>Lead novo</b> é negociação criada sem nenhuma conversa nos 20 dias anteriores.
+        <Ajuda titulo="Novo, conhecido e requentado"
+          fontes={["Negociações: RD Station CRM (tabela rd_negociacoes)",
+                   "Conversas: Pigeon Post (tabela conversas_eventos), ligadas pelo telefone"]}>
+          Gente que entrou agora. Quem já falou com a gente antes disso entra como conhecido, e requentado é
+          quem voltou a falar depois de um tempo parado.
+        </Ajuda>
       </p>
       {!linhas ? <p className="rotulo">Carregando</p> : (
         <div className="rolar">

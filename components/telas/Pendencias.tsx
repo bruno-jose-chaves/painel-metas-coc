@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import Ajuda from "@/components/Ajuda";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, dataCurta } from "@/lib/formato";
 import { useIndicadores, useDestinos, partirDestino, type Indicador, type Destino } from "@/lib/indicadores";
@@ -118,10 +119,16 @@ export default function Pendencias({ admin }: { admin: boolean }) {
 
       <h2><span className="idx">021</span> Esperando a sua decisão</h2>
       <p className="nota">
-        Campanhas do CRM e formulários que o painel não conseguiu ligar a um curso. Enquanto não forem apontados,
-        esses leads ficam fora dos filtros por curso. O maior volume vem primeiro, então resolver os primeiros já
-        fecha a maior parte do buraco. A lista olha de 01/08/2026 em diante: o que aparece com nome de 2025 é peça
-        antiga que continua no ar e segue trazendo lead agora, e a coluna de período mostra a data real.
+        Campanhas do CRM e formulários que o painel não conseguiu ligar a um curso sozinho.
+        <Ajuda titulo="Por que resolver, e em que ordem"
+          fontes={["Campanhas: RD Station CRM (tabela rd_negociacoes, campo campanha)",
+                   "Formulários: RD Station Marketing (tabela rd_conversoes_diarias)",
+                   "A decisão apontada aqui vira regra na tabela captacao_regras"]}>
+          Enquanto não forem apontados, esses leads ficam fora dos filtros por curso. O maior volume vem
+          primeiro, então resolver os primeiros já fecha a maior parte do buraco. A lista olha de 01/08/2026 em
+          diante: o que aparece com nome de 2025 é peça antiga que continua no ar e segue trazendo lead agora, e
+          a coluna de período mostra a data real.
+        </Ajuda>
       </p>
       <div className="filtros">
         <div className="atalhos">
@@ -198,9 +205,12 @@ export default function Pendencias({ admin }: { admin: boolean }) {
 
       <h2><span className="idx">022</span> Regras já apontadas</h2>
       <p className="nota">
-        Regra apontada para <b>curso</b> vale para qualquer ano: a data do lead decide sozinha a turma e a
-        campanha, e ninguém precisa repontar nada em janeiro. Apontar para turma ou campanha só faz sentido
-        quando a regra é mesmo daquele ano. {indicadores.map((i) => i.nome + ": " + (i.ajuda ?? "")).join(" ")}
+        Regra apontada para <b>curso</b> vale para qualquer ano: a data do lead decide a turma e a campanha.
+        <Ajuda titulo="Curso, turma ou campanha">
+          Apontar para turma ou campanha só faz sentido quando a regra é mesmo daquele ano, como um formulário
+          feito para uma campanha específica. Apontada para curso, a regra é escrita uma vez e não precisa ser
+          repontada em janeiro.
+        </Ajuda>
       </p>
       {!regras ? <p className="rotulo">Carregando</p> : regras.length === 0 ? (
         <p className="mudo">Nenhuma regra cadastrada. O painel está usando só a regra automática pelo nome do curso.</p>

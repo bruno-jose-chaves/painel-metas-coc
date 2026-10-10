@@ -1,0 +1,29 @@
+-- Update 17 — Gráfico que responde, comparação automática, Ⓘ de origem do dado
+--             e tela de por onde começar
+-- Aplicado direto no banco em 10/10/2026. Este arquivo é o registro.
+
+-- 1. painel_vendas_periodo(de, ate, produto, comparar)
+--    Novo parâmetro p_comparar: 'anterior' ou 'ano'.
+--      'anterior' = a mesma quantidade de dias imediatamente antes do período
+--      'ano'      = as mesmas datas, um ano atrás
+--    Devolve, além da série do período, as colunas dia_comp, alunos_comp,
+--    acumulado_comp e rotulo_comp.
+--    O alinhamento é por POSIÇÃO no período, dia 1 contra dia 1, não por data
+--    do calendário: é a comparação que responde "está melhor ou pior", porque
+--    campanha e mês caem em dias de semana diferentes a cada ano.
+
+-- 2. Nada mais mudou no banco neste update. O resto é tela:
+--
+--    Curva ganhou fio vertical que gruda no ponto mais próximo e balão com o
+--    valor exato de TODAS as séries daquele dia. Antes a linha não respondia
+--    nada: dava para ver a forma e não o número.
+--
+--    Componente Ajuda, o Ⓘ. Guarda o resto do texto e, mais importante, a
+--    procedência: de qual base o número vem, qual tabela, por qual chave as
+--    bases foram cruzadas. É o que permite conferir um número sem perguntar
+--    para ninguém. Aplicado em 24 blocos, que antes eram parágrafos de cinco a
+--    dez linhas no meio da tela.
+--
+--    Tela /guia/, "por onde começar". Duas perguntas, o que a pessoa faz e o
+--    que quer saber agora, e sai uma lista curta de telas na ordem de abrir.
+--    Atalho no cabeçalho, ao lado da estrela.

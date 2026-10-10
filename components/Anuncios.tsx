@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import FiltroCampanha, { type Campanha } from "@/components/FiltroCampanha";
 import { supabase } from "@/lib/supabase";
+import Ajuda from "@/components/Ajuda";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num } from "@/lib/formato";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
@@ -88,10 +89,15 @@ export default function Anuncios() {
 
       <h2><span className="idx">028</span> Peça por peça</h2>
       <p className="nota">
-        O lead de anúncio de clique para WhatsApp não passa por formulário, então o RD não o vê. Quem registra é o
-        Pigeon, que guarda a peça que originou a conversa. A matrícula é ligada por telefone e só conta quando aconteceu
-        depois da conversa e dentro da janela de atribuição do curso vendido: 45 dias no intensivo, 60 no Semi e no
-        Extensivo.
+        Quem chegou por peça de clique para WhatsApp, ligado à matrícula pelo telefone.
+        <Ajuda titulo="Como a peça vira matrícula"
+          fontes={["Conversa e peça de origem: Pigeon Post (tabelas pigeon_contatos e pigeon_conversas, campo utm)",
+                   "Matrícula: planilha comercial (tabela vendas)",
+                   "Ligação: telefone normalizado, e só vale se a venda veio depois da conversa",
+                   "Janela de atribuição: 45 dias no intensivo, 60 no Semi e no Extensivo (tabela produtos)"]}>
+          O lead de anúncio de clique para WhatsApp não passa por formulário, então o RD não o vê. Quem registra
+          é o Pigeon, que guarda a peça que originou a conversa.
+        </Ajuda>
       </p>
       {!lista ? <p className="rotulo">Carregando</p> : lista.length === 0 ? (
         <p className="mudo">
@@ -143,9 +149,12 @@ export default function Anuncios() {
         </div>
       )}
       <p className="rodape">
-        Pessoas por matrícula não é custo: para custo falta a verba de cada peça, que o painel não recebe. O que esta
-        coluna diz é quantas conversas a peça precisa gerar para sair uma matrícula, o que já separa peça que traz
-        volume de peça que traz aluno.
+        Pessoas por matrícula não é custo.
+        <Ajuda titulo="Por que não é custo">
+          Para custo falta a verba de cada peça, que o painel não recebe. O que esta coluna diz é quantas
+          conversas a peça precisa gerar para sair uma matrícula, o que já separa peça que traz volume de peça
+          que traz aluno.
+        </Ajuda>
       </p>
     </>
   );

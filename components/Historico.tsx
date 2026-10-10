@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Curva, { type Serie } from "@/components/Curva";
 import { supabase } from "@/lib/supabase";
+import Ajuda from "@/components/Ajuda";
 import { COR as CORES } from "@/lib/cores";
 import Detalhe, { type Recorte } from "@/components/Detalhe";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
@@ -154,9 +155,14 @@ export default function Historico() {
 
       <h2><span className="idx">009</span> Curva acumulada, sobreposta</h2>
       <p className="nota">
-        Alinhada pela semana do ano, não pelo dia da campanha, porque a campanha muda de data a cada ano. Lido assim,
-        a distância vertical entre as linhas na semana de hoje é exatamente o quanto {nomeProduto}
-        {temporada ? ` do ${temporada}º semestre` : ""} está à frente ou atrás do mesmo momento dos anos anteriores.
+        Alinhada pela semana do ano, não pelo dia da campanha.
+        <Ajuda titulo="Por que pela semana"
+          fontes={["Planilha comercial (tabela vendas), pela data da venda",
+                   "Semestre resolvido pela janela de venda da turma (tabela turmas)"]}>
+          A campanha muda de data a cada ano, então comparar pelo dia da campanha compara coisas diferentes.
+          Lido pela semana do ano dá para ver se o curso está à frente ou atrás do mesmo momento dos anos
+          anteriores.
+        </Ajuda>
       </p>
       {!curva ? <p className="rotulo">Carregando</p> : semanas.length === 0 ? (
         <p className="mudo">Sem histórico de venda para este curso.</p>
@@ -205,10 +211,15 @@ export default function Historico() {
         </div>
       )}
       <p className="rodape">
-        Até esta data compara maçã com maçã: conta só a venda feita até o mesmo dia do ano, nos anos anteriores
-        também, e dentro do mesmo semestre quando o curso tem duas turmas: o Método ACAFE do 1º semestre vende de
-        janeiro a junho e o do 2º de julho a novembro, então somar os dois esconde o que cada turma está fazendo. A coluna de alunos no ano é o fechamento cheio, que para o ano corrente ainda vai crescer. Ticket e
-        desconto de 2021 e 2022 aparecem vazios porque a planilha daquela época não trazia valor de tabela.
+        <b>Até esta data</b> compara maçã com maçã: conta só a venda feita até o mesmo dia do ano.
+        <Ajuda titulo="O que cada coluna conta"
+          fontes={["Planilha comercial (tabela vendas)",
+                   "Turma e semestre: tabela turmas, pela janela de venda de cada uma"]}>
+          Vale para os anos anteriores também, e dentro do mesmo semestre quando o curso tem duas turmas: o
+          Método ACAFE do 1º semestre vende de janeiro a junho e o do 2º de julho a dezembro, então somar os
+          dois esconde o que cada turma está fazendo. A coluna de alunos no ano é o fechamento cheio, que para
+          o ano corrente ainda vai crescer.
+        </Ajuda>
       </p>
       {detalhe && (
         <Detalhe titulo={detalhe.titulo} recorte={detalhe.recorte} aoFechar={() => setDetalhe(null)} />

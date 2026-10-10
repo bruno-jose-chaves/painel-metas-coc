@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import Ajuda from "@/components/Ajuda";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, dataCurta } from "@/lib/formato";
 
@@ -59,9 +60,11 @@ export default function Sugestoes() {
 
       <h2><span className="idx">033</span> Lista de conferência</h2>
       <p className="nota">
-        Isto não é cobrança, é uma lista do que está estranho na base. Cada ponto diz por que importa e o que fazer, e
-        abre a relação nominal para conferir caso a caso no CRM ou na planilha. Nada aqui é apagado ou corrigido pelo
-        painel: quem decide é quem conhece a negociação.
+        Isto não é cobrança, é uma lista do que está estranho na base.
+        <Ajuda titulo="Como usar">
+          Cada ponto diz por que importa e o que fazer, e some sozinho quando o caso é resolvido na origem.
+          Nada aqui muda dado: a correção é feita onde o dado nasce.
+        </Ajuda>
       </p>
 
       {!lista ? <p className="rotulo">Carregando</p> : lista.length === 0 ? (

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import Ajuda from "@/components/Ajuda";
 import { brl, num, dataCurta } from "@/lib/formato";
 
 type Campanha = {
@@ -228,10 +229,13 @@ export default function Cadastro({ admin }: { admin: boolean }) {
 
       <h2><span className="idx">006</span> Turmas por ano</h2>
       <p className="nota">
-        Turma é o produto de um ano específico: "Semi Extensivo" é produto, "Semi Extensivo 2026/2" é turma. É o que
-        permite comparar maçã com maçã entre anos e escolher o recorte certo na análise de upsell. A janela de venda
-        define a qual turma cada matrícula pertence, e foi tirada do comportamento real da base. Se alguma janela
-        estiver errada, é só avisar.
+        Turma é o produto de um ano específico: "Semi Extensivo" é produto, "Semi Extensivo 2026/2" é turma.
+        <Ajuda titulo="Para que serve a turma"
+          fontes={["Tabela turmas, semeada de 2021 a 2027",
+                   "Janela de venda derivada da sazonalidade real das vendas de 2021 a 2025"]}>
+          É o que permite comparar o mesmo curso entre anos e apontar uma regra de captação para o ano certo.
+          A janela de venda de cada turma é o que decide a qual delas uma matrícula pertence.
+        </Ajuda>
       </p>
       {!turmas ? <p className="rotulo">Carregando</p> : turmas.length === 0 ? (
         <p className="mudo">Nenhuma turma com venda registrada.</p>

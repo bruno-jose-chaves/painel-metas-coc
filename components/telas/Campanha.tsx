@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import Curva from "@/components/Curva";
 import Detalhe, { type Recorte } from "@/components/Detalhe";
 import { supabase } from "@/lib/supabase";
+import Ajuda from "@/components/Ajuda";
 import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta } from "@/lib/formato";
@@ -302,11 +303,17 @@ export default function Campanha() {
 
       <h2><span className="idx">004</span> Escada de preço por fase</h2>
       <p className="nota">
-        A <b>meta ajustada</b> é a meta da fase mais o que as fases anteriores deixaram de trazer, ou menos o que
-        trouxeram a mais. Fase que vende abaixo não some: o buraco cai na próxima, porque a meta da campanha não
-        muda. Se cada fase bater a ajustada, a campanha fecha exatamente na meta. Em fase encerrada a coluna fica
-        vazia, porque ajustar meta de fase que já acabou é reescrever o passado. Clique na linha para ver as
-        matrículas da fase.
+        A <b>meta ajustada</b> é a meta da fase corrigida pelo que as anteriores deixaram de trazer.
+        <Ajuda titulo="Como a meta ajustada é calculada"
+          fontes={["Metas por fase: cadastro da campanha (tabela fases)",
+                   "Alunos: planilha comercial (tabela vendas), pela data dentro da fase",
+                   "saldo anterior = soma de (alunos - meta) das fases anteriores",
+                   "meta ajustada = meta da fase - saldo anterior"]}>
+          Fase que vende abaixo não some: o buraco cai na próxima, porque a meta da campanha não muda. Se cada
+          fase bater a ajustada, a campanha fecha exatamente na meta. Em fase encerrada a coluna fica vazia,
+          porque ajustar meta de fase que já acabou é reescrever o passado. Clique na linha para ver as
+          matrículas da fase.
+        </Ajuda>
       </p>
       {!fases ? <p className="rotulo">Carregando</p> : (
         <div className="rolar">
@@ -484,11 +491,17 @@ export default function Campanha() {
             </div>
           )}
           <p className="rodape">
-            Cada matrícula da planilha é ligada à negociação do CRM que deu origem a ela, cruzando por e-mail, telefone e, em último caso, nome. A barra de conversão usa 20% como referência de topo.
-            A leitura por campanha mostra qual peça trouxe o lead, que é o que permite decidir onde investir. A fonte diz só o canal, e fica como segunda visão.
-            A matrícula só conta para a peça quando aconteceu depois da conversão nela e dentro de sessenta dias, senão a peça levaria crédito por venda que veio antes dela.
-            <b> Só desta peça</b> são as matrículas de quem converteu nela e em mais nenhuma outra no período, ou seja o que ela fecha sozinha.
-          </p>
+        Cada matrícula é ligada à negociação do CRM que deu origem a ela.
+        <Ajuda titulo="Como a ligação é feita"
+          fontes={["Matrícula: planilha comercial (tabela vendas)",
+                   "Negociação: RD Station CRM (tabela rd_negociacoes)",
+                   "Chaves, nessa ordem: e-mail, telefone e nome normalizados",
+                   "O resultado de cada ligação fica na tabela cruzamentos"]}>
+          O que não tem par é venda que entrou sem passar pelo CRM, ou com dado diferente nos dois lugares.
+          A cobertura diz quanto do total conseguiu ser ligado: quanto mais alta, mais confiável fica toda
+          leitura de origem e de tempo de fechamento.
+        </Ajuda>
+      </p>
         </>
       )}
 
@@ -510,10 +523,13 @@ export default function Campanha() {
             ))}
           </div>
           <p className="rodape">
-            Rematrícula é quem fez o mesmo curso na edição anterior e voltou. As outras linhas olham se a pessoa também
-            tem curso longo ou o outro intensivo. A mesma pessoa é reconhecida por e-mail, telefone ou nome.
-            As faixas se sobrepõem de propósito: alguém pode ser rematrícula e ter curso longo ao mesmo tempo.
-          </p>
+        Rematrícula é quem fez o mesmo curso na edição anterior e voltou.
+        <Ajuda titulo="O que cada linha conta"
+          fontes={["Planilha comercial (tabela vendas), cruzando por e-mail, telefone e nome"]}>
+          As outras linhas olham se a pessoa também tem compra de outro curso, antes ou depois. Conta pessoa,
+          não matrícula.
+        </Ajuda>
+      </p>
         </>
       )}
 
