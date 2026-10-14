@@ -6,6 +6,9 @@ export type Serie = {
   nome: string;
   cor: string;
   tracejada?: boolean;
+  // "ponto" é o segundo padrão de traço: duas séries de referência no mesmo
+  // gráfico se distinguem pela textura, não por uma cor de alerta emprestada.
+  pontilhada?: boolean;
   pontos: (number | null)[];
   // Texto pronto para o balão, quando o número cru não basta (valor em reais,
   // por exemplo). Mesma posição dos pontos.
@@ -94,7 +97,7 @@ export default function Curva({
               stroke={s.cor}
               strokeWidth="2"
               strokeLinecap="round"
-              strokeDasharray={s.tracejada ? "5 4" : undefined}
+              strokeDasharray={s.pontilhada ? "1.5 4" : s.tracejada ? "6 4" : undefined}
             />
           ))}
 
@@ -145,7 +148,7 @@ export default function Curva({
             <div className="rotulo">{rotulos[ativo]}</div>
             {series.map((s) => (
               <div key={s.nome} className="balao-linha">
-                <i style={{ background: s.cor }} className={s.tracejada ? "tracejada" : undefined} />
+                <i style={{ background: s.cor, borderTopColor: s.cor }} className={s.pontilhada ? "pontilhada" : s.tracejada ? "tracejada" : undefined} />
                 <b className="num">
                   {s.rotulos?.[ativo] ??
                     (s.pontos[ativo] == null ? "-" : formatar(s.pontos[ativo] as number))}
@@ -162,7 +165,7 @@ export default function Curva({
         <div className="legenda-serie">
           {series.map((s) => (
             <span key={s.nome}>
-              <i style={{ background: s.cor }} className={s.tracejada ? "tracejada" : undefined} />
+              <i style={{ background: s.cor, borderTopColor: s.cor }} className={s.pontilhada ? "pontilhada" : s.tracejada ? "tracejada" : undefined} />
               {s.nome}
             </span>
           ))}

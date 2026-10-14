@@ -53,9 +53,10 @@ const POR_PERGUNTA: Record<Pergunta, Sugestao[]> = {
     { tela: "Comercial · Lançamentos", link: "/comercial/?v=lancamentos", porque: "A matrícula como foi lançada: aluno, curso, valor e desconto" },
   ],
   comparar: [
+    { tela: "Campanha · Turma contra turma", link: "/campanha/?v=comparar", porque: "Duas turmas sobrepostas pelo dia da turma, no mesmo ponto de venda" },
     { tela: "Campanha · Histórico entre anos", link: "/campanha/?v=historico", porque: "O mesmo curso em anos diferentes, com curva sobreposta" },
     { tela: "Campanha · Upsell entre cursos", link: "/campanha/?v=upsell", porque: "Quem comprou um curso e comprou outro, com o ano anterior ao lado" },
-    { tela: "Comercial · Vendas dia a dia", link: "/comercial/", porque: "Escolha a comparação com o período anterior ou com o ano passado" },
+    { tela: "Comercial · Vendas dia a dia", link: "/comercial/", porque: "Escolha a comparação com o período anterior, o ano passado ou a mesma turma" },
   ],
   conferir_dado: [
     { tela: "O Ⓘ ao lado de cada bloco", link: "/", porque: "Diz de onde o número vem e quais bases foram cruzadas" },

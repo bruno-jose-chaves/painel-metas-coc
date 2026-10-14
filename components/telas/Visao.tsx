@@ -63,6 +63,18 @@ const naFaixa = (c: Resumo, f: Faixa) =>
   : f === "encerradas" ? c.situacao === "encerrada"
   : c.situacao !== "nao_iniciada" && c.situacao !== "encerrada";
 
+// De onde sai cada indicador de captação. As páginas entram na lista porque é
+// por elas que se confere o número sem precisar abrir o RD.
+function fontesDoIndicador(m: MetaLead) {
+  const f = [
+    "Conversões de formulário: RD Station Marketing (tabela rd_conversoes_diarias)",
+    "Pessoas no CRM: RD Station CRM (tabela rd_negociacoes)",
+    "Quais páginas entram neste indicador: tabela captacao_regras",
+  ];
+  if (m.identificadores?.length) f.push("Páginas contadas: " + m.identificadores.join(" · "));
+  return f;
+}
+
 const SITUACAO: Record<string, string> = {
   no_ritmo: "No ritmo", atencao: "Atenção", atras: "Atrás", nao_iniciada: "Não iniciada", encerrada: "Encerrada",
 };
@@ -288,7 +300,23 @@ export default function Visao() {
                   return (
                     <div key={m.indicador} style={{ marginTop: 16 }}>
                       <div className="legenda">
-                        <span><b>{m.rotulo}</b></span>
+                        <span>
+                          <b>{m.rotulo}</b>
+                          {/* Toda a procedência do indicador mora aqui dentro: as duas
+                              contagens, desde quando conta e quais páginas entram. Antes
+                              eram três linhas de letra miúda debaixo de cada barra. */}
+                          <Ajuda titulo={m.rotulo} fontes={fontesDoIndicador(m)}>
+                            {m.tem_regra && Number(m.por_crm) > 0 && Number(m.por_formulario) > 0 ? (
+                              <>
+                                São duas contagens para a mesma coisa: {num(m.por_crm)} pessoas pelo CRM
+                                e {num(m.por_formulario)} conversões no formulário. Vale o do CRM, que conta
+                                gente, enquanto o formulário conta cada envio, e a mesma pessoa pode baixar
+                                dois materiais.{" "}
+                              </>
+                            ) : null}
+                            {m.desde ? <>A conta começa em {dataCurta(m.desde)}, que é quando a captação desta campanha abriu.</> : null}
+                          </Ajuda>
+                        </span>
                         {!semMeta && (
                           <span className={"selo " + m.situacao} style={{ fontSize: 10 }}>{SITUACAO[m.situacao] ?? m.situacao}</span>
                         )}
@@ -314,22 +342,6 @@ export default function Visao() {
                           </div>
                         </>
                       )}
-                      {m.tem_regra && Number(m.por_crm) > 0 && Number(m.por_formulario) > 0 ? (
-                        <div className="ids">
-                          {num(m.por_crm)} pessoas pelo CRM · {num(m.por_formulario)} conversões no formulário ·
-                          vale o do CRM, que conta gente, enquanto o formulário conta cada envio
-                        </div>
-                      ) : null}
-                      {m.desde ? (
-                        <div className="ids">
-                          contando desde {dataCurta(m.desde)}, que é quando a captação começou
-                        </div>
-                      ) : null}
-                      {m.identificadores?.length ? (
-                        <div className="ids">
-                          {m.identificadores.join(" · ")}
-                        </div>
-                      ) : null}
                     </div>
                   );
                 })}
@@ -337,7 +349,7 @@ export default function Visao() {
             ))}
           </div>
           <p className="rodape">
-        Abaixo de cada barra estão as páginas que entraram na conta, para o número poder ser conferido.
+        O Ⓘ ao lado de cada indicador diz o que ele conta e quais páginas entram.
         <Ajuda titulo="O que entra em cada indicador"
           fontes={["Conversões de formulário: RD Station Marketing (tabela rd_conversoes_diarias)",
                    "Pessoas no CRM: RD Station CRM (tabela rd_negociacoes)",
@@ -367,12 +379,9 @@ export default function Visao() {
                   <th>Campanha</th>
                   <th className="n">Realizado</th>
                   <th className="n">Esperado hoje</th>
-                  <th className="n">Hoje</th>
-                  <th className="n">Ontem</th>
-                  <th className="n">Anteriores</th>
+                  <th className="n">Hoje · ontem · antes</th>
                   <th className="n">Média 7 dias úteis</th>
                   <th className="n">Precisa por dia útil</th>
-                  <th style={{ minWidth: 110 }}>Cobertura</th>
                   <th className="n">Faltam</th>
                   <th className="n">Dias úteis</th>
                   <th>No ritmo das últimas semanas</th>
@@ -391,12 +400,16 @@ export default function Visao() {
                         {num(r.esperado_hoje)}
                         <div className="rotulo">{Number(r.alunos) - Number(r.esperado_hoje) >= 0 ? "+" : ""}{num(Number(r.alunos) - Number(r.esperado_hoje))}</div>
                       </td>
-                      <td className="n">{num(r.hoje)}</td>
-                      <td className="n">{num(r.ontem)}</td>
-                      <td className="n">{Number(r.anteriores ?? 0) > 0 ? num(r.anteriores) : "-"}</td>
+                      {/* Três contagens de dias recentes ocupavam três colunas e
+                          empurravam o resto da tabela para fora da tela. Juntas
+                          numa célula só continuam legíveis e devolvem a largura. */}
+                      <td className="n">
+                        <b>{num(r.hoje)}</b>
+                        <span className="mudo"> · {num(r.ontem)} · {Number(r.anteriores ?? 0) > 0 ? num(r.anteriores) : "-"}</span>
+                      </td>
                       <td className="n"><b>{num(r.media_7)}</b><div className="rotulo">28d: {num(r.media_28)}</div></td>
-                      <td className="n">{r.necessario_dia == null ? "-" : num(r.necessario_dia)}</td>
-                      <td>
+                      <td className="n">
+                        {r.necessario_dia == null ? "-" : num(r.necessario_dia)}
                         <div className="mini"><i style={{ width: `${Math.min(cob ?? 0, 1.5) / 1.5 * 100}%` }} /></div>
                         <div className="rotulo num">{cob == null ? "-" : num(cob) + "x o necessário"}</div>
                       </td>
@@ -417,12 +430,12 @@ export default function Visao() {
                   <td>Total</td>
                   <td className="n">{num(ritmo.reduce((s, r) => s + Number(r.alunos), 0))}</td>
                   <td className="n">{num(ritmo.reduce((s, r) => s + Number(r.esperado_hoje), 0))}</td>
-                  <td className="n">{num(ritmo.reduce((s, r) => s + Number(r.hoje), 0))}</td>
-                  <td className="n">{num(ritmo.reduce((s, r) => s + Number(r.ontem), 0))}</td>
-                  <td className="n">{num(ritmo.reduce((s, r) => s + Number(r.anteriores ?? 0), 0))}</td>
+                  <td className="n">
+                    <b>{num(ritmo.reduce((s, r) => s + Number(r.hoje), 0))}</b>
+                    <span className="mudo"> · {num(ritmo.reduce((s, r) => s + Number(r.ontem), 0))} · {num(ritmo.reduce((s, r) => s + Number(r.anteriores ?? 0), 0))}</span>
+                  </td>
                   <td className="n">{num(ritmo.reduce((s, r) => s + Number(r.media_7), 0).toFixed(2))}</td>
                   <td className="n">{num(ritmo.reduce((s, r) => s + Number(r.necessario_dia ?? 0), 0).toFixed(2))}</td>
-                  <td />
                   <td className="n">{num(ritmo.reduce((s, r) => s + Number(r.falta), 0))}</td>
                   <td />
                   <td className="n">{num(ritmo.reduce((s, r) => s + Number(r.projecao_restante), 0))} alunos</td>
@@ -438,9 +451,17 @@ export default function Visao() {
           puxavam a média para baixo e faziam o ritmo necessário parecer menor do que é.
         </Ajuda>
       </p>
-          <p className="mudo">
-            São três leituras diferentes e elas podem discordar. <b>Esperado hoje</b> vem da escada de fases, então uma campanha que concentra venda no fim aparece adiantada no começo.
-            <b> No ritmo das últimas semanas</b> repete a média de 7 dias até o fim, sem considerar sazonalidade. A <b>projeção</b> no card da campanha pesa a curva do ano anterior e costuma ser a mais próxima do resultado final.
+          <p className="rodape">
+            São três leituras diferentes e elas podem discordar entre si.
+            <Ajuda titulo="Por que as três leituras discordam"
+              fontes={["Esperado hoje: escada de fases da campanha (tabela campanha_fases)",
+                       "Ritmo das últimas semanas: média de 7 dias úteis (tabela vendas)",
+                       "Projeção: curva do mesmo curso no ano anterior (tabela vendas)"]}>
+              <b>Esperado hoje</b> vem da escada de fases, então uma campanha que concentra venda no fim
+              aparece adiantada no começo.<b> No ritmo das últimas semanas</b> repete a média de 7 dias até
+              o fim, sem considerar sazonalidade. A <b>projeção</b> no card da campanha pesa a curva do ano
+              anterior e costuma ser a mais próxima do resultado final.
+            </Ajuda>
           </p>
         </>
       )}

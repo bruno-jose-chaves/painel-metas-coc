@@ -7,6 +7,7 @@ import { brl, num, pct, dataCurta } from "@/lib/formato";
 export type Recorte = {
   p_de?: string | null; p_ate?: string | null; p_produto?: string | null;
   p_vendedor?: string | null; p_campanha?: string | null; p_fase?: number | null;
+  p_turma?: string | null;
 };
 type Venda = {
   data: string; aluno: string; curso: string; vendedor: string;

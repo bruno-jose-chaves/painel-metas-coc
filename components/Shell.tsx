@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import Insights from "@/components/Insights";
+import { TarjaFontes } from "@/components/Fontes";
 import Indice from "@/components/Indice";
 
 // Cinco áreas, no caminho que a pergunta faz: como estamos hoje, como vai a
@@ -124,12 +125,13 @@ export default function Shell({ children }: { children: (ctx: { admin: boolean; 
             </a>
           ))}
         </nav>
-        {/* O ponto de interrogação fica ao lado da estrela: um é o que fazer
-            hoje, o outro é onde olhar. */}
-        <a className="estrela ajuda-link" href="/guia/" title="Por onde começar" aria-label="Por onde começar">?</a>
+        {/* Era um "?" e ninguém entendia o que havia atrás. Agora diz o que é.
+            Fica ao lado da estrela: um é o que fazer hoje, o outro é onde olhar. */}
+        <a className="como-usar" href="/guia/" title="Por onde começar no painel">Como usar</a>
         <Insights />
         <button className="sair" onClick={sair}>Sair</button>
       </div></header>
+      <TarjaFontes />
       <Indice />
       <main>{children({ admin, session: session! })}</main>
     </>

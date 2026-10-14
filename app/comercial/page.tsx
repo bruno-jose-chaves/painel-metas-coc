@@ -10,7 +10,7 @@ import Sugestoes from "@/components/Sugestoes";
 const ABAS: Aba[] = [
   { id: "time", nome: "Time", oque: "Quanto cada vendedor recebeu de lead, quanto fechou e quanto está pendurado, com comissão e bônus no período." },
   { id: "lancamentos", nome: "Lançamentos", oque: "A matrícula como ela foi lançada: aluno, curso, valor de tabela, desconto e vendedor." },
-  { id: "conferir", nome: "O que conferir", oque: "Casos que o painel marcou como estranhos e precisam de olho humano: duplicado, sem curso, valor fora da faixa." },
+  { id: "conferir", nome: "O que conferir", oque: "Lançamentos que o painel marcou como estranhos e precisam de olho humano." },
 ];
 
 function Tela() {

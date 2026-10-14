@@ -295,8 +295,8 @@ export default function Campanha() {
           rotulos={curva.rotulos}
           series={[
             { nome: "Alunos acumulados", cor: COR.tinta, pontos: curva.real },
-            { nome: `Ritmo da Meta ${c.meta_ativa}`, cor: COR.ruim, tracejada: true, pontos: curva.meta },
-            { nome: `Mesmo dia em ${proj?.ref_ano ?? "ano anterior"}`, cor: COR.cinza, tracejada: true, pontos: curva.anterior },
+            { nome: `Ritmo da Meta ${c.meta_ativa}`, cor: COR.tinta2, tracejada: true, pontos: curva.meta },
+            { nome: `Mesmo dia em ${proj?.ref_ano ?? "ano anterior"}`, cor: COR.cinza, pontilhada: true, pontos: curva.anterior },
           ]}
         />
       ) : <p className="rotulo">Carregando</p>}

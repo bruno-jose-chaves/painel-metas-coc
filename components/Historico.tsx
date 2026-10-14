@@ -19,7 +19,7 @@ type Produto = { id: string; nome: string; duas_temporadas: boolean };
 
 // Preto para o ano corrente, cinza para o anterior, cinza claro para os de trás.
 // Mesma escada de cinzas do resto do site.
-const COR = [CORES.tinta, CORES.cinza, CORES.cinzaClaro, CORES.linha];
+const COR = [CORES.tinta, CORES.tinta2, CORES.cinza, CORES.cinzaClaro];
 
 const variacao = (v: number | null | undefined) => {
   if (v == null || !Number.isFinite(Number(v))) return "-";

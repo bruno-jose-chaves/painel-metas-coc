@@ -116,7 +116,30 @@ const origemMat = [
   { origem: "[ACAFE 26/2] LIVE", negocios: 430, matriculas: 23, matriculas_unicas: 9, conversao: 0.0535, faturamento: 14682.7, ticket_medio: 638.38, dias_medio: 15.2 },
 ];
 
+const comparar = Array.from({ length: 121 }, (_, d) => ({
+  d,
+  dia_a: d <= 101 ? new Date(Date.UTC(2026, 6, 1 + d)).toISOString().slice(0, 10) : null,
+  alunos_a: d <= 101 ? (d > 55 ? 3 : 1) : null,
+  acum_a: d <= 101 ? Math.round(Math.min(208, d * 2.05)) : null,
+  dia_b: new Date(Date.UTC(2025, 6, 1 + d)).toISOString().slice(0, 10),
+  alunos_b: d > 50 ? 3 : 1,
+  acum_b: Math.round(Math.min(258, d * 2.3)),
+}));
+
 const rotas0 = {
+  "rpc/painel_saude_fontes": [
+    { fonte: "RD Station CRM", o_que: "Negociações, etapas e matrículas do CRM", ultima: "2026-10-14T02:30:00Z", atraso_min: 4, limite_min: 30, situacao: "ok", detalhe: null, ordem: 1 },
+    { fonte: "RD Station Marketing", o_que: "Conversões de formulário que viram leads captados", ultima: "2026-10-14T01:10:00Z", atraso_min: 84, limite_min: 120, situacao: "ok", detalhe: null, ordem: 2 },
+    { fonte: "Planilha comercial", o_que: "Matrículas lançadas pelo time", ultima: "2026-10-13T20:05:00Z", atraso_min: 400, limite_min: 1440, situacao: "ok", detalhe: null, ordem: 3 },
+    { fonte: "Pigeon Post", o_que: "Conversas e mensagens do atendimento", ultima: "2026-10-13T20:00:00Z", atraso_min: 405, limite_min: 60, situacao: "fora", detalhe: null, ordem: 4 },
+    { fonte: "Rotina rd-sync", o_que: "Roda sozinha no banco e alimenta as telas", ultima: "2026-10-14T02:28:00Z", atraso_min: 6, limite_min: 20, situacao: "ok", detalhe: null, ordem: 10 },
+  ],
+  "rpc/painel_comparar_turmas": comparar,
+  "rpc/painel_comparar_turmas_resumo": [
+    { turma_id: "metodo-acafe-2026-2", nome: "Método ACAFE 2026/2", lado: "a", alunos: 208, faturamento: 133688.06, ticket: 642.73, desconto: 0.238, venda_de: "2026-07-01", venda_ate: "2026-12-31", dias_corridos: 105, em_curso: true, melhor_dia: "2026-08-20", melhor_dia_n: 20 },
+    { turma_id: "metodo-acafe-2025-2", nome: "Método ACAFE 2025/2", lado: "b", alunos: 258, faturamento: 156118.45, ticket: 605.11, desconto: 0.2402, venda_de: "2025-07-01", venda_ate: "2025-12-31", dias_corridos: 183, em_curso: false, melhor_dia: "2025-09-17", melhor_dia_n: 34 },
+  ],
+
   "rpc/painel_funil": funil,
   "rpc/painel_turmas": [
     { id: "metodo-acafe-2026-2", produto_id: "metodo-acafe", produto: "Método de Aprovação ACAFE", ano: 2026, semestre: 2, nome: "Método ACAFE 2026/2", venda_de: "2026-07-01", venda_ate: "2026-12-31", alunos: 201, faturamento: 127923.76 },
@@ -241,6 +264,12 @@ const rotas0 = {
       numero: "60 alunos", pessoa: null, link: "/campanha/" },
   ],
   "rpc/painel_ritmo": ritmo,
+  // Uma fonte fora, para a tarja de dado desatualizado aparecer na conferência.
+  "rpc/painel_fontes": [
+    { fonte: "RD Station CRM", o_que: "Negociações, etapas e matrículas do CRM", ultima: "2026-10-10T05:50:03Z", atraso_min: 3, limite_min: 30, situacao: "ok", detalhe: null },
+    { fonte: "Planilha comercial", o_que: "Matrículas lançadas pelo time", ultima: "2026-10-10T05:41:52Z", atraso_min: 11, limite_min: 1440, situacao: "ok", detalhe: null },
+    { fonte: "Rotina pigeon-mensagens", o_que: "Roda sozinha no banco e alimenta as telas", ultima: "2026-10-09T23:00:00Z", atraso_min: 413, limite_min: 90, situacao: "fora", detalhe: "Última corrida falhou: ERROR: apenas administradores" },
+  ],
   "rpc/painel_curva": curva,
   "rpc/painel_projecao": projecao,
   "rpc/painel_cenarios": cenarios,
@@ -308,6 +337,7 @@ const telas = [
   ["/", "Metas de captação"],
   ["/campanha/", "Da origem à matrícula"],
   ["/campanha/?v=historico", "O mesmo curso, ano a ano"],
+  ["/campanha/?v=comparar", "Turma contra turma"],
   ["/campanha/?v=upsell", "Quem comprou um, comprou o outro?"],
   ["/comercial/?v=lancamentos", "Lançamentos"],
   ["/comercial/?v=conferir", "O que vale conferir"],
@@ -338,8 +368,8 @@ for (const [rota, esperado] of telas) {
 // Retratos para olho humano: notebook, que é onde a maioria usa, e telefone.
 // A conferência acima diz que renderizou; estas dizem se dá para ler.
 const retratos = [
-  ["notebook", 1280, 800, ["/", "/campanha/", "/comercial/", "/marketing/?v=passagem", "/campanha/?v=upsell", "/guia/"]],
-  ["telefone", 390, 844, ["/", "/campanha/", "/comercial/", "/marketing/?v=paginas", "/campanha/?v=upsell", "/comercial/?v=lancamentos", "/ajustes/"]],
+  ["notebook", 1280, 800, ["/", "/campanha/", "/comercial/", "/marketing/?v=passagem", "/campanha/?v=comparar", "/campanha/?v=upsell", "/guia/"]],
+  ["telefone", 390, 844, ["/", "/campanha/", "/comercial/", "/marketing/?v=paginas", "/campanha/?v=comparar", "/comercial/?v=lancamentos", "/ajustes/"]],
 ];
 for (const [nome, width, height, rotas] of retratos) {
   const c2 = await b.newContext({ viewport: { width, height } });

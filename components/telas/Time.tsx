@@ -27,7 +27,10 @@ type DiaVenda = {
 const COMPARACOES = [
   { id: "", nome: "Sem comparação" },
   { id: "anterior", nome: "Período anterior" },
-  { id: "ano", nome: "Ano passado" },
+  { id: "ano", nome: "Ano passado, mesmas datas" },
+  // Só faz sentido com um curso escolhido, porque é turma contra turma:
+  // Método/2 com Método/2, Semi/1 com Semi/1.
+  { id: "turma", nome: "Mesma turma do ano passado", soComCurso: true },
 ] as const;
 type PreVenda = {
   captados: number; contatados: number; sem_contato: number;
@@ -73,6 +76,13 @@ export default function Time() {
       .then(({ data }) => setDiasVenda((data as DiaVenda[]) ?? []));
   }, [periodo, produto, comparar, volta]);
 
+  // Tirar o curso do filtro tira o sentido da comparação por turma. Em vez de
+  // deixar o gráfico sem linha de comparação e sem explicação, volta para a
+  // comparação que continua valendo.
+  useEffect(() => {
+    if (!produto && comparar === "turma") setComparar("anterior");
+  }, [produto, comparar]);
+
   const totalFat = time?.reduce((s, l) => s + Number(l.faturamento), 0) ?? 0;
   const maiorFat = Math.max(1, ...(time ?? []).map((l) => Number(l.faturamento)));
 
@@ -115,7 +125,9 @@ export default function Time() {
             <button className={vista === "acumulado" ? "ativo" : ""} onClick={() => setVista("acumulado")}>Acumulado</button>
           </div>
           <select value={comparar} onChange={(e) => setComparar(e.target.value)} aria-label="Comparar com">
-            {COMPARACOES.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
+            {COMPARACOES.filter((c) => !("soComCurso" in c) || produto).map((c) => (
+              <option key={c.id} value={c.id}>{c.nome}</option>
+            ))}
           </select>
         </div>
       </div>
@@ -125,10 +137,14 @@ export default function Time() {
           fontes={["Planilha comercial (tabela vendas), pela data da venda",
                    "Cancelada não entra",
                    "Período anterior: a mesma quantidade de dias imediatamente antes",
-                   "Ano passado: as mesmas datas, um ano atrás"]}>
+                   "Ano passado: as mesmas datas, um ano atrás",
+                   "Mesma turma: tabela turmas, pela janela de venda de cada turma"]}>
           <b>Por dia</b> mostra o que entrou em cada data, que é onde se vê pico e buraco.
           <b> Acumulado</b> mostra o total somado, que é onde se vê aceleração ou freio.
           A comparação é alinhada por posição no período, dia 1 contra dia 1, não por data do calendário.
+          <b> Mesma turma do ano passado</b> aparece quando há um curso escolhido e compara com a turma
+          equivalente: Método/2 com Método/2, Semi/1 com Semi/1, alinhado pelo ponto da turma e não pela
+          data. Turma que abriu mais cedo ou mais tarde que a do ano anterior deixa de atrapalhar a conta.
           Clique em um ponto para ver as matrículas daquele dia.
         </Ajuda>
       </p>

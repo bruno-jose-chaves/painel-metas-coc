@@ -39,6 +39,11 @@ export default function Ajuda({
   }, [aberto]);
 
   return (
+    <>
+    {/* Espaço inquebrável antes da caixa: é ele que impede o Ⓘ de cair sozinho
+        na linha seguinte quando a frase termina no limite da largura. Dentro da
+        caixa não adiantaria, porque a caixa inteira é que quebra. */}
+    {"\u00A0"}
     <span
       className="ajuda"
       ref={caixa}
@@ -68,5 +73,6 @@ export default function Ajuda({
         </span>
       )}
     </span>
+    </>
   );
 }

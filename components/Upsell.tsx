@@ -70,7 +70,22 @@ export default function Upsell() {
 
   useEffect(() => {
     supabase.rpc("painel_turmas", { p_so_com_venda: true })
-      .then(({ data }) => setTurmas((data as Turma[]) ?? []));
+      .then(({ data }) => {
+        const t = (data as Turma[]) ?? [];
+        setTurmas(t);
+        // A tela abria vazia e a pessoa tinha que montar o cruzamento antes de
+        // ver qualquer coisa. Abre já no cruzamento que a gente mais olha: a
+        // turma mais recente do Método ACAFE contra o Semi Extensivo do mesmo
+        // ano. Quem quiser outro recorte troca em dois cliques.
+        if (t.length === 0) return;
+        const recente = (lista: Turma[]) =>
+          lista.slice().sort((a, b) => b.ano - a.ano || (b.semestre ?? 0) - (a.semestre ?? 0))[0];
+        const b = recente(t.filter((x) => x.produto_id === "metodo-acafe")) ?? recente(t);
+        const a = recente(t.filter((x) => x.produto_id !== b.produto_id && x.ano === b.ano))
+          ?? recente(t.filter((x) => x.id !== b.id));
+        setBase([b.id]);
+        if (a) setAlvo([a.id]);
+      });
   }, [volta]);
 
   useEffect(() => {

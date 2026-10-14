@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase, SUPABASE_URL } from "@/lib/supabase";
 import Ajuda from "@/components/Ajuda";
+import Fontes from "@/components/Fontes";
 import { dataHora, dataCurta, num } from "@/lib/formato";
 
 type Status = { servico: string; app_configurado: boolean; conectado: boolean; expira_em: string | null; atualizado_em: string | null };
@@ -277,6 +278,8 @@ export default function Configuracao({ admin }: { admin: boolean }) {
           </>
         )}
       </div>
+
+      <Fontes />
 
       <h2><span className="idx">007</span> Cobertura do RD Marketing</h2>
       <p className="nota">
