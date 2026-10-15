@@ -32,10 +32,6 @@ const COMPARACOES = [
   // Método/2 com Método/2, Semi/1 com Semi/1.
   { id: "turma", nome: "Mesma turma do ano passado", soComCurso: true },
 ] as const;
-type PreVenda = {
-  captados: number; contatados: number; sem_contato: number;
-  entregues: number; ganhos: number; ganhos_de_antes: number; parados_7d: number; parados_30d: number;
-};
 
 export default function Time() {
   const { volta, em, minutos } = useAtualizacao();
@@ -45,7 +41,6 @@ export default function Time() {
   const [time, setTime] = useState<Linha[] | null>(null);
   const [parados, setParados] = useState<Parado[] | null>(null);
   const [motivos, setMotivos] = useState<Motivo[] | null>(null);
-  const [apv, setApv] = useState<PreVenda | null>(null);
   const [diasVenda, setDiasVenda] = useState<DiaVenda[] | null>(null);
   const [vista, setVista] = useState<"dia" | "acumulado">("dia");
   const [comparar, setComparar] = useState<string>("anterior");
@@ -60,7 +55,7 @@ export default function Time() {
 
   useEffect(() => {
     const p = { p_de: periodo.de, p_ate: periodo.ate };
-    setTime(null); setParados(null); setMotivos(null); setApv(null); setDiasVenda(null);
+    setTime(null); setParados(null); setMotivos(null); setDiasVenda(null);
     supabase.rpc("painel_time_comercial", { ...p, p_produto: produto })
       .then(({ data }) => setTime((data as Linha[]) ?? []));
     supabase.rpc("painel_parados", { ...p, p_trilha: "comercial", p_produto: produto })
@@ -70,8 +65,6 @@ export default function Time() {
     // O bloco do pré-vendas também respeita o curso escolhido. Antes ele era o
     // único da tela que ignorava o filtro, e quem lia achava que o número era
     // daquele curso.
-    supabase.rpc("painel_pre_venda", { ...p, p_produto: produto })
-      .then(({ data }) => setApv(((data as PreVenda[]) ?? [])[0] ?? null));
     supabase.rpc("painel_vendas_periodo", { ...p, p_produto: produto, p_comparar: comparar || null })
       .then(({ data }) => setDiasVenda((data as DiaVenda[]) ?? []));
   }, [periodo, produto, comparar, volta]);
@@ -350,58 +343,15 @@ export default function Time() {
         </div>
       )}
 
-      <h2><span className="idx">012</span> Agente de Pré-vendas (APV)</h2>
-      {!apv ? <p className="rotulo">Carregando</p> : (
-        <>
-          <div className="faixa">
-            <div>
-              <div className="rotulo">Leads captados</div>
-              <div className="valor num">{num(apv.captados)}</div>
-              <div className="mudo">material rico</div>
-            </div>
-            <div>
-              <div className="rotulo">Entregues ao comercial</div>
-              <div className="valor num">{num(apv.entregues)}</div>
-              <div className="mudo num">
-                {apv.captados ? pct(Number(apv.entregues) / Number(apv.captados), 1) + " do captado" : ""}
-              </div>
-            </div>
-            <div>
-              <div className="rotulo">Viraram matrícula</div>
-              <div className="valor num">{num(apv.ganhos)}</div>
-              <div className="mudo num">
-                {Number(apv.ganhos_de_antes) > 0
-                  ? num(apv.ganhos_de_antes) + " vieram de antes do período"
-                  : "todas captadas no período"}
-              </div>
-            </div>
-            <div>
-              <div className="rotulo">Trabalhados pelo agente</div>
-              <div className="valor num">{num(apv.contatados)}</div>
-              <div className="mudo">saíram de Sem contato</div>
-            </div>
-            <div>
-              <div className="rotulo">Parados +7 dias</div>
-              <div className="valor num">{num(apv.parados_7d)}</div>
-            </div>
-            <div>
-              <div className="rotulo">Parados +30 dias</div>
-              <div className="valor num">{num(apv.parados_30d)}</div>
-            </div>
-          </div>
-          <p className="rodape">
-        O APV é o agente de IA de pré-vendas: ele captura o lead no funil SDR e o comercial abre a negociação depois.
-        <Ajuda titulo="Como estes números são medidos"
-          fontes={["Funil SDR: RD Station CRM (tabela rd_negociacoes, funil SDR)",
-                   "Entrega: existe negociação do mesmo contato fora do funil SDR, criada depois",
-                   "Curso de um lead de pré-vendas vem do contato, porque o funil SDR não é classificado"]}>
-          Entregue ao comercial é inferido: conta quando o mesmo contato tem negociação fora do SDR criada
-          depois da passagem pelo agente. Enquanto a transferência não for registrada no CRM, o número é
-          aproximação por cima.
-        </Ajuda>
+      {/* O bloco do APV saiu daqui e foi para Comercial > Agente de Pré-vendas,
+          junto com a medição pelo lado da conversa. Eram duas telas contando a
+          mesma coisa por caminhos diferentes, e dava para as duas discordarem
+          sem ninguém perceber. */}
+      <p className="rodape">
+        O Agente de Pré-vendas tem tela própria, em <a href="/comercial/?v=agente">Comercial, Agente de
+        Pré-vendas</a>: entrega no CRM, resposta do cliente e o que virou matrícula.
       </p>
-        </>
-      )}
+
       {detalhe && (
         <Detalhe titulo={detalhe.titulo} recorte={detalhe.recorte} aoFechar={() => setDetalhe(null)} />
       )}

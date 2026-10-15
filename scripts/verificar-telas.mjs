@@ -135,7 +135,15 @@ const apvDias = Array.from({ length: 30 }, (_, i) => {
     entregue_crm: d >= "2026-09-30" ? (i % 4) : 0, entregue_whats: i % 3, matriculas: i % 9 === 0 ? 1 : 0 };
 });
 
+const cursosMock = [
+  { curso: "Metodo Acafe", curso_norm: "metodo acafe", produto_id: "metodo-acafe", produto: "Método de Aprovação ACAFE", conta_aluno: true, origem: "regra", vendas: 2336, faturamento: 1051442.98, primeira: "2021-01-04", ultima: "2026-10-14", anos: "2026, 2025, 2024, 2023, 2022, 2021" },
+  { curso: "Preparatorio Enem Hibrido", curso_norm: "preparatorio enem hibrido", produto_id: "prep-enem", produto: "Preparação ENEM", conta_aluno: true, origem: "apontado", vendas: 310, faturamento: 97938.09, primeira: "2021-03-16", ultima: "2023-09-05", anos: "2023, 2022, 2021" },
+  { curso: "Material - Coc 1000 Acafe", curso_norm: "material - coc 1000 acafe", produto_id: "material", produto: "Material avulso", conta_aluno: false, origem: "apontado", vendas: 24, faturamento: 3600, primeira: "2026-05-05", ultima: "2026-09-02", anos: "2026" },
+  { curso: "Preparação Intensiva - MED. FURB", curso_norm: "preparacao intensiva - med. furb", produto_id: "outros", produto: "Outros", conta_aluno: true, origem: "apontado", vendas: 44, faturamento: 25325.54, primeira: "2026-01-15", ultima: "2026-02-06", anos: "2026" },
+];
+
 const rotas0 = {
+  "rpc/painel_cursos": cursosMock,
   "rpc/painel_apv_dia": apvDias,
   "rpc/painel_saude_fontes": [
     { fonte: "RD Station CRM", o_que: "Negociações, etapas e matrículas do CRM", ultima: "2026-10-14T02:30:00Z", atraso_min: 4, limite_min: 30, situacao: "ok", detalhe: null, ordem: 1 },
@@ -212,10 +220,6 @@ const rotas0 = {
     { dia: "2026-10-07", conversas_novas: 175, requentados: 11, leads_novos: 44 },
     { dia: "2026-10-08", conversas_novas: 5, requentados: 0, leads_novos: 12 },
   ],
-  produtos: [
-    { id: "metodo-acafe", nome: "Método de Aprovação ACAFE", ordem: 1 },
-    { id: "missao-ufsc", nome: "Missão UFSC", ordem: 2 },
-  ],
   "rpc/painel_vendas_periodo": [
     { dia: "2026-09-28", alunos: 9, faturamento: 6253, acumulado: 100, dia_comp: "2026-08-29", alunos_comp: 6, acumulado_comp: 71, rotulo_comp: "30 dias anteriores" },
     { dia: "2026-09-29", alunos: 4, faturamento: 2779, acumulado: 104, dia_comp: "2026-08-30", alunos_comp: 5, acumulado_comp: 76, rotulo_comp: "30 dias anteriores" },
@@ -255,7 +259,13 @@ const rotas0 = {
   "rpc/painel_higiene": [{ motivo: "Lead duplicado", descartadas: 98, fatia_do_total: 0.69 }],
   "rpc/solicitar_acesso": "registrada",
   solicitacoes_acesso: [{ email: "novo@coconline.com.br", nome: "Pessoa Nova", mensagem: "acompanhar metas", criada_em: "2026-10-02T12:00:00Z", situacao: "pendente" }],
-  produtos: [{ id: "metodo-acafe", nome: "Método de Aprovação ACAFE", ordem: 1, duas_temporadas: true }, { id: "semi-extensivo", nome: "Semi Extensivo", ordem: 2, duas_temporadas: true }],
+  produtos: [
+    { id: "metodo-acafe", nome: "Método de Aprovação ACAFE", ordem: 1, duas_temporadas: true, conta_aluno: true },
+    { id: "semi-extensivo", nome: "Semi Extensivo", ordem: 2, duas_temporadas: true, conta_aluno: true },
+    { id: "prep-enem", nome: "Preparação ENEM", ordem: 5, duas_temporadas: false, conta_aluno: true },
+    { id: "material", nome: "Material avulso", ordem: 90, duas_temporadas: false, conta_aluno: false },
+    { id: "outros", nome: "Outros", ordem: 99, duas_temporadas: false, conta_aluno: true },
+  ],
   metas: [{ nivel: 2, alunos: 263, faturamento: 185673 }],
   fases: fases,
   "rpc/painel_origem_matriculas": origemMat,
@@ -338,6 +348,7 @@ pg.on("pageerror", (e) => erros.push("pageerror: " + e.message));
 
 const telas = [
   ["/ajustes/", "Cadastro de campanhas"],
+  ["/ajustes/?v=cursos", "Para onde cada curso"],
   ["/ajustes/?v=sistema", "Pedidos de acesso"],
   ["/marketing/?v=paginas", "O que falta classificar"],
   ["/marketing/?v=etiquetas", "Etiqueta para curso"],

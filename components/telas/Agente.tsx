@@ -27,6 +27,15 @@ type Dia = {
 // As duas datas em que cada medição passou a existir. Antes delas o número não
 // é zero, é desconhecido, e a tela precisa dizer isso em vez de desenhar uma
 // linha no chão.
+// O outro lado da mesma história: o funil SDR no CRM. Vinha de um bloco solto
+// em Comercial > Time, e estar em duas telas fazia a pessoa ver metade da
+// história conforme onde clicasse.
+type PreVenda = {
+  captados: number; contatados: number; sem_contato: number;
+  entregues: number; ganhos: number; ganhos_de_antes: number;
+  parados_7d: number; parados_30d: number;
+};
+
 const DESDE_MENSAGEM = "2026-10-05";
 const DESDE_FUNIL = "2026-09-30";
 
@@ -37,11 +46,15 @@ export default function Agente() {
   const { volta, em, minutos } = useAtualizacao();
   const [periodo, setPeriodo] = useState<Periodo>(() => ultimosDias(30));
   const [dias, setDias] = useState<Dia[] | null>(null);
+  const [crm, setCrm] = useState<PreVenda | null>(null);
 
   useEffect(() => {
     setDias(null);
+    setCrm(null);
     supabase.rpc("painel_apv_dia", { p_de: periodo.de, p_ate: periodo.ate })
       .then(({ data }) => setDias((data as Dia[]) ?? []));
+    supabase.rpc("painel_pre_venda", { p_de: periodo.de, p_ate: periodo.ate, p_produto: null })
+      .then(({ data }) => setCrm(((data as PreVenda[]) ?? [])[0] ?? null));
   }, [periodo, volta]);
 
   // Dentro da janela de medição de mensagem, que é o único recorte em que
@@ -180,6 +193,58 @@ export default function Agente() {
           <p className="rodape">
             Traço quer dizer que naquele dia a medição ainda não existia, não que o número foi zero.
           </p>
+
+          <h2><span className="idx">053</span> O mesmo agente, pelo funil do CRM</h2>
+          <p className="nota">
+            A conversa mostra o esforço. O funil mostra o que sobrou dele dentro do CRM.
+            <Ajuda titulo="Por que as duas leituras convivem"
+              fontes={["Funil SDR: RD Station CRM (tabela rd_negociacoes, funil SDR)",
+                       "Entrega: existe negociação do mesmo contato fora do funil SDR, criada depois",
+                       "Curso de um lead de pré-vendas vem do contato, porque o funil SDR não é classificado"]}>
+              Este bloco conta pelo CRM e o de cima conta pela conversa. Os dois medem o mesmo agente por
+              caminhos diferentes e não precisam bater: um lead pode ter respondido no WhatsApp e nunca
+              ter virado negociação, e o contrário também acontece. Diferença grande entre os dois é
+              sinal de passagem perdida, não de erro de conta.
+            </Ajuda>
+          </p>
+          {!crm ? <p className="rotulo">Carregando</p> : (
+            <div className="faixa">
+              <div>
+                <div className="rotulo">Leads captados</div>
+                <div className="valor num">{num(crm.captados)}</div>
+                <div className="mudo">material rico</div>
+              </div>
+              <div>
+                <div className="rotulo">Entregues ao comercial</div>
+                <div className="valor num">{num(crm.entregues)}</div>
+                <div className="mudo num">
+                  {crm.captados ? pct(Number(crm.entregues) / Number(crm.captados), 1) + " do captado" : ""}
+                </div>
+              </div>
+              <div>
+                <div className="rotulo">Viraram matrícula</div>
+                <div className="valor num">{num(crm.ganhos)}</div>
+                <div className="mudo num">
+                  {Number(crm.ganhos_de_antes) > 0
+                    ? num(crm.ganhos_de_antes) + " vieram de antes do período"
+                    : "todas captadas no período"}
+                </div>
+              </div>
+              <div>
+                <div className="rotulo">Trabalhados pelo agente</div>
+                <div className="valor num">{num(crm.contatados)}</div>
+                <div className="mudo">saíram de Sem contato</div>
+              </div>
+              <div>
+                <div className="rotulo">Parados +7 dias</div>
+                <div className="valor num">{num(crm.parados_7d)}</div>
+              </div>
+              <div>
+                <div className="rotulo">Parados +30 dias</div>
+                <div className="valor num">{num(crm.parados_30d)}</div>
+              </div>
+            </div>
+          )}
         </>
       )}
     </>
