@@ -1,0 +1,42 @@
+-- Update 19 — Agente de Pré-vendas pelo lado da conversa, lead do comercial
+--             e o resumo diário virando pauta
+-- Aplicado direto no banco em 15/10/2026. Este arquivo é o registro.
+
+-- 1. leads_do_comercial(de, ate)
+--    "Lead captado" e "lead que o comercial recebeu" não são a mesma coisa, e
+--    tratar como se fossem é o que fazia o número do dia vir zerado.
+--    Captação conta conversão de formulário no RD Marketing, que chega com
+--    cerca de dois dias de atraso e inclui material rico, que vai para o agente
+--    de pré-vendas e pode nunca chegar no time.
+--    Esta função conta o que entrou no funil do comercial, e chega no mesmo
+--    dia: negociação criada fora do funil SDR, mais negociação que o agente
+--    passou do SDR para o funil do comercial.
+
+-- 2. painel_apv_dia(de, ate)
+--    O Agente de Pré-vendas pelo lado da conversa, dia a dia. O bloco que já
+--    existe em Comercial mede pelo CRM, quantos entraram e saíram do funil SDR.
+--    Este mede qualidade: de tudo que o agente abriu, quanto o cliente
+--    respondeu, quanto virou conversa de verdade (três ou mais respostas),
+--    quanto saiu do SDR, quanto reapareceu no número do comercial e quanto
+--    virou matrícula.
+--    Volume sozinho premia quem dispara mais, então o número grande da tela é
+--    sempre a taxa, nunca o total de atendimentos.
+--
+--    Duas datas de início de medição, e a tela mostra as duas:
+--      05/10/2026 — mensagem do cliente, quando o webhook do Pigeon entrou
+--      30/09/2026 — saída do funil SDR, quando o webhook do CRM entrou
+--    Antes delas o número não é zero, é desconhecido.
+
+-- 3. resumo_do_dia(dia) reescrita
+--    Era boletim e passou a ser pauta. O que mudou:
+--      • Fonte parada aparece no topo, antes de qualquer número, porque carga
+--        que parou não aparece como erro, aparece como queda.
+--      • O dia compara com a média dos quatro mesmos dias da semana anteriores.
+--        Comparar segunda com sábado é o erro clássico de resumo diário.
+--      • Bloco novo "A semana": contra a semana anterior e contra a mesma
+--        semana do ano passado.
+--      • "Leads captados no RD" saiu e entrou "leads chegaram no comercial",
+--        que é o número que existe no mesmo dia.
+--      • A cobertura saiu do fim da linha entre parênteses e virou frase
+--        própria em negrito: era a informação mais importante da mensagem e a
+--        menos visível.

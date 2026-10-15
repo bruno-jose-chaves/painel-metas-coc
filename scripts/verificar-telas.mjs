@@ -126,7 +126,17 @@ const comparar = Array.from({ length: 121 }, (_, d) => ({
   acum_b: Math.round(Math.min(258, d * 2.3)),
 }));
 
+const apvDias = Array.from({ length: 30 }, (_, i) => {
+  const d = new Date(Date.UTC(2026, 8, 16 + i)).toISOString().slice(0, 10);
+  const medido = d >= "2026-10-05";
+  const at = 10 + ((i * 7) % 60);
+  return { dia: d, atendidos: at, responderam: medido ? Math.round(at * 0.26) : 0,
+    aqueceu: medido ? Math.round(at * 0.13) : 0,
+    entregue_crm: d >= "2026-09-30" ? (i % 4) : 0, entregue_whats: i % 3, matriculas: i % 9 === 0 ? 1 : 0 };
+});
+
 const rotas0 = {
+  "rpc/painel_apv_dia": apvDias,
   "rpc/painel_saude_fontes": [
     { fonte: "RD Station CRM", o_que: "Negociações, etapas e matrículas do CRM", ultima: "2026-10-14T02:30:00Z", atraso_min: 4, limite_min: 30, situacao: "ok", detalhe: null, ordem: 1 },
     { fonte: "RD Station Marketing", o_que: "Conversões de formulário que viram leads captados", ultima: "2026-10-14T01:10:00Z", atraso_min: 84, limite_min: 120, situacao: "ok", detalhe: null, ordem: 2 },
@@ -340,6 +350,7 @@ const telas = [
   ["/campanha/?v=comparar", "Turma contra turma"],
   ["/campanha/?v=upsell", "Quem comprou um, comprou o outro?"],
   ["/comercial/?v=lancamentos", "Lançamentos"],
+  ["/comercial/?v=agente", "O agente está aquecendo"],
   ["/comercial/?v=conferir", "O que vale conferir"],
   ["/comercial/", "Agente de Pré-vendas"],
   ["/marketing/", "Formulário embutido"],
@@ -368,7 +379,7 @@ for (const [rota, esperado] of telas) {
 // Retratos para olho humano: notebook, que é onde a maioria usa, e telefone.
 // A conferência acima diz que renderizou; estas dizem se dá para ler.
 const retratos = [
-  ["notebook", 1280, 800, ["/", "/campanha/", "/comercial/", "/marketing/?v=passagem", "/campanha/?v=comparar", "/campanha/?v=upsell", "/guia/"]],
+  ["notebook", 1280, 800, ["/", "/campanha/", "/comercial/", "/comercial/?v=agente", "/campanha/?v=comparar", "/campanha/?v=upsell", "/guia/"]],
   ["telefone", 390, 844, ["/", "/campanha/", "/comercial/", "/marketing/?v=paginas", "/campanha/?v=comparar", "/comercial/?v=lancamentos", "/ajustes/"]],
 ];
 for (const [nome, width, height, rotas] of retratos) {

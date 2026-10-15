@@ -51,6 +51,7 @@ const POR_PERGUNTA: Record<Pergunta, Sugestao[]> = {
   quem_vende: [
     { tela: "Comercial · Time", link: "/comercial/", porque: "Quanto cada um recebeu de lead, fechou e deixou pendurado" },
     { tela: "Comercial · Lançamentos", link: "/comercial/?v=lancamentos", porque: "A matrícula como foi lançada: aluno, curso, valor e desconto" },
+    { tela: "Comercial · Agente de Pré-vendas", link: "/comercial/?v=agente", porque: "Quanto do que o agente abriu respondeu, aqueceu e chegou no comercial" },
   ],
   comparar: [
     { tela: "Campanha · Turma contra turma", link: "/campanha/?v=comparar", porque: "Duas turmas sobrepostas pelo dia da turma, no mesmo ponto de venda" },
