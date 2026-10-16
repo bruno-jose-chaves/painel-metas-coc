@@ -17,7 +17,8 @@ import { brl, num, dataCurta } from "@/lib/formato";
 // cada nome continua discriminado, com quantos e quanto.
 
 type Curso = {
-  curso: string; curso_norm: string; produto_id: string | null; produto: string | null;
+  curso: string; curso_norm: string; grafias: string | null;
+  produto_id: string | null; produto: string | null;
   conta_aluno: boolean; origem: "apontado" | "regra" | "sem destino";
   vendas: number; faturamento: number; primeira: string; ultima: string; anos: string;
 };
@@ -169,7 +170,12 @@ export default function Cursos({ admin }: { admin: boolean }) {
               <tbody>
                 {lista.map((c) => (
                   <tr key={c.curso_norm + c.curso} className={c.origem === "sem destino" ? "fora" : undefined}>
-                    <td><b>{c.curso}</b></td>
+                    <td>
+                      <b>{c.curso}</b>
+                      {/* Mesma coisa escrita de jeitos diferentes na planilha.
+                          Conta como um curso só e as grafias ficam à vista. */}
+                      {c.grafias && <div className="ids">também aparece como: {c.grafias}</div>}
+                    </td>
                     <td className="n">{num(c.vendas)}</td>
                     <td className="n">{brl(c.faturamento)}</td>
                     <td className="mudo num">{c.anos}</td>

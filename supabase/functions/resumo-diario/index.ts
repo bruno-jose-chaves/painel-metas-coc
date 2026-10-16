@@ -24,6 +24,11 @@ Deno.serve(async (req) => {
   if (error) return Response.json({ ok: false, erro: error.message }, { status: 500 });
 
   const texto = String(data ?? "").trim();
+
+  // Marca a própria entrega. O resumo ficou seis dias sem sair e ninguém
+  // percebeu, porque nada vigiava a mensagem. Agora a saúde das fontes vigia:
+  // se esta marca envelhecer mais de um dia, o painel mostra a tarja.
+  await db.rpc("marcar_sync", { p_chave: "resumo_diario" });
   // Texto puro para quem só quer encaminhar, e json para quem quer montar.
   if (url.searchParams.get("formato") === "texto") {
     return new Response(texto, { headers: { "Content-Type": "text/plain; charset=utf-8" } });

@@ -136,10 +136,10 @@ const apvDias = Array.from({ length: 30 }, (_, i) => {
 });
 
 const cursosMock = [
-  { curso: "Metodo Acafe", curso_norm: "metodo acafe", produto_id: "metodo-acafe", produto: "Método de Aprovação ACAFE", conta_aluno: true, origem: "regra", vendas: 2336, faturamento: 1051442.98, primeira: "2021-01-04", ultima: "2026-10-14", anos: "2026, 2025, 2024, 2023, 2022, 2021" },
-  { curso: "Preparatorio Enem Hibrido", curso_norm: "preparatorio enem hibrido", produto_id: "prep-enem", produto: "Preparação ENEM", conta_aluno: true, origem: "apontado", vendas: 310, faturamento: 97938.09, primeira: "2021-03-16", ultima: "2023-09-05", anos: "2023, 2022, 2021" },
-  { curso: "Material - Coc 1000 Acafe", curso_norm: "material - coc 1000 acafe", produto_id: "material", produto: "Material avulso", conta_aluno: false, origem: "apontado", vendas: 24, faturamento: 3600, primeira: "2026-05-05", ultima: "2026-09-02", anos: "2026" },
-  { curso: "Preparação Intensiva - MED. FURB", curso_norm: "preparacao intensiva - med. furb", produto_id: "outros", produto: "Outros", conta_aluno: true, origem: "apontado", vendas: 44, faturamento: 25325.54, primeira: "2026-01-15", ultima: "2026-02-06", anos: "2026" },
+  { curso: "Metodo Acafe", curso_norm: "metodo acafe", grafias: "Metodo Acafe · METODO ACAFE", produto_id: "metodo-acafe", produto: "Método de Aprovação ACAFE", conta_aluno: true, origem: "regra", vendas: 2336, faturamento: 1051442.98, primeira: "2021-01-04", ultima: "2026-10-14", anos: "2026, 2025, 2024, 2023, 2022, 2021" },
+  { curso: "Preparatorio Enem Hibrido", curso_norm: "preparatorio enem hibrido", grafias: null, produto_id: "prep-enem", produto: "Preparação ENEM", conta_aluno: true, origem: "apontado", vendas: 310, faturamento: 97938.09, primeira: "2021-03-16", ultima: "2023-09-05", anos: "2023, 2022, 2021" },
+  { curso: "Material - Coc 1000 Acafe", curso_norm: "material - coc 1000 acafe", grafias: null, produto_id: "material", produto: "Material avulso", conta_aluno: false, origem: "apontado", vendas: 24, faturamento: 3600, primeira: "2026-05-05", ultima: "2026-09-02", anos: "2026" },
+  { curso: "Preparação Intensiva - MED. FURB", curso_norm: "preparacao intensiva - med. furb", grafias: null, produto_id: "outros", produto: "Outros", conta_aluno: true, origem: "apontado", vendas: 44, faturamento: 25325.54, primeira: "2026-01-15", ultima: "2026-02-06", anos: "2026" },
 ];
 
 const rotas0 = {
