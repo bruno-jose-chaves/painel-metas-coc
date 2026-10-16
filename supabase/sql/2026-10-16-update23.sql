@@ -1,0 +1,39 @@
+-- Update 23 — Falso alarme da classificar-leads, importação visível e turmas do ENEM
+-- Aplicado direto no banco em 16/10/2026. Este arquivo é o registro.
+
+-- 1. painel_saude_fontes(): duas correções nas rotinas
+--
+--    a) Corrida em andamento virava "fora".
+--       A função pegava a última linha do histórico do cron e tratava qualquer
+--       status diferente de "succeeded" como falha. Uma corrida em curso tem
+--       status "running", então toda rotina aparecia como fora enquanto rodava.
+--       A classificar-leads leva 19 segundos em média (máximo 49) e roda de 15
+--       em 15 minutos, por isso era justamente ela que o Bruno via piscando.
+--       Em 48 horas: 192 corridas, zero falhas. Era alarme falso.
+--       Agora a função só olha corrida TERMINADA.
+--
+--    b) O limite saiu do código e passou a vir do agendamento.
+--       Era escrito à mão, rotina por rotina, e envelhecia junto com o cron.
+--       Agora é o intervalo do cron mais cinco minutos, que foi o critério que
+--       o Bruno pediu. Rotina de 15 em 15 minutos tem limite de 20, e não mais
+--       de 45.
+--         rd-sync 10 · pigeon-sync 15 · classificar-leads 20
+--         cruzar-vendas 25 · pigeon-mensagens 35
+
+-- 2. painel_importacoes()
+--    A planilha é a fonte firme da venda e a importação era caixa preta: linha
+--    com data ilegível saía descartada em silêncio, e não havia como saber que
+--    a venda existia na planilha e não no painel.
+--    Agora Ajustes mostra, por aba, quantas linhas foram lidas, quantas
+--    entraram, quantas eram sobra de planilha e quais foram recusadas, com o
+--    número da linha para corrigir na origem.
+--    São 16 recusadas, todas de 2021 e 2022, exatamente as do item C4.
+--    2026 e 2027 estão com zero.
+
+-- 3. Turmas da Preparação ENEM, de 2021 a 2027
+--    O ENEM virou produto no Update 20 mas não tinha turma nenhuma, e por isso
+--    suas 824 matrículas ficavam de fora de Turma contra turma, do Acompanhando
+--    e de qualquer comparação por turma.
+--    Uma turma por ano, sem semestre, janela de venda no ano civil, que é como
+--    o produto sempre vendeu: 291 em 2021, 271 em 2022, 166 em 2023, 96 em 2024.
+--    A de 2027 fica criada e vazia, pronta para quando o produto voltar.

@@ -154,6 +154,12 @@ const rotas0 = {
       alunos: 0, faturamento: 0, ticket: null,
       anterior_id: "semi-extensivo-2026-1", anterior_nome: "Semi Extensivo 2026/1", anterior_mesmo_ponto: 2, anterior_total: 119 },
   ],
+  "rpc/painel_importacoes": [
+    { fonte: "planilha:Vendas 2027", aba: "Vendas 2027", quando: "2026-10-16T14:41:59Z", lidas: 1253, importadas: 1, em_branco: 1252, rejeitadas: 0, status: "ok", motivos: null, linhas: null },
+    { fonte: "planilha:Vendas 2026", aba: "Vendas 2026", quando: "2026-10-16T14:41:55Z", lidas: 1253, importadas: 914, em_branco: 339, rejeitadas: 0, status: "ok", motivos: null, linhas: null },
+    { fonte: "planilha:Vendas 2022", aba: "Vendas 2022", quando: "2026-09-30T16:24:34Z", lidas: 794, importadas: 782, em_branco: 0, rejeitadas: 12, status: "ok", motivos: "data ilegível", linhas: "118, 204, 311, 489" },
+    { fonte: "planilha:Vendas 2021", aba: "Vendas 2021", quando: "2026-09-30T16:24:39Z", lidas: 813, importadas: 809, em_branco: 0, rejeitadas: 4, status: "ok", motivos: "data ilegível", linhas: "77, 402, 598, 701" },
+  ],
   "rpc/painel_apv_dia": apvDias,
   "rpc/painel_saude_fontes": [
     { fonte: "RD Station CRM", o_que: "Negociações, etapas e matrículas do CRM", ultima: "2026-10-14T02:30:00Z", atraso_min: 4, limite_min: 30, situacao: "ok", detalhe: null, ordem: 1 },

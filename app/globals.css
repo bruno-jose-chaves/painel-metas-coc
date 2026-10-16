@@ -1327,3 +1327,10 @@ select:disabled, input:disabled { color: var(--cinza-claro); background: var(--s
 .escolhas .escolha { padding: 11px 13px; }
 .escolhas .escolha b { font-size: 14px; }
 .escolhas .escolha:disabled { opacity: .45; cursor: not-allowed; }
+
+/* O mesmo aviso, quando o assunto é perda de dado e não só leitura. Vermelho
+   suave: chama o olho sem gritar. */
+.aviso-leve.ruim {
+  background: #FBEEEB;
+  border-left-color: var(--ruim, #B5301A);
+}
