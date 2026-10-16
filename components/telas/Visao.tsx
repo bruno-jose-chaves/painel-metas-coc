@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Ajuda from "@/components/Ajuda";
+import Acompanhando from "@/components/Acompanhando";
 import { useIndicadores } from "@/lib/indicadores";
 import Detalhe, { type Recorte } from "@/components/Detalhe";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
@@ -275,8 +276,11 @@ export default function Visao() {
       )}
       <p className="rodape">Barra preta: realizado. Traço vermelho: onde a meta ativa espera que a campanha esteja hoje.</p>
 
+      {/* Turma que ainda não virou campanha não aparece acima e some da tela.
+          Foi o que aconteceu com 2027 quando começou a vender. */}
+      <Acompanhando volta={volta} />
 
-      <h2><span className="idx">003</span> Metas de captação</h2>
+      <h2><span className="idx">004</span> Metas de captação</h2>
       {!metasProntas ? (
         <p className="rotulo">Carregando</p>
       ) : Object.keys(metasLeads).length === 0 ? (

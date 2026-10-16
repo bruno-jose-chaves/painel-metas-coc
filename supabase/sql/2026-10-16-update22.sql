@@ -1,0 +1,18 @@
+-- Update 22 — Acompanhando: turma que ainda não é campanha deixa de ser invisível
+-- Aplicado direto no banco em 16/10/2026. Este arquivo é o registro.
+
+-- painel_turma_cartao(turmas[])
+--   Campanha cadastrada tem meta, fase e projeção, e por isso ganha cartão na
+--   tela Hoje. Turma que ainda não virou campanha não tem nada disso e some da
+--   tela: foi exatamente o que aconteceu com 2027, que começou a vender e
+--   ficou invisível até a aba da planilha ser importada.
+--
+--   A referência deste cartão não é meta, porque turma não tem meta: é a turma
+--   equivalente do ano anterior CONTADA ATÉ O MESMO DIA DE VIDA da atual.
+--   Comparar uma turma de 15 dias com o total fechado da anterior não diz nada.
+--
+--   Exemplo real de hoje: Extensivo 2027 está com 1 aluno no dia 76 de venda,
+--   contra 3 que a Extensivo 2026 tinha no dia 76 dela. A 2026 fechou com 64.
+--
+--   Limite de duas turmas por pessoa, guardado no navegador de cada um. A tela
+--   Hoje serve para bater o olho, e uma lista de dez turmas vira outra planilha.

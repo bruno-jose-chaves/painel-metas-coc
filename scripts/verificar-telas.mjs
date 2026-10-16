@@ -144,6 +144,16 @@ const cursosMock = [
 
 const rotas0 = {
   "rpc/painel_cursos": cursosMock,
+  "rpc/painel_turma_cartao": [
+    { turma_id: "extensivo-2027", nome: "Extensivo 2027", produto: "Extensivo", ano: 2027, semestre: null,
+      venda_de: "2026-08-01", venda_ate: "2027-07-31", dia_da_turma: 76, em_curso: true,
+      alunos: 1, faturamento: 19274, ticket: 19274,
+      anterior_id: "extensivo-2026", anterior_nome: "Extensivo 2026", anterior_mesmo_ponto: 3, anterior_total: 64 },
+    { turma_id: "semi-extensivo-2027-1", nome: "Semi Extensivo 2027/1", produto: "Semi Extensivo", ano: 2027, semestre: 1,
+      venda_de: "2026-10-01", venda_ate: "2027-04-30", dia_da_turma: 15, em_curso: true,
+      alunos: 0, faturamento: 0, ticket: null,
+      anterior_id: "semi-extensivo-2026-1", anterior_nome: "Semi Extensivo 2026/1", anterior_mesmo_ponto: 2, anterior_total: 119 },
+  ],
   "rpc/painel_apv_dia": apvDias,
   "rpc/painel_saude_fontes": [
     { fonte: "RD Station CRM", o_que: "Negociações, etapas e matrículas do CRM", ultima: "2026-10-14T02:30:00Z", atraso_min: 4, limite_min: 30, situacao: "ok", detalhe: null, ordem: 1 },
@@ -337,7 +347,10 @@ const sessao = {
   user: { id: "00000000-0000-0000-0000-000000000000", email: "brunojose_chaves@hotmail.com", aud: "authenticated", role: "authenticated", app_metadata: {}, user_metadata: {}, created_at: "2026-01-01T00:00:00Z" },
 };
 await ctx.addInitScript(
-  ([ref, s]) => localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(s)),
+  ([ref, s]) => {
+    localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(s));
+    localStorage.setItem("acompanhando", JSON.stringify(["extensivo-2027", "semi-extensivo-2027-1"]));
+  },
   [REF, sessao]
 );
 
@@ -402,7 +415,10 @@ for (const [nome, width, height, rotas] of retratos) {
       headers: { "content-range": "0-1/2", "access-control-allow-origin": "*" },
       body: JSON.stringify(chave ? rotas0[chave] : []) });
   });
-  await c2.addInitScript(([ref, s]) => localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(s)), [REF, sessao]);
+  await c2.addInitScript(([ref, s]) => {
+    localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(s));
+    localStorage.setItem("acompanhando", JSON.stringify(["extensivo-2027", "semi-extensivo-2027-1"]));
+  }, [REF, sessao]);
   const p2 = await c2.newPage();
   for (const r of rotas) {
     await p2.goto("http://127.0.0.1:4599" + r, { waitUntil: "networkidle" });

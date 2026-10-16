@@ -1314,3 +1314,16 @@ select:disabled, input:disabled { color: var(--cinza-claro); background: var(--s
 /* Linha de fonte fora. Usar o destaque lima aqui dava a leitura trocada: verde
    limão para a única linha que está com problema. */
 .tabela tr.fora td { background: #FBEEEB; }
+
+/* Grade das escolhas dentro da gaveta. O botão de escolha já existe do guia;
+   aqui só entra o arranjo, para caber duas por linha no notebook e uma no
+   telefone. */
+.escolhas {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  margin-top: 6px;
+}
+.escolhas .escolha { padding: 11px 13px; }
+.escolhas .escolha b { font-size: 14px; }
+.escolhas .escolha:disabled { opacity: .45; cursor: not-allowed; }
