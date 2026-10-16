@@ -59,7 +59,12 @@ function lerPigeon(c: any, origem: string): Linha | null {
   const tel = cliente
     ?? det.to ?? det.from
     ?? d.contact?.phone ?? d.contact?.number
-    ?? achar(c, ["phone", "whatsapp", "number", "telefone", "celular"]);
+    ?? d.phonenumber
+    // O evento de etiqueta traz o telefone em "phonenumber", com o país
+    // separado por barra vertical: "+55|4799293372". A busca genérica não
+    // achava essa chave, e por isso 774 eventos de etiqueta ficaram sem
+    // telefone e invisíveis para o painel.
+    ?? achar(c, ["phone", "whatsapp", "number", "telefone", "celular", "phonenumber"]);
 
   return {
     origem,
@@ -87,7 +92,7 @@ function lerGenerico(c: any, origem: string): Linha {
     conversa_id: texto(achar(c, ["conversa_id", "conversation_id", "chat_id", "ticket_id", "session_id", "sessionid"])),
     contato_id: texto(achar(c, ["contato_id", "contact_id", "contactid", "customer_id", "lead_id"])),
     email_norm: email,
-    telefone_norm: normTel(achar(c, ["telefone", "phone", "whatsapp", "number", "from", "to", "celular"])),
+    telefone_norm: normTel(achar(c, ["telefone", "phone", "whatsapp", "number", "from", "to", "celular", "phonenumber"])),
     nome: texto(achar(c, ["nome", "name", "contact_name", "pushname"])),
     canal: texto(achar(c, ["canal", "channel", "platform"])),
     direcao: texto(achar(c, ["direcao", "direction", "fromme", "is_from_me"])),

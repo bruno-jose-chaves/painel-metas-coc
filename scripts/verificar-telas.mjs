@@ -160,6 +160,20 @@ const rotas0 = {
     { fonte: "planilha:Vendas 2022", aba: "Vendas 2022", quando: "2026-09-30T16:24:34Z", lidas: 794, importadas: 782, em_branco: 0, rejeitadas: 12, status: "ok", motivos: "data ilegível", linhas: "118, 204, 311, 489" },
     { fonte: "planilha:Vendas 2021", aba: "Vendas 2021", quando: "2026-09-30T16:24:39Z", lidas: 813, importadas: 809, em_branco: 0, rejeitadas: 4, status: "ok", motivos: "data ilegível", linhas: "77, 402, 598, 701" },
   ],
+  "rpc/painel_funil_whats": [
+    { etapa: "Sem etapa marcada", ordem: 0, pessoas: 183, matriculas: 18, por_curso: { "Missão UFSC 2026": 148, "Método ACAFE 2026/2": 17, "Extensivo 2027": 5, "Semi Extensivo 2027/1": 5, "sem curso": 6, "Semi Extensivo 2026/2": 2 }, por_vendedor: { "João": 180, "Márcia": 3 } },
+    { etapa: "Aquecido pelo agente", ordem: 1, pessoas: 2, matriculas: 0, por_curso: { "Missão UFSC 2026": 2 }, por_vendedor: { "João": 2 } },
+    { etapa: "Primeiro contato", ordem: 2, pessoas: 190, matriculas: 9, por_curso: { "Missão UFSC 2026": 174, "Método ACAFE 2026/2": 12, "sem curso": 3, "Semi Extensivo 2027/1": 1 }, por_vendedor: { "Márcia": 189, "João": 1 } },
+    { etapa: "Qualificação", ordem: 3, pessoas: 114, matriculas: 11, por_curso: { "Missão UFSC 2026": 101, "Método ACAFE 2026/2": 9, "sem curso": 2, "Extensivo 2027": 1, "Semi Extensivo 2027/1": 1 }, por_vendedor: { "Márcia": 114 } },
+    { etapa: "Negociação", ordem: 4, pessoas: 42, matriculas: 1, por_curso: { "Missão UFSC 2026": 21, "Método ACAFE 2026/2": 15, "Semi Extensivo 2027/1": 4, "Extensivo 2027": 1, "Método ACAFE 2026/1": 1 }, por_vendedor: { "Márcia": 42 } },
+    { etapa: "Venda realizada", ordem: 5, pessoas: 16, matriculas: 15, por_curso: { "Missão UFSC 2026": 8, "Método ACAFE 2026/2": 6, "Semi Extensivo 2026/2": 2 }, por_vendedor: { "Márcia": 16 } },
+  ],
+  "rpc/painel_etiquetas_whats": [
+    { etiqueta: "MÁRCIA - 67F3BBD418D12700144C2302", etiqueta_norm: "MÁRCIA", tipo: "vendedor", valor: "Márcia", pessoas: 361, ultima: "2026-10-16T19:20:12Z" },
+    { etiqueta: "LIVE UFSC 2026", etiqueta_norm: "LIVE UFSC 2026", tipo: "curso", valor: "missao-ufsc-2026", pessoas: 312, ultima: "2026-10-16T18:02:00Z" },
+    { etiqueta: "1° CONTATO RD", etiqueta_norm: "1° CONTATO RD", tipo: "etapa", valor: "Primeiro contato", pessoas: 190, ultima: "2026-10-16T19:20:12Z" },
+    { etiqueta: "LEAD FRIO 2027", etiqueta_norm: "LEAD FRIO 2027", tipo: null, valor: null, pessoas: 7, ultima: "2026-10-15T11:40:00Z" },
+  ],
   "rpc/painel_apv_dia": apvDias,
   "rpc/painel_saude_fontes": [
     { fonte: "RD Station CRM", o_que: "Negociações, etapas e matrículas do CRM", ultima: "2026-10-14T02:30:00Z", atraso_min: 4, limite_min: 30, situacao: "ok", detalhe: null, ordem: 1 },
@@ -381,6 +395,7 @@ const telas = [
   ["/campanha/?v=upsell", "Quem comprou um, comprou o outro?"],
   ["/comercial/?v=lancamentos", "Lançamentos"],
   ["/comercial/?v=agente", "O agente está aquecendo"],
+  ["/comercial/?v=whats", "Onde cada contato parou"],
   ["/comercial/?v=conferir", "O que vale conferir"],
   ["/comercial/", "Agente de Pré-vendas"],
   ["/marketing/", "Formulário embutido"],
@@ -409,7 +424,7 @@ for (const [rota, esperado] of telas) {
 // Retratos para olho humano: notebook, que é onde a maioria usa, e telefone.
 // A conferência acima diz que renderizou; estas dizem se dá para ler.
 const retratos = [
-  ["notebook", 1280, 800, ["/", "/campanha/", "/comercial/", "/comercial/?v=agente", "/campanha/?v=comparar", "/campanha/?v=upsell", "/guia/"]],
+  ["notebook", 1280, 800, ["/", "/campanha/", "/comercial/", "/comercial/?v=whats", "/campanha/?v=comparar", "/campanha/?v=upsell", "/guia/"]],
   ["telefone", 390, 844, ["/", "/campanha/", "/comercial/", "/marketing/?v=paginas", "/campanha/?v=comparar", "/comercial/?v=lancamentos", "/ajustes/"]],
 ];
 for (const [nome, width, height, rotas] of retratos) {
