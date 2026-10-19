@@ -142,6 +142,21 @@ const cursosMock = [
   { curso: "Preparação Intensiva - MED. FURB", curso_norm: "preparacao intensiva - med. furb", grafias: null, produto_id: "outros", produto: "Outros", conta_aluno: true, origem: "apontado", vendas: 44, faturamento: 25325.54, primeira: "2026-01-15", ultima: "2026-02-06", anos: "2026" },
 ];
 
+const escapandoResumo = [
+  { tipo: "Pagamento pendente", prioridade: 1, quantos: 28, mediana_dias: 48, mais_parado: 164, na_fila: true, por_dono: { "Marcia  Laurett": 21, "João Pedro Beraldo": 7 } },
+  { tipo: "Conversa sem card", prioridade: 2, quantos: 61, mediana_dias: 7, mais_parado: 12, na_fila: true, por_dono: { Marcia: 39, "João": 22 } },
+  { tipo: "Negociação parada", prioridade: 3, quantos: 205, mediana_dias: 68, mais_parado: 201, na_fila: true, por_dono: { "Marcia  Laurett": 168, "João Pedro Beraldo": 20, "Tarso Brietzke Iracet": 17 } },
+  { tipo: "Qualificação parada", prioridade: 4, quantos: 364, mediana_dias: 68, mais_parado: 110, na_fila: false, por_dono: { "Marcia  Laurett": 300, "João Pedro Beraldo": 64 } },
+  { tipo: "Lead do SDR sem contato", prioridade: 5, quantos: 5701, mediana_dias: 172, mais_parado: 417, na_fila: false, por_dono: { "sem dono": 5701 } },
+];
+const escapando = [
+  { tipo: "Pagamento pendente", prioridade: 1, pessoa: "Juliana Reis", telefone: "47988112233", dono: "Marcia  Laurett", onde: "Funil principal · Aguardando Pagamento", dias: 164, desde: "2026-05-08", ja_e_aluno: false, o_que_fazer: "Cobrar o pagamento ou devolver o card para Negociação" },
+  { tipo: "Pagamento pendente", prioridade: 1, pessoa: "Rafael Tomaz", telefone: "48997654321", dono: "João Pedro Beraldo", onde: "Funil principal · Aguardando Pagamento", dias: 52, desde: "2026-08-28", ja_e_aluno: false, o_que_fazer: "Cobrar o pagamento ou devolver o card para Negociação" },
+  { tipo: "Conversa sem card", prioridade: 2, pessoa: "[NOVO] (47) 98846-8060", telefone: "47988468060", dono: "Marcia", onde: "WhatsApp, fora do CRM", dias: 12, desde: "2026-10-07", ja_e_aluno: false, o_que_fazer: "Abrir a negociação no CRM e retomar a conversa" },
+  { tipo: "Conversa sem card", prioridade: 2, pessoa: "Enilson Silva Souza", telefone: "48991555125", dono: "Marcia", onde: "WhatsApp, fora do CRM", dias: 3, desde: "2026-10-16", ja_e_aluno: true, o_que_fazer: "Já virou matrícula e nunca teve card: abrir e fechar como ganha" },
+  { tipo: "Negociação parada", prioridade: 3, pessoa: "Camila Fontes", telefone: "49998877665", dono: "Marcia  Laurett", onde: "Funil principal · Negociação", dias: 201, desde: "2026-04-01", ja_e_aluno: false, o_que_fazer: "Retomar ou marcar perdida com motivo" },
+];
+
 const rotas0 = {
   "rpc/painel_cursos": cursosMock,
   "rpc/painel_turma_cartao": [
@@ -313,6 +328,8 @@ const rotas0 = {
       detalhe: "Faltam 60 alunos para a meta e 18 dias de campanha.",
       numero: "60 alunos", pessoa: null, link: "/campanha/" },
   ],
+  "rpc/painel_escapando": escapando,
+  "rpc/painel_escapando_resumo": escapandoResumo,
   "rpc/painel_ritmo": ritmo,
   // Uma fonte fora, para a tarja de dado desatualizado aparecer na conferência.
   "rpc/painel_fontes": [
@@ -341,6 +358,7 @@ const rotas0 = {
   sincronizacoes: [{ id: 1, fonte: "planilha:Vendas 2026", terminado_em: "2026-10-02T13:05:00Z", lidas: 860, importadas: 858, rejeitadas: 2, status: "ok" }],
   usuarios_autorizados: [{ email: "brunojose_chaves@hotmail.com", nome: "Bruno", papel: "admin" }],
 };
+
 
 const b = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium" });
 const ctx = await b.newContext({ viewport: { width: 1280, height: 1000 } });
@@ -395,7 +413,8 @@ const telas = [
   ["/campanha/?v=upsell", "Quem comprou um, comprou o outro?"],
   ["/comercial/?v=lancamentos", "Lançamentos"],
   ["/comercial/?v=agente", "O agente está aquecendo"],
-  ["/comercial/?v=whats", "Onde cada contato parou"],
+  ["/comercial/?v=whats", "Toda conversa virou card?"],
+  ["/comercial/?v=escapando", "A fila do que ninguém está olhando"],
   ["/comercial/?v=conferir", "O que vale conferir"],
   ["/comercial/", "Agente de Pré-vendas"],
   ["/marketing/", "Formulário embutido"],

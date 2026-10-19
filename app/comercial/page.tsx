@@ -6,6 +6,7 @@ import Vendas from "@/components/telas/Vendas";
 import Sugestoes from "@/components/Sugestoes";
 import Agente from "@/components/telas/Agente";
 import FunilWhats from "@/components/telas/FunilWhats";
+import Escapando from "@/components/telas/Escapando";
 
 // Time e Lançamentos respondem à mesma pergunta por ângulos diferentes: quem
 // está entregando, e o que exatamente foi vendido.
@@ -14,6 +15,7 @@ const ABAS: Aba[] = [
   { id: "lancamentos", nome: "Lançamentos", oque: "A matrícula como ela foi lançada: aluno, curso, valor de tabela, desconto e vendedor." },
   { id: "agente", nome: "Agente de Pré-vendas", oque: "A qualidade do agente: de tudo que ele abriu, quanto respondeu, quanto virou conversa e quanto chegou no comercial." },
   { id: "whats", nome: "WhatsApp e CRM", oque: "Quem conversou no WhatsApp e não virou card no CRM, e há quantos dias cada negociação aberta está parada na etapa." },
+  { id: "escapando", nome: "O que está escapando", oque: "A fila do que some sem ninguém ver: pagamento pendente, conversa sem card no CRM e negociação dormindo, com nome, dono e o que fazer." },
   { id: "conferir", nome: "O que conferir", oque: "Lançamentos que o painel marcou como estranhos e precisam de olho humano." },
 ];
 
@@ -26,6 +28,7 @@ function Tela() {
       {aba === "lancamentos" && <Vendas />}
       {aba === "agente" && <Agente />}
       {aba === "whats" && <FunilWhats />}
+      {aba === "escapando" && <Escapando />}
       {aba === "conferir" && <Sugestoes />}
     </>
   );
