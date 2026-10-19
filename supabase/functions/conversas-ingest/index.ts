@@ -14,7 +14,11 @@ function normTel(t: unknown) {
   if (d.length >= 12 && d.startsWith("55")) d = d.slice(2);
   if (d.length === 11 && d.startsWith("0")) d = d.slice(1);
   if (d.length === 10 && "6789".includes(d[2])) d = d.slice(0, 2) + "9" + d.slice(2);
-  return d.length >= 10 ? d : null;
+  // Telefone brasileiro normalizado tem 10 ou 11 digitos, e so. O limite
+  // frouxo de ">= 10" deixava passar o numero de protocolo da sessao do Pigeon
+  // ("2026101900068", 13 digitos), que ficou gravado como telefone em 2.395
+  // eventos e quebrou em silencio todo cruzamento de conversa com o CRM.
+  return d.length === 10 || d.length === 11 ? d : null;
 }
 
 function achar(obj: unknown, nomes: string[], profundidade = 0): unknown {
@@ -59,12 +63,18 @@ function lerPigeon(c: any, origem: string): Linha | null {
   const tel = cliente
     ?? det.to ?? det.from
     ?? d.contact?.phone ?? d.contact?.number
-    ?? d.phonenumber
     // O evento de etiqueta traz o telefone em "phonenumber", com o país
     // separado por barra vertical: "+55|4799293372". A busca genérica não
     // achava essa chave, e por isso 774 eventos de etiqueta ficaram sem
     // telefone e invisíveis para o painel.
-    ?? achar(c, ["phone", "whatsapp", "number", "telefone", "celular", "phonenumber"]);
+    ?? d.phonenumber
+    // O evento de sessão traz o telefone do contato aqui. Sem esta linha a
+    // busca larga achava "number", que no Pigeon é o número de protocolo da
+    // sessão, e 2.395 eventos ficaram com o protocolo gravado como telefone.
+    // Isso quebrou em silêncio todo cruzamento de conversa com o CRM.
+    ?? d.contactDetails?.phonenumber
+    // "number" ficou fora da busca larga pelo mesmo motivo.
+    ?? achar(c, ["phone", "whatsapp", "telefone", "celular", "phonenumber"]);
 
   return {
     origem,
@@ -92,7 +102,13 @@ function lerGenerico(c: any, origem: string): Linha {
     conversa_id: texto(achar(c, ["conversa_id", "conversation_id", "chat_id", "ticket_id", "session_id", "sessionid"])),
     contato_id: texto(achar(c, ["contato_id", "contact_id", "contactid", "customer_id", "lead_id"])),
     email_norm: email,
-    telefone_norm: normTel(achar(c, ["telefone", "phone", "whatsapp", "number", "from", "to", "celular", "phonenumber"])),
+    telefone_norm: normTel(
+      c?.content?.contactDetails?.phonenumber
+        ?? c?.contactDetails?.phonenumber
+        // "number" ficou fora da busca larga de proposito: no Pigeon esse campo
+        // e o numero de protocolo da sessao, e vinha antes do telefone de verdade.
+        ?? achar(c, ["telefone", "phone", "whatsapp", "from", "to", "celular", "phonenumber"]),
+    ),
     nome: texto(achar(c, ["nome", "name", "contact_name", "pushname"])),
     canal: texto(achar(c, ["canal", "channel", "platform"])),
     direcao: texto(achar(c, ["direcao", "direction", "fromme", "is_from_me"])),

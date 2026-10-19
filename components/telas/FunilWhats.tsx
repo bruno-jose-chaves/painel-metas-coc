@@ -5,195 +5,250 @@ import Ajuda from "@/components/Ajuda";
 import SeletorPeriodo from "@/components/Periodo";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
-import { num, pct, dataHora } from "@/lib/formato";
+import { num, pct, dataCurta } from "@/lib/formato";
 
-// O funil do WhatsApp, lido pelas etiquetas do Pigeon.
+// Conversa do WhatsApp contra card no CRM.
 //
-// O time já marcava tudo: em que etapa o contato está, de que curso é o
-// interesse e de quem é o lead. Isso chegava no painel desde 05/10 dentro do
-// corpo do webhook e nada lia, porque o telefone não estava sendo extraído
-// desse tipo de evento.
+// Esta tela media etapa do funil pela etiqueta do Pigeon. Estava errada na raiz.
+// A etiqueta não é estado: o comercial põe a etiqueta só para disparar a
+// automação que move o card no CRM, e tira em seguida, porque se o cliente
+// responde de novo com a etiqueta no contato a automação dispara outra vez.
+// Etiqueta é botão, não lugar.
 //
-// Etiqueta é estado, não evento: vale a última marcação de cada telefone.
+// Então "contato sem etapa marcada" nunca foi desleixo, era o funcionamento
+// normal. A pergunta que sobra, e que é a que importa: toda conversa do
+// WhatsApp virou card no CRM? Quem conversou e não tem card está fora de
+// qualquer acompanhamento, e some.
 
+type Pessoa = {
+  telefone: string; nome: string | null; atendente: string | null;
+  conversas: number; primeira: string; ultima: string;
+  tem_negociacao: boolean; funil: string | null; etapa: string | null;
+  etapa_desde: string | null; dias_na_etapa: number | null;
+  status_negociacao: string | null; virou_matricula: boolean;
+};
 type Etapa = {
-  etapa: string; ordem: number; pessoas: number; matriculas: number;
-  por_curso: Record<string, number>; por_vendedor: Record<string, number>;
-};
-type Etiqueta = {
-  etiqueta: string; etiqueta_norm: string; tipo: string | null; valor: string | null;
-  pessoas: number; ultima: string;
-};
-
-const TIPO: Record<string, string> = {
-  etapa: "etapa do funil", curso: "curso", vendedor: "dono do lead", ignorar: "ignorada",
+  funil: string; etapa: string; abertas: number;
+  mediana_dias: number; media_dias: number;
+  parados_14d: number; parados_30d: number; mais_antigo: number;
+  por_dono: Record<string, number> | null;
 };
 
 export default function FunilWhats() {
   const { volta, em, minutos } = useAtualizacao();
-  const [periodo, setPeriodo] = useState<Periodo>(() => ultimosDias(30));
-  const [funil, setFunil] = useState<Etapa[] | null>(null);
-  const [etiquetas, setEtiquetas] = useState<Etiqueta[] | null>(null);
+  const [periodo, setPeriodo] = useState<Periodo>(() => ultimosDias(14));
+  const [pessoas, setPessoas] = useState<Pessoa[] | null>(null);
+  const [etapas, setEtapas] = useState<Etapa[] | null>(null);
+  const [soFora, setSoFora] = useState(true);
 
   useEffect(() => {
-    setFunil(null);
-    supabase.rpc("painel_funil_whats", { p_de: periodo.de, p_ate: periodo.ate })
-      .then(({ data }) => setFunil((data as Etapa[]) ?? []));
-    supabase.rpc("painel_etiquetas_whats", { p_desde: periodo.de })
-      .then(({ data }) => setEtiquetas((data as Etiqueta[]) ?? []));
+    setPessoas(null);
+    supabase.rpc("painel_whats_crm", { p_de: periodo.de, p_ate: periodo.ate })
+      .then(({ data }) => setPessoas((data as Pessoa[]) ?? []));
+    supabase.rpc("painel_tempo_etapa", { p_funil: null })
+      .then(({ data }) => setEtapas((data as Etapa[]) ?? []));
   }, [periodo, volta]);
 
-  const marcadas = useMemo(() => (funil ?? []).filter((e) => e.ordem > 0), [funil]);
-  const semEtapa = useMemo(() => (funil ?? []).find((e) => e.ordem === 0), [funil]);
-  const maior = Math.max(1, ...marcadas.map((e) => Number(e.pessoas)));
-  const semSignificado = (etiquetas ?? []).filter((e) => !e.tipo);
+  const total = pessoas?.length ?? 0;
+  const fora = useMemo(() => (pessoas ?? []).filter((p) => !p.tem_negociacao), [pessoas]);
+  const dentro = total - fora.length;
+
+  // Quem conversa muito e não abre card. Por atendente, porque é aí que a
+  // conversa com a pessoa acontece.
+  const porAtendente = useMemo(() => {
+    const m = new Map<string, { total: number; fora: number }>();
+    for (const p of pessoas ?? []) {
+      const k = p.atendente ?? "sem atendente";
+      const a = m.get(k) ?? { total: 0, fora: 0 };
+      a.total += 1; if (!p.tem_negociacao) a.fora += 1;
+      m.set(k, a);
+    }
+    return [...m.entries()].sort((a, b) => b[1].total - a[1].total);
+  }, [pessoas]);
+
+  const lista = soFora ? fora : (pessoas ?? []);
 
   return (
     <>
-      <div className="rotulo">Funil do WhatsApp</div>
-      <h1>Onde cada contato parou</h1>
+      <div className="rotulo">WhatsApp e CRM</div>
+      <h1>Toda conversa virou card?</h1>
       <p className="carimbo num">
         Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
       </p>
 
       <p className="nota">
-        A etapa vem da etiqueta que o time coloca no contato dentro do Pigeon.
-        <Ajuda titulo="Como esta tela é montada"
-          fontes={["Etiquetas do contato: webhook do Pigeon (tabela conversas_eventos, evento CONTACT_TAG_UPDATE)",
-                   "Significado de cada etiqueta: tabela etiquetas_whats",
-                   "Virou matrícula: planilha comercial (tabela vendas), cruzando por telefone",
-                   "Medição começa em 05/10/2026, quando o webhook entrou no ar"]}>
-          Cada contato carrega três etiquetas ao mesmo tempo: a etapa, o curso de interesse e o dono do
-          lead. Etiqueta é estado, não evento, então vale a última marcação de cada telefone dentro do
-          período. <b>Virou matrícula</b> não vem da etiqueta: vem da planilha comercial, cruzando pelo
-          telefone, que é a fonte firme da venda.
+        Quem conversou no WhatsApp no período e se existe negociação no CRM para essa pessoa.
+        <Ajuda titulo="Por que a leitura mudou"
+          fontes={["Conversas: tabela pigeon_conversas, telefone vindo dos eventos de sessão do Pigeon",
+                   "Negociação, etapa e tempo: RD Station CRM (tabelas rd_negociacoes e rd_contatos)",
+                   "Virou matrícula: planilha comercial (tabela vendas), cruzando por telefone"]}>
+          Esta tela mostrava etapa do funil pela etiqueta do Pigeon, e isso estava errado na raiz. A
+          etiqueta é usada como botão: o comercial põe a etiqueta só para disparar a automação que move o
+          card no CRM e tira logo depois, senão a automação dispara de novo a cada resposta do cliente.
+          Contato sem etiqueta nunca foi descuido, era o funcionamento normal. A conta que resta é esta:
+          conversa que não virou card fica fora de qualquer acompanhamento.
         </Ajuda>
       </p>
 
       <SeletorPeriodo valor={periodo} aoMudar={setPeriodo} />
 
-      {!funil ? <p className="rotulo">Carregando</p> : funil.length === 0 ? (
-        <p className="mudo">Nenhuma etiqueta no período.</p>
-      ) : (
+      {!pessoas ? <p className="rotulo">Carregando</p> : (
         <>
-          <h2><span className="idx">070</span> O funil</h2>
+          <h2><span className="idx">070</span> A passagem</h2>
+          <div className="faixa">
+            <div>
+              <div className="rotulo">Conversaram</div>
+              <div className="valor num">{num(total)}</div>
+              <div className="mudo">pessoas no período</div>
+            </div>
+            <div>
+              <div className="rotulo">Têm card no CRM</div>
+              <div className="valor num">{num(dentro)}</div>
+              <div className="mudo num">{total ? pct(dentro / total) : ""}</div>
+            </div>
+            <div>
+              <div className="rotulo">Sem card nenhum</div>
+              <div className={"valor num " + (fora.length ? "alerta" : "ok")}>{num(fora.length)}</div>
+              <div className="mudo">conversaram e sumiram</div>
+            </div>
+            <div>
+              <div className="rotulo">Já são matrícula</div>
+              <div className="valor num">{num((pessoas ?? []).filter((p) => p.virou_matricula).length)}</div>
+              <div className="mudo">entre quem conversou</div>
+            </div>
+          </div>
+
+          {fora.length > 0 && (
+            <p className="aviso-leve ruim">
+              {num(fora.length)} pessoa{fora.length > 1 ? "s" : ""} conversou no WhatsApp e não tem
+              negociação no CRM. Sem card, ninguém acompanha, e a pessoa não aparece em nenhuma conta
+              de funil.
+            </p>
+          )}
+
+          <h2><span className="idx">071</span> Por atendente</h2>
           <div className="rolar">
             <table className="tabela">
               <thead>
                 <tr>
-                  <th>Etapa</th>
-                  <th style={{ minWidth: 150 }}>Tamanho</th>
-                  <th className="n">Pessoas</th>
-                  <th className="n">Viraram matrícula</th>
-                  <th className="n">Conversão</th>
-                  <th>Cursos</th>
-                  <th>Dono do lead</th>
+                  <th>Atendente</th>
+                  <th className="n">Conversou com</th>
+                  <th className="n">Sem card</th>
+                  <th className="n">Fora do CRM</th>
                 </tr>
               </thead>
               <tbody>
-                {marcadas.map((e) => (
-                  <tr key={e.etapa}>
-                    <td><b>{e.etapa}</b></td>
-                    <td>
-                      <div className="mini"><i style={{ width: `${(Number(e.pessoas) / maior) * 100}%` }} /></div>
-                    </td>
-                    <td className="n"><b>{num(e.pessoas)}</b></td>
-                    <td className="n">{num(e.matriculas)}</td>
-                    <td className="n">{e.pessoas ? pct(Number(e.matriculas) / Number(e.pessoas)) : "-"}</td>
-                    <td className="mudo" style={{ maxWidth: 260 }}>
-                      {Object.entries(e.por_curso ?? {}).sort((a, b) => b[1] - a[1])
-                        .map(([k, v]) => `${k} ${v}`).join(" · ")}
-                    </td>
-                    <td className="mudo" style={{ maxWidth: 170 }}>
-                      {Object.entries(e.por_vendedor ?? {}).sort((a, b) => b[1] - a[1])
-                        .map(([k, v]) => `${k} ${v}`).join(" · ")}
-                    </td>
+                {porAtendente.map(([k, a]) => (
+                  <tr key={k} className={a.fora > 0 ? "fora" : undefined}>
+                    <td><b>{k}</b></td>
+                    <td className="n">{num(a.total)}</td>
+                    <td className="n">{num(a.fora)}</td>
+                    <td className="n">{a.total ? pct(a.fora / a.total) : "-"}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
 
-          {semEtapa && (
-            <>
-              <h2><span className="idx">071</span> Contato sem etapa marcada</h2>
-              <p className="nota">
-                Quem tem etiqueta de curso ou de dono, mas nenhuma etiqueta de etapa. Não é erro do
-                painel: é contato que o time não marcou.
-              </p>
-              <div className="faixa">
-                <div>
-                  <div className="rotulo">Pessoas</div>
-                  <div className="valor num">{num(semEtapa.pessoas)}</div>
-                  <div className="mudo">sem etapa no período</div>
-                </div>
-                <div>
-                  <div className="rotulo">Viraram matrícula</div>
-                  <div className="valor num">{num(semEtapa.matriculas)}</div>
-                  <div className="mudo num">
-                    {semEtapa.pessoas ? pct(Number(semEtapa.matriculas) / Number(semEtapa.pessoas)) + " do grupo" : ""}
-                  </div>
-                </div>
-                <div>
-                  <div className="rotulo">Por dono</div>
-                  <div className="valor num" style={{ fontSize: 16 }}>
-                    {Object.entries(semEtapa.por_vendedor ?? {}).sort((a, b) => b[1] - a[1])
-                      .map(([k, v]) => `${k} ${v}`).join(" · ") || "-"}
-                  </div>
-                  <div className="mudo">quem concentra o não marcado</div>
-                </div>
-              </div>
-            </>
-          )}
-
-          <h2><span className="idx">072</span> Etiquetas em uso</h2>
+          <h2><span className="idx">072</span> Quanto tempo o card fica parado</h2>
           <p className="nota">
-            Toda etiqueta que apareceu no período e o significado apontado para ela.
-            <Ajuda titulo="Etiqueta sem significado">
-              Etiqueta que o painel não conhece não entra em conta nenhuma: a pessoa some do funil e
-              aparece em &quot;sem etapa marcada&quot;. Quando aparecer uma etiqueta nova aqui, me avise
-              que eu aponto o significado dela.
+            Negociação aberta no CRM, por etapa, e há quantos dias ela não sai do lugar.
+            <Ajuda titulo="Por que tempo, e não conversão"
+              fontes={["RD Station CRM, tabela rd_negociacoes, campo etapa_desde",
+                       "Só negociação com status aberta",
+                       "Histórico desde setembro de 2024, preenchido em todas as linhas"]}>
+              Conversão por etapa não diz nada aqui, porque <b>Aguardando Pagamento</b> quer dizer link
+              enviado e não dinheiro na conta: o card entra nessa etapa quando o cliente avisa que vai
+              comprar. Já o tempo parado diz muito. Mediana alta numa etapa é lead morto ocupando funil,
+              e card parado em Aguardando Pagamento é venda que foi dada como feita e não aconteceu.
             </Ajuda>
           </p>
-          {semSignificado.length > 0 && (
-            <p className="aviso-leve ruim">
-              {semSignificado.length} etiqueta{semSignificado.length > 1 ? "s" : ""} sem significado
-              apontado: {semSignificado.map((e) => e.etiqueta).join(", ")}.
-            </p>
-          )}
-          {!etiquetas ? <p className="rotulo">Carregando</p> : (
+          {!etapas ? <p className="rotulo">Carregando</p> : (
             <div className="rolar">
               <table className="tabela">
                 <thead>
                   <tr>
-                    <th>Etiqueta</th>
-                    <th>Significa</th>
-                    <th>Aponta para</th>
-                    <th className="n">Pessoas</th>
-                    <th>Última vez</th>
+                    <th>Funil</th>
+                    <th>Etapa</th>
+                    <th className="n">Abertas</th>
+                    <th className="n">Mediana parada</th>
+                    <th className="n">Parados +14d</th>
+                    <th className="n">Parados +30d</th>
+                    <th className="n">Mais antigo</th>
+                    <th>Por dono</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {etiquetas.map((e) => (
-                    <tr key={e.etiqueta_norm} className={!e.tipo ? "fora" : undefined}>
-                      <td><b>{e.etiqueta}</b></td>
-                      <td>
-                        {e.tipo
-                          ? <span className="selo no_ritmo">{TIPO[e.tipo] ?? e.tipo}</span>
-                          : <span className="selo atras">sem significado</span>}
+                  {etapas.map((e) => (
+                    <tr key={e.funil + e.etapa} className={Number(e.mediana_dias) > 30 ? "fora" : undefined}>
+                      <td className="mudo">{e.funil}</td>
+                      <td><b>{e.etapa}</b></td>
+                      <td className="n">{num(e.abertas)}</td>
+                      <td className="n"><b>{num(e.mediana_dias)}</b> <span className="mudo">dias</span></td>
+                      <td className="n">{num(e.parados_14d)}</td>
+                      <td className="n">{num(e.parados_30d)}</td>
+                      <td className="n mudo">{num(e.mais_antigo)} dias</td>
+                      <td className="mudo" style={{ maxWidth: 240 }}>
+                        {Object.entries(e.por_dono ?? {}).sort((a, b) => b[1] - a[1])
+                          .map(([k, v]) => `${k} ${v}`).join(" · ")}
                       </td>
-                      <td className="mudo">{e.valor ?? "-"}</td>
-                      <td className="n">{num(e.pessoas)}</td>
-                      <td className="mudo num">{dataHora(e.ultima)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           )}
+
+          <div className="secao-topo">
+            <h2><span className="idx">073</span> Pessoa a pessoa</h2>
+            <div className="atalhos">
+              <button onClick={() => setSoFora(!soFora)}>
+                {soFora ? "Ver todo mundo" : "Ver só quem está fora do CRM"}
+              </button>
+            </div>
+          </div>
+          <div className="rolar">
+            <table className="tabela">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Telefone</th>
+                  <th>Atendente</th>
+                  <th className="n">Conversas</th>
+                  <th>Última</th>
+                  <th>No CRM</th>
+                  <th>Etapa</th>
+                  <th className="n">Parado há</th>
+                </tr>
+              </thead>
+              <tbody>
+                {lista.slice(0, 300).map((p) => (
+                  <tr key={p.telefone} className={!p.tem_negociacao ? "fora" : undefined}>
+                    <td><b>{p.nome ?? "(sem nome)"}</b></td>
+                    <td className="num">{p.telefone}</td>
+                    <td className="mudo">{p.atendente ?? "-"}</td>
+                    <td className="n">{num(p.conversas)}</td>
+                    <td className="mudo num">{dataCurta(p.ultima)}</td>
+                    <td>
+                      {p.tem_negociacao
+                        ? <span className="selo no_ritmo">sim</span>
+                        : <span className="selo atras">não</span>}
+                    </td>
+                    <td className="mudo">{p.etapa ?? "-"}</td>
+                    <td className="n mudo num">
+                      {p.dias_na_etapa == null ? "-" : num(p.dias_na_etapa) + " dias"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {lista.length > 300 && (
+            <p className="rodape">Mostrando as 300 primeiras de {num(lista.length)}.</p>
+          )}
           <p className="rodape">
-            A medição começa em 05/10/2026, quando o webhook do Pigeon entrou no ar. Antes disso não há
-            etiqueta guardada, e o período maior que isso não traz mais gente.
+            O telefone da conversa vem dos eventos de sessão do Pigeon, que começaram a chegar em
+            30/09/2026. Conversa anterior a isso não tem telefone guardado e fica fora desta conta.
           </p>
         </>
       )}
