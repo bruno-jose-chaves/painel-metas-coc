@@ -1,0 +1,31 @@
+-- Update 28 — Qualidade do lead: quem chega, quem responde, quanto espera.
+--
+-- Até aqui o painel sabia quantos leads entraram e quantos viraram matrícula,
+-- e não sabia nada do meio. Lead que procura a gente e lead que a gente foi
+-- buscar entravam na mesma conta, e são bichos diferentes.
+
+-- canais_whats — os canais do Pigeon por nome. Eram cinco uuids soltos, e
+-- dois deles ninguém sabia que existiam: as DMs dos dois Instagram caem no
+-- mesmo atendimento e nunca tinham sido medidas.
+--   e3be742b -> (47) 99716-6873, WhatsApp comercial
+--   f03f9fe5 -> (47) 99626-5849, WhatsApp pré-vendas
+--   c22cac46 -> @coconline.oficial
+--   4f724732 -> @cocconcursos
+
+-- painel_qualidade_lead(de, ate) — por canal e por quem deu o primeiro passo:
+-- conversas, responderam, nunca responderam, tempo até atender, mediana e pior
+-- 10%, matrículas e conversão.
+--
+-- Duas medições com alcances diferentes, e a tela diz isso em vez de fingir
+-- que é tudo a mesma coisa. Resposta e tempo de atendimento valem desde agosto,
+-- porque vêm do próprio registro da conversa. Virou matrícula só vale de
+-- outubro em diante: o telefone da conversa só passou a ser guardado quando o
+-- webhook de sessão entrou no ar. Por isso a conversão aparece sempre com a
+-- base do lado: taxa sem denominador à vista é taxa que engana.
+--
+-- O tempo até atender só é calculado em conversa que o CLIENTE começou. Quando
+-- somos nós que abrimos, a "primeira resposta" é a nossa própria mensagem de
+-- abertura e a conta daria zero: mediria o disparo, não o atendimento.
+
+-- painel_espera_atendimento(de, ate) — a mesma espera por dia da semana e hora
+-- de Brasília, só para conversa que o cliente começou.

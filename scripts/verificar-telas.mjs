@@ -157,6 +157,22 @@ const escapando = [
   { tipo: "Negociação parada", prioridade: 3, pessoa: "Camila Fontes", telefone: "49998877665", dono: "Marcia  Laurett", onde: "Funil principal · Negociação", dias: 201, desde: "2026-04-01", ja_e_aluno: false, o_que_fazer: "Retomar ou marcar perdida com motivo" },
 ];
 
+const qualidadeLead = [
+  { canal: "WhatsApp comercial", time_dono: "Comercial", quem_comecou: "Cliente procurou", conversas: 360, responderam: 359, nunca_responderam: 1, minutos_ate_atender: 46, p90_minutos: 980, em_ate_15min: 141, em_ate_1h: 97, depois_de_1h: 122, com_telefone: 150, viraram_matricula: 13, dias_ate_comprar: 2 },
+  { canal: "WhatsApp comercial", time_dono: "Comercial", quem_comecou: "Nós procuramos", conversas: 1185, responderam: 348, nunca_responderam: 837, minutos_ate_atender: null, p90_minutos: null, em_ate_15min: 0, em_ate_1h: 0, depois_de_1h: 0, com_telefone: 624, viraram_matricula: 20, dias_ate_comprar: 5 },
+  { canal: "WhatsApp pré-vendas", time_dono: "Agente de Pré-vendas", quem_comecou: "Nós procuramos", conversas: 895, responderam: 281, nunca_responderam: 614, minutos_ate_atender: null, p90_minutos: null, em_ate_15min: 0, em_ate_1h: 0, depois_de_1h: 0, com_telefone: 341, viraram_matricula: 5, dias_ate_comprar: 8 },
+  { canal: "Instagram COC Online", time_dono: "Marketing", quem_comecou: "Cliente procurou", conversas: 34, responderam: 34, nunca_responderam: 0, minutos_ate_atender: 569, p90_minutos: 2100, em_ate_15min: 3, em_ate_1h: 5, depois_de_1h: 26, com_telefone: 0, viraram_matricula: 0, dias_ate_comprar: null },
+];
+const esperaAtendimento = [
+  { dia_semana: 0, nome_dia: "domingo", faixa_hora: 10, procuraram: 30, mediana_min: 1136, p90_min: 2400, em_ate_15min: 1, mais_de_1h: 29 },
+  { dia_semana: 1, nome_dia: "segunda", faixa_hora: 9, procuraram: 97, mediana_min: 9, p90_min: 300, em_ate_15min: 55, mais_de_1h: 32 },
+  { dia_semana: 2, nome_dia: "terça", faixa_hora: 9, procuraram: 105, mediana_min: 71, p90_min: 600, em_ate_15min: 40, mais_de_1h: 45 },
+  { dia_semana: 3, nome_dia: "quarta", faixa_hora: 9, procuraram: 85, mediana_min: 13, p90_min: 280, em_ate_15min: 46, mais_de_1h: 25 },
+  { dia_semana: 4, nome_dia: "quinta", faixa_hora: 9, procuraram: 83, mediana_min: 48, p90_min: 420, em_ate_15min: 38, mais_de_1h: 24 },
+  { dia_semana: 5, nome_dia: "sexta", faixa_hora: 9, procuraram: 72, mediana_min: 48, p90_min: 390, em_ate_15min: 31, mais_de_1h: 23 },
+  { dia_semana: 6, nome_dia: "sábado", faixa_hora: 11, procuraram: 44, mediana_min: 2356, p90_min: 3200, em_ate_15min: 1, mais_de_1h: 43 },
+];
+
 const rotas0 = {
   "rpc/painel_cursos": cursosMock,
   "rpc/painel_turma_cartao": [
@@ -328,6 +344,8 @@ const rotas0 = {
       detalhe: "Faltam 60 alunos para a meta e 18 dias de campanha.",
       numero: "60 alunos", pessoa: null, link: "/campanha/" },
   ],
+  "rpc/painel_qualidade_lead": qualidadeLead,
+  "rpc/painel_espera_atendimento": esperaAtendimento,
   "rpc/painel_escapando": escapando,
   "rpc/painel_escapando_resumo": escapandoResumo,
   "rpc/painel_ritmo": ritmo,
@@ -414,6 +432,7 @@ const telas = [
   ["/comercial/?v=lancamentos", "Lançamentos"],
   ["/comercial/?v=agente", "O agente está aquecendo"],
   ["/comercial/?v=whats", "Toda conversa virou card?"],
+  ["/comercial/?v=qualidade", "Quem chega, quem responde, quanto espera"],
   ["/comercial/?v=escapando", "A fila do que ninguém está olhando"],
   ["/comercial/?v=conferir", "O que vale conferir"],
   ["/comercial/", "Agente de Pré-vendas"],
