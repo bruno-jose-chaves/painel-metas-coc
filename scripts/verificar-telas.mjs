@@ -164,13 +164,13 @@ const qualidadeLead = [
   { canal: "Instagram COC Online", time_dono: "Marketing", quem_comecou: "Cliente procurou", conversas: 34, responderam: 34, nunca_responderam: 0, minutos_ate_atender: 569, p90_minutos: 2100, em_ate_15min: 3, em_ate_1h: 5, depois_de_1h: 26, com_telefone: 0, viraram_matricula: 0, dias_ate_comprar: null },
 ];
 const esperaAtendimento = [
-  { dia_semana: 0, nome_dia: "domingo", faixa_hora: 10, procuraram: 30, mediana_min: 1136, p90_min: 2400, em_ate_15min: 1, mais_de_1h: 29 },
-  { dia_semana: 1, nome_dia: "segunda", faixa_hora: 9, procuraram: 97, mediana_min: 9, p90_min: 300, em_ate_15min: 55, mais_de_1h: 32 },
-  { dia_semana: 2, nome_dia: "terça", faixa_hora: 9, procuraram: 105, mediana_min: 71, p90_min: 600, em_ate_15min: 40, mais_de_1h: 45 },
-  { dia_semana: 3, nome_dia: "quarta", faixa_hora: 9, procuraram: 85, mediana_min: 13, p90_min: 280, em_ate_15min: 46, mais_de_1h: 25 },
-  { dia_semana: 4, nome_dia: "quinta", faixa_hora: 9, procuraram: 83, mediana_min: 48, p90_min: 420, em_ate_15min: 38, mais_de_1h: 24 },
-  { dia_semana: 5, nome_dia: "sexta", faixa_hora: 9, procuraram: 72, mediana_min: 48, p90_min: 390, em_ate_15min: 31, mais_de_1h: 23 },
-  { dia_semana: 6, nome_dia: "sábado", faixa_hora: 11, procuraram: 44, mediana_min: 2356, p90_min: 3200, em_ate_15min: 1, mais_de_1h: 43 },
+  { dia_semana: 0, nome_dia: "domingo", fim_de_semana: true, faixa_hora: 10, procuraram: 30, mediana_min: 1136, p90_min: 2400, em_ate_15min: 1, mais_de_1h: 29, nunca_respondida: 8 },
+  { dia_semana: 1, nome_dia: "segunda", fim_de_semana: false, faixa_hora: 9, procuraram: 97, mediana_min: 9, p90_min: 300, em_ate_15min: 55, mais_de_1h: 32, nunca_respondida: 23 },
+  { dia_semana: 2, nome_dia: "terça", fim_de_semana: false, faixa_hora: 9, procuraram: 105, mediana_min: 71, p90_min: 600, em_ate_15min: 40, mais_de_1h: 45, nunca_respondida: 15 },
+  { dia_semana: 3, nome_dia: "quarta", fim_de_semana: false, faixa_hora: 9, procuraram: 85, mediana_min: 13, p90_min: 280, em_ate_15min: 46, mais_de_1h: 25, nunca_respondida: 19 },
+  { dia_semana: 4, nome_dia: "quinta", fim_de_semana: false, faixa_hora: 9, procuraram: 83, mediana_min: 48, p90_min: 420, em_ate_15min: 38, mais_de_1h: 24, nunca_respondida: 20 },
+  { dia_semana: 5, nome_dia: "sexta", fim_de_semana: false, faixa_hora: 9, procuraram: 72, mediana_min: 48, p90_min: 390, em_ate_15min: 31, mais_de_1h: 23, nunca_respondida: 24 },
+  { dia_semana: 6, nome_dia: "sábado", fim_de_semana: true, faixa_hora: 11, procuraram: 44, mediana_min: 2356, p90_min: 3200, em_ate_15min: 1, mais_de_1h: 43, nunca_respondida: 18 },
 ];
 
 const rotas0 = {
@@ -345,6 +345,11 @@ const rotas0 = {
       numero: "60 alunos", pessoa: null, link: "/campanha/" },
   ],
   "rpc/painel_qualidade_lead": qualidadeLead,
+  "rpc/painel_filtros_conversa": [
+    { tipo: "atendente", valor: "João", rotulo: "João", quantos: 930 },
+    { tipo: "atendente", valor: "Márcia", rotulo: "Márcia", quantos: 879 },
+    { tipo: "turma", valor: "missao-ufsc-2026", rotulo: "Missão UFSC 2026", quantos: 696 },
+  ],
   "rpc/painel_espera_atendimento": esperaAtendimento,
   "rpc/painel_escapando": escapando,
   "rpc/painel_escapando_resumo": escapandoResumo,

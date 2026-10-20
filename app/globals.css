@@ -254,6 +254,9 @@ h3 { letter-spacing: -.02em; }
 .selo.no_ritmo { background: var(--ok-fundo); color: var(--ok); }
 .selo.atencao { background: var(--alerta-fundo); color: var(--alerta); }
 .selo.atras { background: var(--ruim-fundo); color: var(--ruim); }
+/* Estado neutro de verdade. Sem esta classe as telas emitiam selo com string
+   vazia e ele saía transparente, parecendo falha de carregamento. */
+.selo.neutro { background: var(--superficie-2); color: var(--cinza); }
 .selo.nao_iniciada, .selo.encerrada, .selo.anterior {
   background: #1212110A;
   color: var(--cinza);

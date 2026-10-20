@@ -12,7 +12,6 @@ import { ultimosDias, type Periodo } from "@/lib/periodo";
 type Dia = { dia: string; conversoes: number; conversoes_lp: number; visitas: number };
 type Origem = { identificador: string; tipo: string; conversoes: number; visitas: number; taxa: number | null };
 type Fonte = { fonte: string; negocios: number; ganhas: number; conversao: number | null };
-type PreVenda = { captados: number; aquecidos: number; entregues: number; sem_contato: number; parados_7d: number; parados_30d: number };
 type Tag = { tag: string; leads: number; conversoes: number };
 
 const TIPO: Record<string, string> = { landing_page: "Landing page do RD", formulario: "Formulário embutido" };
@@ -25,7 +24,6 @@ export default function Leads() {
   const [dias, setDias] = useState<Dia[] | null>(null);
   const [origens, setOrigens] = useState<Origem[] | null>(null);
   const [fontes, setFontes] = useState<Fonte[] | null>(null);
-  const [apv, setApv] = useState<PreVenda | null>(null);
   const [tags, setTags] = useState<Tag[] | null>(null);
 
   useEffect(() => {
@@ -37,13 +35,10 @@ export default function Leads() {
 
   useEffect(() => {
     const p = { p_de: periodo.de, p_ate: periodo.ate, p_produto: produto };
-    setDias(null); setOrigens(null); setFontes(null); setApv(null); setTags(null);
+    setDias(null); setOrigens(null); setFontes(null); setTags(null);
     supabase.rpc("painel_leads_dia", p).then(({ data }) => setDias((data as Dia[]) ?? []));
     supabase.rpc("painel_leads_origem", p).then(({ data }) => setOrigens((data as Origem[]) ?? []));
     supabase.rpc("painel_fontes", p).then(({ data }) => setFontes((data as Fonte[]) ?? []));
-    // Respeita o curso escolhido como todo o resto da tela.
-    supabase.rpc("painel_pre_venda", p)
-      .then(({ data }) => setApv(((data as PreVenda[]) ?? [])[0] ?? null));
     supabase.rpc("painel_tags", p).then(({ data }) => setTags((data as Tag[]) ?? []));
   }, [periodo, produto, volta]);
 
@@ -84,17 +79,12 @@ export default function Leads() {
           <div className="rotulo">Média por dia</div>
           <div className="valor num">{dias?.length ? num(Math.round(totalConv / dias.length)) : "-"}</div>
         </div>
-        <div>
-          <div className="rotulo">Captados pelo APV</div>
-          <div className="valor num">{apv ? num(apv.captados) : "..."}</div>
-        </div>
       </div>
 
       {campanha && (
         <p className="nota">
           Filtrado por {campanhas.find((c) => c.id === campanha)?.nome}. Só entram as páginas e formulários
           ligados a esse curso, pela regra automática ou pelo que foi apontado em Pendências.
-          O bloco do Agente de Pré-vendas não separa por curso e continua mostrando o total.
         </p>
       )}
       <h2><span className="idx">016</span> Conversões por dia</h2>

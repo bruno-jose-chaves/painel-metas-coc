@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Ajuda from "@/components/Ajuda";
-import { dataHora } from "@/lib/formato";
+import { dataHora, duracao } from "@/lib/formato";
 
 // Saúde das fontes.
 //
@@ -35,13 +35,11 @@ export function useFontes() {
   return fontes;
 }
 
+// Aqui "nunca" quer dizer que a fonte jamais atualizou, que é diferente de
+// zero minutos. Fora esse caso, a escrita é a mesma do resto do painel.
 export function tempo(min: number | null) {
   if (min == null) return "nunca";
-  if (min < 1) return "agora";
-  if (min < 60) return `${min} min`;
-  const h = Math.floor(min / 60);
-  if (h < 24) return `${h} h`;
-  return `${Math.floor(h / 24)} d`;
+  return duracao(min);
 }
 
 // A tarja. Mora no topo de toda tela e só existe quando alguma fonte está fora.
