@@ -84,12 +84,21 @@ Deno.serve(async (req) => {
   const erros: string[] = [];
 
   while (Date.now() - inicio < ORCAMENTO_MS) {
+    // Lia cada conversa UMA vez e nunca mais voltava. Como a leitura acontece
+    // em até 30 minutos depois de a conversa abrir, o cliente que respondia
+    // duas horas depois ficava marcado para sempre como "nunca respondeu".
+    // Em 7 dias isso dava 45 respostas onde existiam 150: a conta subestimava
+    // três vezes, e pior nos disparos, onde a resposta demora mais.
+    //
+    // Agora volta quando houve movimento depois da última leitura. A coluna
+    // mexeu_depois é mantida pelo banco e existe só para o PostgREST poder
+    // comparar duas colunas, que ele não faz direto.
     const { data: pendentes } = await db
       .from("pigeon_conversas")
       .select("id")
       .is("primeira_mensagem_cliente", null)
-      .is("mensagens_lidas_em", null)
-      .order("inicio", { ascending: false })
+      .eq("mexeu_depois", true)
+      .order("ultima_interacao", { ascending: false })
       .limit(LOTE);
 
     const fila = (pendentes ?? []) as { id: string }[];
@@ -121,7 +130,7 @@ Deno.serve(async (req) => {
     .from("pigeon_conversas")
     .select("id", { count: "exact", head: true })
     .is("primeira_mensagem_cliente", null)
-    .is("mensagens_lidas_em", null);
+    .eq("mexeu_depois", true);
 
   return Response.json({ ok: true, lidas, gravadas, sem_mensagem_do_cliente: vazias, faltam, erros: erros.slice(0, 5) });
 });
