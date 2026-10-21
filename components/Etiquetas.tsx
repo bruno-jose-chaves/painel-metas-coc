@@ -85,10 +85,12 @@ export default function Etiquetas({ admin }: { admin: boolean }) {
         </Ajuda>
       </p>
       <div className="atalhos" style={{ marginBottom: 16 }}>
+        <div className="chaves-filtro">
         <Chave ligada={tudo} aoMudar={setTudo}
                ajuda="Desligado, mostra só etiqueta com 5 ou mais leads. Ligado, mostra a cauda inteira.">
           Mostrar também os de pouco volume
         </Chave>
+        </div>
       </div>
 
       {!lista ? <p className="rotulo">Carregando</p> : lista.length === 0 ? (

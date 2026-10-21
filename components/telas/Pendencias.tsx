@@ -133,10 +133,12 @@ export default function Pendencias({ admin }: { admin: boolean }) {
       </p>
       <div className="filtros">
         <div className="atalhos">
+        <div className="chaves-filtro">
         <Chave ligada={tudo} aoMudar={setTudo}
                ajuda="Desligado, mostra só página com 10 ou mais conversões. Ligado, mostra a cauda inteira.">
           Mostrar também os de pouco volume
         </Chave>
+        </div>
         </div>
         {admin && comPalpite > 0 && (
           <button className="btn" style={{ marginLeft: "auto" }} onClick={aceitarTodas}>

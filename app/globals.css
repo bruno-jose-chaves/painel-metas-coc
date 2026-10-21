@@ -1339,36 +1339,49 @@ select:disabled, input:disabled { color: var(--cinza-claro); background: var(--s
 }
 
 /* Chave liga/desliga.
-   Os filtros de ligar e desligar eram botões que mudavam de texto, e isso
-   confundia: "Só dia de semana" aceso parecia que estava DESLIGANDO alguma
-   coisa. A chave resolve porque o rótulo fica parado e só o estado se move. */
-.chave {
-  display: inline-flex; align-items: center; gap: 9px;
-  background: none; border: 0; padding: 6px 2px; cursor: pointer;
-  font: inherit; font-size: 13px; color: var(--tinta-2); text-align: left;
-}
-.chave:hover { color: var(--tinta); }
-.chave > span.trilho {
-  position: relative; flex: 0 0 auto; width: 34px; height: 20px; border-radius: 999px;
-  background: var(--linha-forte); transition: background .15s ease;
-}
-.chave > span.trilho::after {
-  content: ""; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px;
-  border-radius: 50%; background: var(--superficie);
-  box-shadow: 0 1px 2px #12121130; transition: transform .15s ease;
-}
-.chave[aria-pressed="true"] > span.trilho { background: var(--tinta); }
-.chave[aria-pressed="true"] > span.trilho::after { transform: translateX(14px); }
-.chave:focus-visible { outline: 2px solid var(--tinta); outline-offset: 3px; border-radius: 6px; }
-.chave .texto { display: flex; flex-direction: column; gap: 1px; line-height: 1.25; }
-.chave .nome { white-space: nowrap; }
-/* Sem cor como único sinal: quem não enxerga a diferença lê o estado. Em linha
-   própria, senão a palavra gruda no rótulo e vira frase sem sentido
-   ("Tirar sábado e domingo ligado"). */
-.chave .estado {
-  font-size: 10px; color: var(--cinza);
-  letter-spacing: .09em; text-transform: uppercase;
+   Os filtros de sim ou não eram botões que trocavam de texto, e isso confundia:
+   "Só dia de semana" aceso parecia estar DESLIGANDO alguma coisa. A chave
+   resolve porque o rótulo fica parado e só o estado se move.
+
+   Mora na mesma calha cinza das outras pastilhas do painel, e acesa vira
+   pastilha branca com sombra, igual ao botão ativo. O ponto cheio contra o
+   ponto vazado é a diferença de forma, não de cor: quem não distingue a cor
+   continua lendo o estado. */
+.chaves-filtro {
+  display: flex;
+  gap: 3px;
+  background: #1212110A;
+  padding: 3px;
+  border-radius: 11px;
+  flex-wrap: wrap;
 }
 
-.chaves-filtro { display: flex; flex-direction: column; gap: 2px; }
-@media (min-width: 720px) { .chaves-filtro { flex-direction: row; gap: 18px; align-items: center; } }
+.chave {
+  display: inline-flex; align-items: center; gap: 7px;
+  font: inherit; font-size: 12.5px; font-weight: 550;
+  background: none; border: 0; padding: 6px 11px; border-radius: 8px;
+  color: var(--cinza); white-space: nowrap; cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.chave:hover { color: var(--tinta); }
+
+.chave[aria-pressed="true"] {
+  background: var(--superficie);
+  color: var(--tinta);
+  font-weight: 650;
+  box-shadow: var(--sombra);
+}
+
+/* O ponto. Vazado quando desligado, cheio e lima quando ligado. */
+.chave .trilho {
+  flex: 0 0 auto; width: 9px; height: 9px; border-radius: 50%;
+  border: 1.5px solid var(--cinza-claro); background: none;
+  transition: background .12s, border-color .12s;
+}
+.chave[aria-pressed="true"] .trilho {
+  background: var(--lima); border-color: var(--tinta);
+}
+
+.chave .estado { display: none; }
+
+.chave:focus-visible { outline: 2px solid var(--tinta); outline-offset: 2px; }
