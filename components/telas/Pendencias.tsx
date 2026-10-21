@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Ajuda from "@/components/Ajuda";
+import Chave from "@/components/Chave";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, dataCurta } from "@/lib/formato";
 import { useIndicadores, useDestinos, partirDestino, type Indicador, type Destino } from "@/lib/indicadores";
@@ -132,8 +133,10 @@ export default function Pendencias({ admin }: { admin: boolean }) {
       </p>
       <div className="filtros">
         <div className="atalhos">
-          <button className={!tudo ? "ativo" : ""} onClick={() => setTudo(false)}>Com volume (10 ou mais)</button>
-          <button className={tudo ? "ativo" : ""} onClick={() => setTudo(true)}>Tudo, inclusive a cauda</button>
+        <Chave ligada={tudo} aoMudar={setTudo}
+               ajuda="Desligado, mostra só página com 10 ou mais conversões. Ligado, mostra a cauda inteira.">
+          Mostrar também os de pouco volume
+        </Chave>
         </div>
         {admin && comPalpite > 0 && (
           <button className="btn" style={{ marginLeft: "auto" }} onClick={aceitarTodas}>

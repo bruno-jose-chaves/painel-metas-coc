@@ -20,16 +20,60 @@ export type Fonte = {
   limite_min: number; situacao: "ok" | "atencao" | "fora"; detalhe: string | null;
 };
 
+// Uma leitura só, dividida por todo mundo.
+//
+// Antes cada tela que montava disparava a própria consulta, e o relógio de 5
+// minutos rodava mesmo com a aba escondida. Deu 2.904 chamadas: trocar de aba
+// seis vezes eram seis consultas, e painel esquecido aberto batia no banco a
+// noite inteira. Agora a resposta fica guardada por 5 minutos e quem monta
+// depois recebe a que já existe.
+const ESPERA_MS = 5 * 60 * 1000;
+let cache: { em: number; dados: Fonte[] } | null = null;
+let voando: Promise<Fonte[]> | null = null;
+const ouvintes = new Set<(f: Fonte[]) => void>();
+
+function buscar(): Promise<Fonte[]> {
+  if (cache && Date.now() - cache.em < ESPERA_MS) return Promise.resolve(cache.dados);
+  // Duas telas montando ao mesmo tempo compartilham a mesma ida ao banco.
+  if (voando) return voando;
+  const ida: Promise<Fonte[]> = (async () => {
+    try {
+      const { data } = await supabase.rpc("painel_saude_fontes");
+      const dados = (data as Fonte[]) ?? [];
+      cache = { em: Date.now(), dados };
+      ouvintes.forEach((f) => f(dados));
+      return dados;
+    } catch {
+      // Falha de rede não apaga a tarja que já estava na tela.
+      return cache?.dados ?? [];
+    } finally {
+      voando = null;
+    }
+  })();
+  voando = ida;
+  return ida;
+}
+
 export function useFontes() {
-  const [fontes, setFontes] = useState<Fonte[] | null>(null);
+  const [fontes, setFontes] = useState<Fonte[] | null>(() => cache?.dados ?? null);
 
   useEffect(() => {
     let vivo = true;
-    const ler = () =>
-      supabase.rpc("painel_saude_fontes").then(({ data }) => { if (vivo) setFontes((data as Fonte[]) ?? []); });
-    ler();
-    const t = setInterval(ler, 5 * 60 * 1000);
-    return () => { vivo = false; clearInterval(t); };
+    const receber = (f: Fonte[]) => { if (vivo) setFontes(f); };
+    ouvintes.add(receber);
+    buscar().then(receber);
+
+    const t = setInterval(() => {
+      // Aba escondida não consulta: o número não está sendo lido por ninguém.
+      if (document.visibilityState === "visible") buscar().then(receber);
+    }, ESPERA_MS);
+
+    const aoVoltar = () => { if (document.visibilityState === "visible") buscar().then(receber); };
+    document.addEventListener("visibilitychange", aoVoltar);
+    return () => {
+      vivo = false; ouvintes.delete(receber); clearInterval(t);
+      document.removeEventListener("visibilitychange", aoVoltar);
+    };
   }, []);
 
   return fontes;

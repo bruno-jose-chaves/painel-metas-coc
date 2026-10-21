@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Ajuda from "@/components/Ajuda";
+import Chave from "@/components/Chave";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, dataCurta } from "@/lib/formato";
 
@@ -84,8 +85,10 @@ export default function Etiquetas({ admin }: { admin: boolean }) {
         </Ajuda>
       </p>
       <div className="atalhos" style={{ marginBottom: 16 }}>
-        <button className={!tudo ? "ativo" : ""} onClick={() => setTudo(false)}>Com volume (5 ou mais)</button>
-        <button className={tudo ? "ativo" : ""} onClick={() => setTudo(true)}>Tudo, inclusive a cauda</button>
+        <Chave ligada={tudo} aoMudar={setTudo}
+               ajuda="Desligado, mostra só etiqueta com 5 ou mais leads. Ligado, mostra a cauda inteira.">
+          Mostrar também os de pouco volume
+        </Chave>
       </div>
 
       {!lista ? <p className="rotulo">Carregando</p> : lista.length === 0 ? (

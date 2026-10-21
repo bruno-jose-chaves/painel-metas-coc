@@ -76,6 +76,11 @@ export default function Escapando() {
         </Ajuda>
       </p>
 
+      <p className="nota" style={{ marginTop: 0 }}>
+        Esta tela não tem filtro de período de propósito: ela é a foto de agora. Card parado está
+        parado hoje, e conversa sem card olha sempre os últimos 14 dias.
+      </p>
+
       {!resumo ? <p className="rotulo">Carregando</p> : (
         <>
           <h2><span className="idx">080</span> O tamanho de cada buraco</h2>

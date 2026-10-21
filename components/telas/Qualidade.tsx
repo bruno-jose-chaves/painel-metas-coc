@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Ajuda from "@/components/Ajuda";
 import SeletorPeriodo from "@/components/Periodo";
+import Chave from "@/components/Chave";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, pct, duracao } from "@/lib/formato";
@@ -144,13 +145,15 @@ export default function Qualidade() {
             ))}
           </select>
         </label>
-        <div className="atalhos">
-          <button className={soDiaUtil ? "ativo" : ""} onClick={() => setSoDiaUtil(!soDiaUtil)}>
-            {soDiaUtil ? "Só dia de semana" : "Com sábado e domingo"}
-          </button>
-          <button className={soComercial ? "ativo" : ""} onClick={() => setSoComercial(!soComercial)}>
-            {soComercial ? "Só das 8h às 18h" : "Qualquer horário"}
-          </button>
+        <div className="chaves-filtro">
+          <Chave ligada={soDiaUtil} aoMudar={setSoDiaUtil}
+                 ajuda="Ligado, tira sábado e domingo da conta. O bloco por dia da semana continua mostrando a semana inteira.">
+            Tirar sábado e domingo
+          </Chave>
+          <Chave ligada={soComercial} aoMudar={setSoComercial}
+                 ajuda="Ligado, conta só conversa aberta entre 8h e 18h, para madrugada não estragar a média.">
+            Só das 8h às 18h
+          </Chave>
         </div>
       </div>
 

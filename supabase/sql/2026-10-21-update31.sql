@@ -1,0 +1,25 @@
+-- Update 31 — a lentidão tinha causa, e não era o tamanho dos dados.
+--
+-- Cada consulta isolada roda em 200 ms. A média medida nas chamadas reais do
+-- painel era de 2 a 9,5 segundos. A diferença não estava no cálculo: estava na
+-- checagem de permissão.
+--
+-- As 66 políticas de acesso chamavam is_autorizado() e is_admin() direto, e o
+-- Postgres avalia isso LINHA A LINHA. Em pigeon_contatos são 10.130 chamadas de
+-- uma função que faz um select cada, dentro de uma consulta só. Envolver em
+-- (select ...) faz o plano calcular uma vez e reusar o resultado. Mesma regra,
+-- mesmo resultado, uma avaliação. É a recomendação do próprio Supabase.
+--
+-- Medido depois, já como usuário logado e com RLS valendo:
+--   pigeon_contatos  689 ms -> 4 ms
+--   pigeon_conversas 470 ms -> 2 ms
+--   lead_curso        43 ms -> 1 ms
+--
+-- Aplicado com ALTER POLICY, sem recriar nenhuma política, então nenhuma regra
+-- de acesso mudou. Para conferir que não sobrou nenhuma crua:
+--
+--   select count(*) from pg_policies
+--    where schemaname = 'public'
+--      and (coalesce(qual,'') || coalesce(with_check,'')) ~ '(^|[^ ])is_autorizado\(\)';
+--
+-- Tem que dar zero.
