@@ -247,33 +247,33 @@ export default function Visao() {
                       : "dos candidatos do vestibular"}
                   </div>
                 </div>
+                {/* Uma celula so: o numero de acao por dia e onde a campanha
+                    fecha. O detalhe (faltam, dias uteis, media de 7 dias) mora
+                    na tabela Ritmo diario, para nao dar o mesmo numero duas vezes. */}
                 <div>
-                  <div className="rotulo">Falta por dia útil</div>
+                  <div className="rotulo">Ritmo necessário</div>
                   {(() => {
                     const r = ritmo?.find((x) => x.campanha_id === c.id);
                     if (!r) return <div className="v num">-</div>;
                     const prec = r.necessario_dia == null ? null : Number(r.necessario_dia);
-                    const media = Number(r.media_7);
                     if (prec == null || Number(r.falta) <= 0)
                       return <><div className="v">meta batida</div><div className="mudo">nada a fazer</div></>;
+                    const p = proj[c.id]?.projecao_alunos;
                     return (
                       <>
-                        <div className="v num">{num(prec.toFixed(1))}</div>
-                        <div className={"mudo num " + (media >= prec ? "ok" : "alerta")}>
-                          ritmo {num(media.toFixed(1))} · faltam {num(r.falta)} em {num(r.dias_uteis_restantes ?? r.dias_restantes)} dias úteis
-                        </div>
+                        <div className="v num">{num(prec.toFixed(1))} <small>por dia útil</small></div>
+                        {p != null ? (
+                          <div className={"mudo num " + (Number(p) >= c.meta_alunos ? "ok" : "alerta")}>
+                            fecha em {num(p)} de {num(c.meta_alunos)}
+                          </div>
+                        ) : (
+                          <div className={"mudo num " + (Number(r.media_7) >= prec ? "ok" : "alerta")}>
+                            ritmo de hoje {num(Number(r.media_7).toFixed(1))}
+                          </div>
+                        )}
                       </>
                     );
                   })()}
-                </div>
-                <div>
-                  <div className="rotulo">Projeção de fechamento</div>
-                  <div className="v num">{proj[c.id]?.projecao_alunos != null ? num(proj[c.id].projecao_alunos) + " alunos" : "-"}</div>
-                  <div className="mudo num">
-                    {proj[c.id]?.projecao_alunos != null
-                      ? (Number(proj[c.id].projecao_alunos) >= c.meta_alunos ? "bate a Meta " + c.meta_ativa : "abaixo da Meta " + c.meta_ativa)
-                      : "pela curva do ano anterior"}
-                  </div>
                 </div>
               </div>
             </article>
@@ -283,7 +283,11 @@ export default function Visao() {
       {dados.filter((c) => naFaixa(c, faixa)).length === 0 && (
         <p className="mudo">Nenhuma campanha nesta situação.</p>
       )}
-      <p className="rodape">Barra preta: realizado. Traço vermelho: onde a meta ativa espera que a campanha esteja hoje.</p>
+      <p className="rodape">
+        Barra preta: realizado. Traço vermelho: onde a meta ativa espera que a campanha esteja hoje.
+        O detalhe do ritmo, com quanto falta, quantos dias úteis sobram e a média dos últimos sete,
+        está em <b>Ritmo diário de matrículas</b>, no fim desta tela.
+      </p>
 
       {/* Turma que ainda não virou campanha não aparece acima e some da tela.
           Foi o que aconteceu com 2027 quando começou a vender. */}
@@ -472,8 +476,8 @@ export default function Visao() {
                        "Projeção: curva do mesmo curso no ano anterior (tabela vendas)"]}>
               <b>Esperado hoje</b> vem da escada de fases, então uma campanha que concentra venda no fim
               aparece adiantada no começo.<b> No ritmo das últimas semanas</b> repete a média de 7 dias até
-              o fim, sem considerar sazonalidade. A <b>projeção</b> no card da campanha pesa a curva do ano
-              anterior e costuma ser a mais próxima do resultado final.
+              o fim, sem considerar sazonalidade. O <b>fecha em</b> do card da campanha pesa a curva do ano
+              anterior e costuma ser a leitura mais próxima do resultado final.
             </Ajuda>
           </p>
         </>

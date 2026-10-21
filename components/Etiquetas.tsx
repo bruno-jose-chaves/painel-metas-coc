@@ -13,7 +13,7 @@ type Pendente = {
 type Regra = { id: number; etiqueta: string; produto_id: string };
 type Produto = { id: string; nome: string };
 
-export default function Etiquetas({ admin }: { admin: boolean }) {
+export default function Etiquetas({ admin, embutido }: { admin: boolean; embutido?: boolean }) {
   const { volta, em, minutos } = useAtualizacao();
   const [lista, setLista] = useState<Pendente[] | null>(null);
   const [regras, setRegras] = useState<Regra[] | null>(null);
@@ -52,11 +52,15 @@ export default function Etiquetas({ admin }: { admin: boolean }) {
 
   return (
     <>
-      <div className="rotulo">Etiquetas</div>
-      <h1>Etiqueta para curso</h1>
-      <p className="carimbo num">
-        Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
-      </p>
+      {!embutido && (
+        <>
+          <div className="rotulo">Etiquetas</div>
+          <h1>Etiqueta para curso</h1>
+          <p className="carimbo num">
+            Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
+          </p>
+        </>
+      )}
 
       <div className="faixa">
         <div>
@@ -84,12 +88,14 @@ export default function Etiquetas({ admin }: { admin: boolean }) {
           a carrega.
         </Ajuda>
       </p>
-      <div className="atalhos" style={{ marginBottom: 16 }}>
+      <div className="filtros">
+        <div className="atalhos">
         <div className="chaves-filtro">
         <Chave ligada={tudo} aoMudar={setTudo}
                ajuda="Desligado, mostra só etiqueta com 5 ou mais leads. Ligado, mostra a cauda inteira.">
           Mostrar também os de pouco volume
         </Chave>
+        </div>
         </div>
       </div>
 

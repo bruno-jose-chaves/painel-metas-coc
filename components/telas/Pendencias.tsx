@@ -22,7 +22,7 @@ type Regra = {
 const TIPO: Record<string, string> = { campanha_crm: "Campanha no CRM", formulario: "Formulário" };
 
 
-export default function Pendencias({ admin }: { admin: boolean }) {
+export default function Pendencias({ admin, embutido }: { admin: boolean; embutido?: boolean }) {
   const { volta, em, minutos } = useAtualizacao();
   const [lista, setLista] = useState<Pendencia[] | null>(null);
   const [campanhas, setCampanhas] = useState<Campanha[]>([]);
@@ -96,11 +96,15 @@ export default function Pendencias({ admin }: { admin: boolean }) {
 
   return (
     <>
-      <div className="rotulo">Pendências</div>
-      <h1>O que falta classificar</h1>
-      <p className="carimbo num">
-        Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
-      </p>
+      {!embutido && (
+        <>
+          <div className="rotulo">Pendências</div>
+          <h1>O que falta classificar</h1>
+          <p className="carimbo num">
+            Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
+          </p>
+        </>
+      )}
 
       <div className="faixa">
         <div>

@@ -3,7 +3,7 @@ import { useState } from "react";
 
 // A tela de "por onde começo".
 //
-// O painel tem cinco áreas e dezenove blocos, e quem chega não sabe se o que
+// O painel tem cinco áreas e vinte telas, e quem chega não sabe se o que
 // procura está em Campanha ou em Comercial. Em vez de um manual, que ninguém
 // lê, duas perguntas: o que você faz, e o que quer saber agora. O resultado é
 // uma lista curta de telas, na ordem em que vale abrir.
@@ -72,7 +72,7 @@ const DO_DIA: Record<Papel, Sugestao[]> = {
     { tela: "A estrela, no canto superior direito", link: "/", porque: "Mostra só o que é seu: conversa sem resposta, lead que voltou a falar, virada de preço" },
   ],
   marketing: [
-    { tela: "Marketing · Páginas a classificar", link: "/marketing/?v=paginas", porque: "Formulário captando sem curso apontado não entra na conta de campanha nenhuma" },
+    { tela: "Marketing · A classificar", link: "/marketing/?v=classificar", porque: "Página, campanha do CRM ou etiqueta captando sem curso apontado não entra na conta de campanha nenhuma" },
   ],
   diretoria: [
     { tela: "Ajustes · Campanhas e metas", link: "/ajustes/", porque: "Cadastro de campanha, fases, metas e turmas por ano" },
