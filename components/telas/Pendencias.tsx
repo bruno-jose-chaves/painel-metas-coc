@@ -118,7 +118,7 @@ export default function Pendencias({ admin }: { admin: boolean }) {
         </div>
       </div>
 
-      <h2><span className="idx">021</span> Esperando a sua decisão</h2>
+      <h2><span className="idx" /> Esperando a sua decisão</h2>
       <p className="nota">
         Campanhas do CRM e formulários que o painel não conseguiu ligar a um curso sozinho.
         <Ajuda titulo="Por que resolver, e em que ordem"
@@ -208,7 +208,7 @@ export default function Pendencias({ admin }: { admin: boolean }) {
       )}
       {aviso && <div className="aviso ok" style={{ marginTop: 12 }}>{aviso}</div>}
 
-      <h2><span className="idx">022</span> Regras já apontadas</h2>
+      <h2><span className="idx" /> Regras já apontadas</h2>
       <p className="nota">
         Regra apontada para <b>curso</b> vale para qualquer ano: a data do lead decide a turma e a campanha.
         <Ajuda titulo="Curso, turma ou campanha">

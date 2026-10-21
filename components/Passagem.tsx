@@ -90,7 +90,7 @@ export default function Passagem({ admin }: { admin: boolean }) {
         </div>
       </div>
 
-      <h2><span className="idx">035</span> Formulário por formulário</h2>
+      <h2><span className="idx" /> Formulário por formulário</h2>
       <p className="nota">
         Ter formulário não faz o lead chegar no comercial: é preciso um fluxo no RD Marketing criando a negociação.
         <Ajuda titulo="O que esta conta compara"
@@ -160,7 +160,7 @@ export default function Passagem({ admin }: { admin: boolean }) {
       )}
       {aviso && <div className="aviso ok" style={{ marginTop: 12 }}>{aviso}</div>}
 
-      <h2><span className="idx">036</span> Captação e entrada no CRM, dia a dia</h2>
+      <h2><span className="idx" /> Captação e entrada no CRM, dia a dia</h2>
       <p className="nota">
         Esta leitura não depende de fluxo apontado nenhum.
         <Ajuda titulo="Como ler as duas linhas"

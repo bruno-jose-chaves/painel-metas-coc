@@ -87,7 +87,7 @@ export default function Anuncios() {
         </div>
       </div>
 
-      <h2><span className="idx">028</span> Peça por peça</h2>
+      <h2><span className="idx" /> Peça por peça</h2>
       <p className="nota">
         Quem chegou por peça de clique para WhatsApp, ligado à matrícula pelo telefone.
         <Ajuda titulo="Como a peça vira matrícula"

@@ -1385,3 +1385,12 @@ select:disabled, input:disabled { color: var(--cinza-claro); background: var(--s
 .chave .estado { display: none; }
 
 .chave:focus-visible { outline: 2px solid var(--tinta); outline-offset: 2px; }
+
+/* O código do bloco na barra de seções. Três dígitos: setor, sub-aba e posição,
+   igual ao que aparece no título do bloco. Serve para conversar sobre o painel
+   sem ter que descrever o caminho inteiro até a caixa. */
+.indice-in button .indice-num {
+  font-size: 10px; color: var(--cinza-claro); letter-spacing: .06em;
+  margin-right: 1px;
+}
+.indice-in button.ativo .indice-num { color: var(--cinza); }

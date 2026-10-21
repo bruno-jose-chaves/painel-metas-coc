@@ -196,7 +196,7 @@ export default function Visao() {
           botões custava uma tela de altura em notebook, e empurrava o primeiro
           cartão de campanha para fora. */}
       <div className="secao-topo">
-        <h2><span className="idx">002</span> Campanhas</h2>
+        <h2><span className="idx" /> Campanhas</h2>
         <div className="atalhos">
           {FAIXAS.map((f) => {
             const quantas = dados.filter((c) => naFaixa(c, f.id)).length;
@@ -237,7 +237,16 @@ export default function Visao() {
                 <div><div className="rotulo">Faturamento</div><div className="v num">{brl(c.faturamento)}</div><div className="mudo num">de {brl(c.meta_faturamento)}</div></div>
                 <div><div className="rotulo">Ticket médio</div><div className="v num">{brl(c.ticket_medio)}</div><div className="mudo num">alvo {brl(c.ticket_alvo)}</div></div>
                 <div><div className="rotulo">Fase atual</div><div className="v">{c.fase_atual ?? "-"}</div><div className="mudo num">{c.preco_atual ? brl(c.preco_atual, 2) + " até " + dataCurta(c.fase_fim) : ""}</div></div>
-                <div><div className="rotulo">Dias restantes</div><div className="v num">{num(c.dias_restantes)}</div><div className="mudo num">share {pct(c.market_share, 2)}</div></div>
+                <div><div className="rotulo">Dias restantes</div><div className="v num">{num(c.dias_restantes)}</div><div className="mudo">até o fim da campanha</div></div>
+                <div>
+                  <div className="rotulo">Fatia do mercado</div>
+                  <div className="v num">{pct(c.market_share, 2)}</div>
+                  <div className="mudo num">
+                    {c.referencia_ano_anterior?.market_share
+                      ? "no ano passado foi " + pct(c.referencia_ano_anterior.market_share, 2)
+                      : "dos candidatos do vestibular"}
+                  </div>
+                </div>
                 <div>
                   <div className="rotulo">Falta por dia útil</div>
                   {(() => {
@@ -280,7 +289,7 @@ export default function Visao() {
           Foi o que aconteceu com 2027 quando começou a vender. */}
       <Acompanhando volta={volta} />
 
-      <h2><span className="idx">004</span> Metas de captação</h2>
+      <h2><span className="idx" /> Metas de captação</h2>
       {!metasProntas ? (
         <p className="rotulo">Carregando</p>
       ) : Object.keys(metasLeads).length === 0 ? (
@@ -371,7 +380,7 @@ export default function Visao() {
         </>
       )}
 
-      <h2><span className="idx">004</span> Ritmo diário de matrículas</h2>
+      <h2><span className="idx" /> Ritmo diário de matrículas</h2>
       {!ritmo ? <p className="rotulo">Carregando</p> : ritmo.length === 0 ? (
         <p className="mudo">Nenhuma campanha ativa.</p>
       ) : (

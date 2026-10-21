@@ -97,7 +97,7 @@ export default function Guia() {
         Duas perguntas e o painel diz quais telas abrir, na ordem. Nada aqui muda dado nenhum.
       </p>
 
-      <h2><span className="idx">001</span> O que você faz</h2>
+      <h2><span className="idx" /> O que você faz</h2>
       <div className="cards" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
         {PAPEIS.map((p) => (
           <button
@@ -111,7 +111,7 @@ export default function Guia() {
         ))}
       </div>
 
-      <h2><span className="idx">002</span> O que você quer saber agora</h2>
+      <h2><span className="idx" /> O que você quer saber agora</h2>
       <div className="cards" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
         {PERGUNTAS.map((p) => (
           <button
@@ -124,7 +124,7 @@ export default function Guia() {
         ))}
       </div>
 
-      <h2><span className="idx">003</span> Onde olhar</h2>
+      <h2><span className="idx" /> Onde olhar</h2>
       {!pergunta ? (
         <p className="mudo">Escolha o que você quer saber e a lista aparece aqui.</p>
       ) : (
@@ -141,7 +141,7 @@ export default function Guia() {
         </div>
       )}
 
-      <h2><span className="idx">004</span> Três coisas que valem para o painel inteiro</h2>
+      <h2><span className="idx" /> Três coisas que valem para o painel inteiro</h2>
       <div className="marcos">
         <div>
           <span className="quando">Ⓘ</span>

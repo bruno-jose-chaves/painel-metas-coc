@@ -119,7 +119,7 @@ export default function Fontes() {
 
   return (
     <>
-      <h2><span className="idx">008</span> Saúde das fontes</h2>
+      <h2><span className="idx" /> Saúde das fontes</h2>
       <p className="nota">
         De quanto em quanto tempo cada carga deveria rodar, e quando ela rodou pela última vez.
         <Ajuda titulo="Como a situação é decidida"

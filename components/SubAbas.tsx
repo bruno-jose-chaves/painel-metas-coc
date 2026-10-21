@@ -1,7 +1,15 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 
-export type Aba = { id: string; nome: string; oque?: string; marcador?: number | null };
+export type Aba = {
+  id: string; nome: string; oque?: string; marcador?: number | null;
+  // Código de três dígitos: setor, sub-aba, seção. Hoje é 100, Campanha 200,
+  // Comercial 300, Marketing 400, Ajustes 500. A primeira sub-aba de Comercial
+  // é 310, e os blocos dentro dela são 311, 312, 313. Serve para a gente
+  // conversar: "olha o 341" é mais curto que "a terceira caixa da aba WhatsApp
+  // e CRM dentro de Comercial".
+  codigo?: number;
+};
 
 // Subnavegação de uma área. Guarda a escolha no endereço, então recarregar a
 // página ou mandar o link para alguém cai na mesma visão.
@@ -47,7 +55,17 @@ export default function SubAbas({
   // "Pendências" são nomes curtos que só fazem sentido para quem construiu a
   // tela. Dizer em uma frase o que tem dentro evita a pessoa abrir aba por aba
   // procurando o número que ela quer.
-  const descricao = abas.find((a) => a.id === aba)?.oque;
+  const atual = abas.find((a) => a.id === aba);
+  const descricao = atual?.oque;
+
+  // O código da aba vai para o <main>, e é de lá que o índice tira a numeração
+  // dos blocos. Assim nenhuma tela precisa saber em que posição ela está.
+  useEffect(() => {
+    const main = document.querySelector("main");
+    if (!main) return;
+    if (atual?.codigo) main.setAttribute("data-codigo", String(atual.codigo));
+    else main.removeAttribute("data-codigo");
+  }, [atual?.codigo]);
 
   return (
     <div className="subnav-caixa">

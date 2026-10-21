@@ -140,7 +140,7 @@ export default function Vendas() {
         </div>
       </div>
 
-      <h2><span className="idx">014</span> Lançamentos</h2>
+      <h2><span className="idx" /> Lançamentos</h2>
       {!linhas ? <p className="rotulo">Carregando</p> : linhas.length === 0 ? (
         <p className="mudo">Nenhuma venda com esses filtros.</p>
       ) : (

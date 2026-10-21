@@ -45,6 +45,9 @@ export default function FunilWhats() {
     setPessoas(null);
     supabase.rpc("painel_whats_crm", { p_de: periodo.de, p_ate: periodo.ate })
       .then(({ data }) => setPessoas((data as Pessoa[]) ?? []));
+    // Este bloco não recebe período de propósito: card parado está parado
+    // agora, não "no período". Antes isso não estava escrito em lugar nenhum e
+    // quem trocava o filtro achava que a tabela tinha mudado junto.
     supabase.rpc("painel_tempo_etapa", { p_funil: null })
       .then(({ data }) => setEtapas((data as Etapa[]) ?? []));
   }, [periodo, volta]);
@@ -94,7 +97,7 @@ export default function FunilWhats() {
 
       {!pessoas ? <p className="rotulo">Carregando</p> : (
         <>
-          <h2><span className="idx">070</span> A passagem</h2>
+          <h2><span className="idx" /> A passagem</h2>
           <div className="faixa">
             <div>
               <div className="rotulo">Conversaram</div>
@@ -120,13 +123,18 @@ export default function FunilWhats() {
 
           {fora.length > 0 && (
             <p className="aviso-leve ruim">
-              {num(fora.length)} pessoa{fora.length > 1 ? "s" : ""} conversou no WhatsApp e não tem
-              negociação no CRM. Sem card, ninguém acompanha, e a pessoa não aparece em nenhuma conta
-              de funil.
+              {num(fora.length)} {fora.length > 1 ? "pessoas conversaram" : "pessoa conversou"} no
+              WhatsApp e não tem negociação no CRM. Sem card, ninguém acompanha, e a pessoa não
+              aparece em nenhuma conta de funil.
+              <br />
+              Esta tela é o diagnóstico, com o período que você escolher. Para trabalhar a lista com
+              nome, dono e o que fazer, a fila está em <b>O que está escapando</b>, que olha sempre os
+              últimos 14 dias e deixa o dia de hoje de fora, porque card aberto no fim do dia é normal.
+              Por isso os dois números não são iguais.
             </p>
           )}
 
-          <h2><span className="idx">071</span> Por atendente</h2>
+          <h2><span className="idx" /> Por atendente</h2>
           <div className="rolar">
             <table className="tabela">
               <thead>
@@ -150,9 +158,10 @@ export default function FunilWhats() {
             </table>
           </div>
 
-          <h2><span className="idx">072</span> Quanto tempo o card fica parado</h2>
+          <h2><span className="idx" /> Quanto tempo o card fica parado</h2>
           <p className="nota">
             Negociação aberta no CRM, por etapa, e há quantos dias ela não sai do lugar.
+            <b> Este bloco não segue o período escolhido acima</b>: card parado está parado agora.
             <Ajuda titulo="Por que tempo, e não conversão"
               fontes={["RD Station CRM, tabela rd_negociacoes, campo etapa_desde",
                        "Só negociação com status aberta",
@@ -200,7 +209,7 @@ export default function FunilWhats() {
           )}
 
           <div className="secao-topo">
-            <h2><span className="idx">073</span> Pessoa a pessoa</h2>
+            <h2><span className="idx" /> Pessoa a pessoa</h2>
             <div className="atalhos">
               <button onClick={() => setSoFora(!soFora)}>
                 {soFora ? "Ver todo mundo" : "Ver só quem está fora do CRM"}

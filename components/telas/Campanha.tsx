@@ -191,7 +191,7 @@ export default function Campanha() {
       </div>
 
 
-      <h2><span className="idx">002</span> Projeção de fechamento</h2>
+      <h2><span className="idx" /> Projeção de fechamento</h2>
       {!proj ? <p className="rotulo">Carregando</p> : proj.projecao_alunos == null ? (
         <p className="mudo">Sem histórico do ano anterior para projetar esta campanha.</p>
       ) : (
@@ -289,7 +289,7 @@ export default function Campanha() {
         </>
       )}
 
-      <h2><span className="idx">003</span> Ritmo da campanha</h2>
+      <h2><span className="idx" /> Ritmo da campanha</h2>
       {curva ? (
         <Curva
           rotulos={curva.rotulos}
@@ -301,7 +301,7 @@ export default function Campanha() {
         />
       ) : <p className="rotulo">Carregando</p>}
 
-      <h2><span className="idx">004</span> Escada de preço por fase</h2>
+      <h2><span className="idx" /> Escada de preço por fase</h2>
       <p className="nota">
         A <b>meta ajustada</b> é a meta da fase corrigida pelo que as anteriores deixaram de trazer.
         <Ajuda titulo="Como a meta ajustada é calculada"
@@ -387,7 +387,7 @@ export default function Campanha() {
       )}
 
 
-      <h2><span className="idx">005</span> Cenários das metas</h2>
+      <h2><span className="idx" /> Cenários das metas</h2>
       {!cenarios ? <p className="rotulo">Carregando</p> : (
         <div className="rolar">
           <table className="tabela">
@@ -423,7 +423,7 @@ export default function Campanha() {
       )}
 
 
-      <h2><span className="idx">006</span> Da origem à matrícula</h2>
+      <h2><span className="idx" /> Da origem à matrícula</h2>
       <div className="filtros" style={{ marginBottom: 16 }}>
         <div className="atalhos">
           <button className={porOrigem === "campanha" ? "ativo" : ""} onClick={() => setPorOrigem("campanha")}>
@@ -505,7 +505,7 @@ export default function Campanha() {
         </>
       )}
 
-      <h2><span className="idx">007</span> Quem já era da casa</h2>
+      <h2><span className="idx" /> Quem já era da casa</h2>
       {!recompra ? <p className="rotulo">Carregando</p> : recompra.length === 0 ? (
         <p className="mudo">Sem matrícula nesta campanha ainda.</p>
       ) : (
@@ -567,7 +567,7 @@ export default function Campanha() {
         </>
       )}
 
-      <h2><span className="idx">008</span> Marcos</h2>
+      <h2><span className="idx" /> Marcos</h2>
       {c.marcos?.length ? (
         <div className="marcos">
           {c.marcos.map((m) => {
@@ -585,7 +585,7 @@ export default function Campanha() {
 
       {ref && (
         <>
-          <h2><span className="idx">009</span> Contra {ref.ano}</h2>
+          <h2><span className="idx" /> Contra {ref.ano}</h2>
           <div className="faixa">
             <div>
               <div className="rotulo">Alunos {ref.ano}</div>

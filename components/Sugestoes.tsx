@@ -58,7 +58,7 @@ export default function Sugestoes() {
         </div>
       </div>
 
-      <h2><span className="idx">033</span> Lista de conferência</h2>
+      <h2><span className="idx" /> Lista de conferência</h2>
       <p className="nota">
         Isto não é cobrança, é uma lista do que está estranho na base.
         <Ajuda titulo="Como usar">

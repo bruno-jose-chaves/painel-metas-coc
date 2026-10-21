@@ -123,7 +123,7 @@ export default function Cadastro({ admin }: { admin: boolean }) {
       </div>
       {aviso && <div className={"aviso " + aviso.tipo}>{aviso.texto}</div>}
 
-      <h2><span className="idx">002</span> Dados da campanha</h2>
+      <h2><span className="idx" /> Dados da campanha</h2>
       <div className="bloco" style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))" }}>
         <label className="campo" style={{ margin: 0 }}><span className="rotulo">Código</span>
           <input value={c.id} disabled={!!sel} onChange={(e) => setC({ ...c, id: e.target.value })} placeholder="semi-2027-1" />
@@ -167,7 +167,7 @@ export default function Cadastro({ admin }: { admin: boolean }) {
         pertencem a esta campanha, comparando com o nome do curso; em branco, vale a regra do produto.
       </p>
 
-      <h2><span className="idx">003</span> Metas</h2>
+      <h2><span className="idx" /> Metas</h2>
       <div className="rolar">
         <table className="tabela">
           <thead><tr><th>Nível</th><th className="n">Alunos</th><th className="n">Faturamento</th><th className="n">Ticket implícito</th></tr></thead>
@@ -190,7 +190,7 @@ export default function Cadastro({ admin }: { admin: boolean }) {
         </table>
       </div>
 
-      <h2><span className="idx">004</span> Fases e escada de preço</h2>
+      <h2><span className="idx" /> Fases e escada de preço</h2>
       <div className="rolar">
         <table className="tabela">
           <thead>
@@ -227,7 +227,7 @@ export default function Cadastro({ admin }: { admin: boolean }) {
         Adicionar fase
       </button>
 
-      <h2><span className="idx">006</span> Turmas por ano</h2>
+      <h2><span className="idx" /> Turmas por ano</h2>
       <p className="nota">
         Turma é o produto de um ano específico: "Semi Extensivo" é produto, "Semi Extensivo 2026/2" é turma.
         <Ajuda titulo="Para que serve a turma"
@@ -263,7 +263,7 @@ export default function Cadastro({ admin }: { admin: boolean }) {
         </div>
       )}
 
-      <h2><span className="idx">005</span> Campanhas cadastradas</h2>
+      <h2><span className="idx" /> Campanhas cadastradas</h2>
       <div className="rolar">
         <table className="tabela">
           <thead><tr><th>Nome</th><th>Produto</th><th>Venda</th><th className="n">Meta ativa</th><th>Situação</th></tr></thead>

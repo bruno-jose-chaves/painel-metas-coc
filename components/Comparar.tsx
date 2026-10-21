@@ -192,7 +192,7 @@ export default function Comparar() {
         <p className="rotulo" style={{ marginTop: 24 }}>Calculando</p>
       ) : (
         <>
-          <h2><span className="idx">040</span> No mesmo ponto da turma</h2>
+          <h2><span className="idx" /> No mesmo ponto da turma</h2>
           <p className="nota">
             {ra.em_curso
               ? <>{ra.nome} está no dia {num(mesmoPonto?.d ?? 0)} de venda. O número ao lado é onde {rb.nome} estava no dia de mesmo número.</>
@@ -245,7 +245,7 @@ export default function Comparar() {
             </div>
           </div>
 
-          <h2><span className="idx">041</span> As duas curvas</h2>
+          <h2><span className="idx" /> As duas curvas</h2>
           <Curva
             rotulos={curva.map((p) => "dia " + p.d)}
             series={series}
@@ -260,7 +260,7 @@ export default function Comparar() {
             }}
           />
 
-          <h2><span className="idx">042</span> As duas por inteiro</h2>
+          <h2><span className="idx" /> As duas por inteiro</h2>
           <div className="rolar">
             <table className="tabela">
               <thead>

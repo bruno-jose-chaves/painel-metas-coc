@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 
-type Secao = { id: string; nome: string };
+type Secao = { id: string; nome: string; codigo: string };
 
 // Barra de seções da tela. Ela não é decoração: as telas do painel têm cinco,
 // seis, oito blocos, e sem isso a única forma de ir do primeiro ao último é
@@ -24,20 +24,24 @@ export default function Indice() {
     let observador: IntersectionObserver | null = null;
 
     const ler = () => {
+      const base = Number(main.getAttribute("data-codigo")) || 0;
       const hs = Array.from(main.querySelectorAll("h2"));
       const achadas: Secao[] = hs.map((h, i) => {
         // Escrever sempre, mesmo o mesmo valor, troca o nó de texto e acorda o
         // MutationObserver de novo, o que vira laço infinito. Só mexe se mudou.
         const idx = h.querySelector(".idx");
-        const numero = String(i + 1).padStart(2, "0");
+        // Com código de aba, o bloco é setor + sub-aba + posição: o terceiro
+        // bloco da aba 340 é 343. Sem código, cai na contagem simples.
+        const numero = base ? String(base + i + 1) : String(i + 1).padStart(2, "0");
         if (idx && idx.textContent !== numero) idx.textContent = numero;
         const nome = (h.textContent ?? "").replace(/^\d+\s*/, "").trim();
         const id = "s" + (i + 1);
         if (h.id !== id) h.id = id;
-        return { id, nome };
+        return { id, nome, codigo: numero };
       });
       setSecoes((antes) =>
-        antes.length === achadas.length && antes.every((a, i) => a.nome === achadas[i].nome)
+        antes.length === achadas.length
+        && antes.every((a, i) => a.nome === achadas[i].nome && a.codigo === achadas[i].codigo)
           ? antes
           : achadas,
       );
@@ -81,7 +85,7 @@ export default function Indice() {
               document.getElementById(s.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
           >
-            {s.nome}
+            <span className="indice-num">{s.codigo}</span> {s.nome}
           </button>
         ))}
         <button

@@ -109,7 +109,7 @@ export default function Agente() {
 
       {!dias ? <p className="rotulo">Carregando</p> : (
         <>
-          <h2><span className="idx">050</span> A qualidade do agente</h2>
+          <h2><span className="idx" /> A qualidade do agente</h2>
           <div className="faixa">
             <div>
               <div className="rotulo">Respondeu</div>
@@ -140,7 +140,7 @@ export default function Agente() {
             </div>
           </div>
 
-          <h2><span className="idx">051</span> Dia a dia</h2>
+          <h2><span className="idx" /> Dia a dia</h2>
           <p className="nota">
             A linha cheia é o que o agente abriu. A tracejada é o que respondeu.
             <Ajuda titulo="Por que as duas juntas">
@@ -158,7 +158,7 @@ export default function Agente() {
             altura={240}
           />
 
-          <h2><span className="idx">052</span> Cada dia por inteiro</h2>
+          <h2><span className="idx" /> Cada dia por inteiro</h2>
           <div className="rolar">
             <table className="tabela">
               <thead>
@@ -194,7 +194,7 @@ export default function Agente() {
             Traço quer dizer que naquele dia a medição ainda não existia, não que o número foi zero.
           </p>
 
-          <h2><span className="idx">053</span> O mesmo agente, pelo funil do CRM</h2>
+          <h2><span className="idx" /> O mesmo agente, pelo funil do CRM</h2>
           <p className="nota">
             A conversa mostra o esforço. O funil mostra o que sobrou dele dentro do CRM.
             <Ajuda titulo="Por que as duas leituras convivem"

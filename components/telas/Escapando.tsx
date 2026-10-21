@@ -83,7 +83,7 @@ export default function Escapando() {
 
       {!resumo ? <p className="rotulo">Carregando</p> : (
         <>
-          <h2><span className="idx">080</span> O tamanho de cada buraco</h2>
+          <h2><span className="idx" /> O tamanho de cada buraco</h2>
           <div className="faixa">
             {naFila.map((r) => (
               <div key={r.tipo}>
@@ -137,7 +137,7 @@ export default function Escapando() {
           </div>
 
           <div className="secao-topo">
-            <h2><span className="idx">081</span> A fila</h2>
+            <h2><span className="idx" /> A fila</h2>
             <div className="atalhos">
               <button className={tipo === null ? "ativo" : ""} onClick={() => setTipo(null)}>
                 Tudo

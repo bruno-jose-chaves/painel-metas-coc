@@ -28,7 +28,7 @@ export default function Importacoes() {
 
   return (
     <>
-      <h2><span className="idx">007</span> Importação da planilha</h2>
+      <h2><span className="idx" /> Importação da planilha</h2>
       <p className="nota">
         A última leitura de cada aba, com o que entrou e o que ficou de fora.
         <Ajuda titulo="O que cada coluna conta"

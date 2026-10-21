@@ -111,7 +111,7 @@ export default function Time() {
       </p>
 
       <div className="secao-topo">
-        <h2><span className="idx">008</span> Vendas dia a dia</h2>
+        <h2><span className="idx" /> Vendas dia a dia</h2>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
           <div className="atalhos">
             <button className={vista === "dia" ? "ativo" : ""} onClick={() => setVista("dia")}>Por dia</button>
@@ -212,7 +212,7 @@ export default function Time() {
         </>
       )}
 
-      <h2><span className="idx">009</span> Ranking de vendas</h2>
+      <h2><span className="idx" /> Ranking de vendas</h2>
       <p className="nota">Clique na linha de um vendedor para ver as matrículas dele no período.</p>
       {!time ? <p className="rotulo">Carregando</p> : time.length === 0 ? (
         <p className="mudo">Nenhuma atividade comercial no período.</p>
@@ -281,7 +281,7 @@ export default function Time() {
         </Ajuda>
       </p>
 
-      <h2><span className="idx">010</span> Negócios em aberto e tempo parado</h2>
+      <h2><span className="idx" /> Negócios em aberto e tempo parado</h2>
       {!parados ? <p className="rotulo">Carregando</p> : parados.length === 0 ? (
         <p className="mudo">Nenhum negócio em aberto no período.</p>
       ) : (
@@ -322,7 +322,7 @@ export default function Time() {
         </>
       )}
 
-      <h2><span className="idx">011</span> Motivos de perda</h2>
+      <h2><span className="idx" /> Motivos de perda</h2>
       {!motivos ? <p className="rotulo">Carregando</p> : motivos.length === 0 ? (
         <p className="mudo">Nenhuma perda registrada no período.</p>
       ) : (

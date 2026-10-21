@@ -73,7 +73,7 @@ export default function Etiquetas({ admin }: { admin: boolean }) {
         </div>
       </div>
 
-      <h2><span className="idx">030</span> Esperando a sua decisão</h2>
+      <h2><span className="idx" /> Esperando a sua decisão</h2>
       <p className="nota">
         Etiquetas que chegam do RD e ainda não têm curso apontado.
         <Ajuda titulo="Por que a etiqueta importa"
@@ -139,7 +139,7 @@ export default function Etiquetas({ admin }: { admin: boolean }) {
       )}
       {aviso && <div className="aviso ok" style={{ marginTop: 12 }}>{aviso}</div>}
 
-      <h2><span className="idx">031</span> Regras já apontadas</h2>
+      <h2><span className="idx" /> Regras já apontadas</h2>
       {!regras ? <p className="rotulo">Carregando</p> : regras.length === 0 ? (
         <p className="mudo">Nenhuma regra de etiqueta cadastrada.</p>
       ) : (

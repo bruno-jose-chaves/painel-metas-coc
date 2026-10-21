@@ -153,7 +153,7 @@ export default function Historico() {
         </div>
       )}
 
-      <h2><span className="idx">009</span> Curva acumulada, sobreposta</h2>
+      <h2><span className="idx" /> Curva acumulada, sobreposta</h2>
       <p className="nota">
         Alinhada pela semana do ano, não pelo dia da campanha.
         <Ajuda titulo="Por que pela semana"
@@ -170,7 +170,7 @@ export default function Historico() {
         <Curva rotulos={semanas.map((s) => "s" + s)} series={series} altura={260} />
       )}
 
-      <h2><span className="idx">010</span> Ano por ano</h2>
+      <h2><span className="idx" /> Ano por ano</h2>
       <p className="nota">Clique na linha de um ano para ver as matrículas daquele ano.</p>
       {!anos ? <p className="rotulo">Carregando</p> : anos.length === 0 ? (
         <p className="mudo">Sem histórico para este curso.</p>

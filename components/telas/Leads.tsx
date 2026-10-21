@@ -87,7 +87,7 @@ export default function Leads() {
           ligados a esse curso, pela regra automática ou pelo que foi apontado em Pendências.
         </p>
       )}
-      <h2><span className="idx">016</span> Conversões por dia</h2>
+      <h2><span className="idx" /> Conversões por dia</h2>
       {!dias ? <p className="rotulo">Carregando</p> : dias.length === 0 ? (
         <p className="mudo">Sem conversões registradas no período.</p>
       ) : (
@@ -100,7 +100,7 @@ export default function Leads() {
         />
       )}
 
-      <h2><span className="idx">017</span> Páginas e formulários</h2>
+      <h2><span className="idx" /> Páginas e formulários</h2>
       {!origens ? <p className="rotulo">Carregando</p> : origens.length === 0 ? (
         <p className="mudo">Sem conversões por página no período.</p>
       ) : (
@@ -128,7 +128,7 @@ export default function Leads() {
         </div>
       )}
 
-      <h2><span className="idx">018</span> Tags dos leads</h2>
+      <h2><span className="idx" /> Tags dos leads</h2>
       {!tags ? <p className="rotulo">Carregando</p> : tags.length === 0 ? (
         <p className="mudo">
           Ainda sem tags no período. O webhook de conversão foi ligado em 02/10/2026, então só há tag a partir dessa data.
@@ -156,7 +156,7 @@ export default function Leads() {
         </>
       )}
 
-      <h2><span className="idx">019</span> Origem dos negócios no CRM</h2>
+      <h2><span className="idx" /> Origem dos negócios no CRM</h2>
       {!fontes ? <p className="rotulo">Carregando</p> : fontes.length === 0 ? (
         <p className="mudo">Nenhum negócio criado no período.</p>
       ) : (

@@ -185,7 +185,7 @@ export default function Configuracao({ admin }: { admin: boolean }) {
       <h1>Integrações e acessos</h1>
       {retorno && <div className={"aviso " + retorno.tipo}>{retorno.msg}</div>}
 
-      <h2><span className="idx">001</span> Planilha de vendas</h2>
+      <h2><span className="idx" /> Planilha de vendas</h2>
       <div className="bloco">
         <p style={{ marginTop: 0 }}>Envio automático a cada 15 minutos pelo script instalado na própria planilha.</p>
         <div className="rolar"><table className="tabela">
@@ -200,7 +200,7 @@ export default function Configuracao({ admin }: { admin: boolean }) {
         </table></div>
       </div>
 
-      <h2><span className="idx">002</span> RD Station</h2>
+      <h2><span className="idx" /> RD Station</h2>
       {admin ? (
         <>
           <AppRD servico="rd_crm" status={st("rd_crm")} recarregar={carregar} />
@@ -208,7 +208,7 @@ export default function Configuracao({ admin }: { admin: boolean }) {
         </>
       ) : <p className="mudo">Somente administradores configuram integrações.</p>}
 
-      <h2><span className="idx">005</span> n8n</h2>
+      <h2><span className="idx" /> n8n</h2>
       <div className="bloco">
         <div className="card-top">
           <div><h3 style={{ margin: "4px 0" }}>Automações do n8n</h3></div>
@@ -234,7 +234,7 @@ export default function Configuracao({ admin }: { admin: boolean }) {
 
       </div>
 
-      <h2><span className="idx">006</span> Pigeon Post</h2>
+      <h2><span className="idx" /> Pigeon Post</h2>
       <div className="bloco">
         <div className="card-top">
           <div><h3 style={{ margin: "4px 0" }}>Conversas com clientes</h3></div>
@@ -284,7 +284,7 @@ export default function Configuracao({ admin }: { admin: boolean }) {
 
       <Importacoes />
 
-      <h2><span className="idx">008</span> Cobertura do RD Marketing</h2>
+      <h2><span className="idx" /> Cobertura do RD Marketing</h2>
       <p className="nota">
         As conversões do RD Marketing vêm dia a dia, e dia que não foi buscado não aparece em lugar nenhum.
         <Ajuda titulo="Por que isso importa"
@@ -320,7 +320,7 @@ export default function Configuracao({ admin }: { admin: boolean }) {
         </div>
       )}
 
-      <h2><span className="idx">003</span> Pedidos de acesso</h2>
+      <h2><span className="idx" /> Pedidos de acesso</h2>
       {!pedidos ? <p className="rotulo">Carregando</p> : pedidos.length === 0 ? (
         <p className="mudo">Nenhum pedido esperando resposta.</p>
       ) : (
@@ -347,7 +347,7 @@ export default function Configuracao({ admin }: { admin: boolean }) {
         </div>
       )}
 
-      <h2><span className="idx">004</span> Quem acessa</h2>
+      <h2><span className="idx" /> Quem acessa</h2>
       <div className="bloco">
         <div className="rolar"><table className="tabela">
           <thead>

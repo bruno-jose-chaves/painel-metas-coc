@@ -110,7 +110,7 @@ export default function Cursos({ admin }: { admin: boolean }) {
 
       {!cursos ? <p className="rotulo">Carregando</p> : (
         <>
-          <h2><span className="idx">060</span> O tamanho de cada produto</h2>
+          <h2><span className="idx" /> O tamanho de cada produto</h2>
           <div className="rolar">
             <table className="tabela">
               <thead>
@@ -140,7 +140,7 @@ export default function Cursos({ admin }: { admin: boolean }) {
             </table>
           </div>
 
-          <h2><span className="idx">061</span> Cada nome, um a um</h2>
+          <h2><span className="idx" /> Cada nome, um a um</h2>
           <p className="nota">
             {admin
               ? "Trocar o produto reclassifica na hora todas as matrículas daquele nome."

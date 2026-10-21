@@ -84,7 +84,7 @@ export default function Acompanhando({ volta }: { volta: number }) {
   return (
     <>
       <div className="secao-topo">
-        <h2><span className="idx">003</span> Acompanhando</h2>
+        <h2><span className="idx" /> Acompanhando</h2>
         <div className="atalhos">
           <button onClick={() => setAbrindo(true)}>
             {escolha.length ? "Trocar o que acompanho" : "Escolher o que acompanhar"}

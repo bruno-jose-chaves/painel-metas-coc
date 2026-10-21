@@ -152,7 +152,7 @@ export default function Upsell() {
         <p className="rotulo" style={{ marginTop: 24 }}>Calculando</p>
       ) : (
         <>
-          <h2><span className="idx">038</span> Resultado</h2>
+          <h2><span className="idx" /> Resultado</h2>
           <div className="faixa">
             <div>
               <div className="rotulo">Alunos na base</div>
@@ -189,7 +189,7 @@ export default function Upsell() {
             </div>
           </div>
 
-          <h2><span className="idx">039</span> Contra o ano anterior</h2>
+          <h2><span className="idx" /> Contra o ano anterior</h2>
           <div className="rolar">
             <table className="tabela">
               <thead>

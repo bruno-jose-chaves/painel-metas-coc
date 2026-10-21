@@ -89,7 +89,7 @@ export default function Gestao() {
         </Ajuda>
       </p>
 
-      <h2><span className="idx">024</span> Quem chegou no período</h2>
+      <h2><span className="idx" /> Quem chegou no período</h2>
       <p className="nota">
         <b>Lead novo</b> é negociação criada sem nenhuma conversa nos 20 dias anteriores.
         <Ajuda titulo="Novo, conhecido e requentado"
@@ -129,7 +129,7 @@ export default function Gestao() {
         </div>
       )}
 
-      <h2><span className="idx">025</span> Conversas no período</h2>
+      <h2><span className="idx" /> Conversas no período</h2>
       {!linhas ? <p className="rotulo">Carregando</p> : (
         <div className="rolar">
           <table className="tabela">
@@ -157,7 +157,7 @@ export default function Gestao() {
         </div>
       )}
 
-      <h2><span className="idx">026</span> Dia a dia</h2>
+      <h2><span className="idx" /> Dia a dia</h2>
       {!dias ? <p className="rotulo">Carregando</p> : dias.length === 0 ? (
         <p className="mudo">Sem movimento no período.</p>
       ) : (
