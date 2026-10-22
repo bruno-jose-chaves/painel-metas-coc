@@ -14,7 +14,7 @@ type Caso = { quem: string | null; quando: string | null; onde: string | null; o
 const SEVERIDADE: Record<string, string> = { alta: "Atrapalha agora", media: "Vale olhar", baixa: "Pouca coisa" };
 const CLASSE: Record<string, string> = { alta: "atras", media: "atencao", baixa: "encerrada" };
 
-export default function Sugestoes() {
+export default function Sugestoes({ embutido }: { embutido?: boolean } = {}) {
   const { volta, em, minutos } = useAtualizacao();
   const [lista, setLista] = useState<Sugestao[] | null>(null);
   const [aberto, setAberto] = useState<string | null>(null);
@@ -37,11 +37,15 @@ export default function Sugestoes() {
 
   return (
     <>
-      <div className="rotulo">Conferência</div>
-      <h1>O que vale conferir</h1>
-      <p className="carimbo num">
-        Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
-      </p>
+      {!embutido && (
+        <>
+          <div className="rotulo">Conferência</div>
+          <h1>O que vale conferir</h1>
+          <p className="carimbo num">
+            Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
+          </p>
+        </>
+      )}
 
       <div className="faixa">
         <div>

@@ -36,7 +36,7 @@ const PORQUE: Record<string, string> = {
 
 const TIPOS = ["Pagamento pendente", "Conversa sem card", "Negociação parada"];
 
-export default function Escapando() {
+export default function Escapando({ embutido }: { embutido?: boolean } = {}) {
   const { volta, em, minutos } = useAtualizacao();
   const [resumo, setResumo] = useState<Resumo[] | null>(null);
   const [fila, setFila] = useState<Linha[] | null>(null);
@@ -57,11 +57,15 @@ export default function Escapando() {
 
   return (
     <>
-      <div className="rotulo">O que está escapando</div>
-      <h1>A fila do que ninguém está olhando</h1>
-      <p className="carimbo num">
-        Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
-      </p>
+      {!embutido && (
+        <>
+          <div className="rotulo">O que está escapando</div>
+          <h1>A fila do que ninguém está olhando</h1>
+          <p className="carimbo num">
+            Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
+          </p>
+        </>
+      )}
 
       <p className="nota">
         Lead some por caminhos diferentes, e cada caminho morava em uma tela diferente. Aqui é uma fila só.
@@ -77,8 +81,8 @@ export default function Escapando() {
       </p>
 
       <p className="nota" style={{ marginTop: 0 }}>
-        Esta tela não tem filtro de período de propósito: ela é a foto de agora. Card parado está
-        parado hoje, e conversa sem card olha sempre os últimos 14 dias.
+        A fila não tem filtro de período de propósito: ela é a foto de agora. Card parado está parado
+        hoje, e conversa sem card olha sempre os últimos 14 dias.
       </p>
 
       {!resumo ? <p className="rotulo">Carregando</p> : (

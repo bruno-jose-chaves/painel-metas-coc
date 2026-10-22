@@ -433,12 +433,10 @@ const telas = [
   ["/campanha/?v=historico", "O mesmo curso, ano a ano"],
   ["/campanha/?v=comparar", "Turma contra turma"],
   ["/campanha/?v=upsell", "Quem comprou um, comprou o outro?"],
-  ["/comercial/?v=lancamentos", "Lançamentos"],
   ["/comercial/?v=agente", "O agente está aquecendo"],
-  ["/comercial/?v=whats", "Toda conversa virou card?"],
   ["/comercial/?v=qualidade", "Quem chega, quem responde, quanto espera"],
-  ["/comercial/?v=escapando", "A fila do que ninguém está olhando"],
-  ["/comercial/?v=conferir", "O que vale conferir"],
+  ["/comercial/?v=atendimento", "O tamanho de cada buraco"],
+  ["/comercial/?v=lancamentos", "Matrícula por matrícula"],
   ["/comercial/", "Agente de Pré-vendas"],
   ["/marketing/", "Formulário embutido"],
   ["/guia/", "O que você quer saber?"],
@@ -463,25 +461,28 @@ for (const [rota, esperado] of telas) {
 }
 
 
-// A tela "A classificar" tem dois tipos no mesmo lugar. A volta acima exercita
-// o primeiro; esta exercita o segundo, que so aparece depois do clique.
-{
+// Telas com dois modos: o segundo so aparece depois do clique.
+for (const [rota, botao, esperado, arquivo] of [
+  ["/marketing/?v=classificar", /^Etiquetas/, "Etiquetas sem curso", "classificar_etiquetas"],
+  ["/comercial/?v=atendimento", /^Diagnóstico/, "Quanto tempo o card fica parado", "atendimento_diagnostico"],
+  ["/comercial/?v=lancamentos", /^O que vale conferir/, "Lista de conferência", "lancamentos_conferir"],
+]) {
   erros.length = 0;
-  await pg.goto("http://127.0.0.1:4599/marketing/?v=classificar", { waitUntil: "networkidle" });
-  await pg.getByRole("button", { name: /^Etiquetas/ }).click();
+  await pg.goto("http://127.0.0.1:4599" + rota, { waitUntil: "networkidle" });
+  await pg.getByRole("button", { name: botao }).click();
   await pg.waitForTimeout(700);
   const corpo = await pg.textContent("body");
-  const achou = corpo.includes("Por que a etiqueta importa") || corpo.includes("Etiquetas sem curso");
+  const achou = corpo.includes(esperado);
   if (!achou || erros.length) falhou = true;
-  console.log("A classificar · Etiquetas".padEnd(13), achou ? "render ok" : "FALTA o bloco de etiquetas",
+  console.log((rota + " · 2o modo").padEnd(13), achou ? "render ok" : `FALTA "${esperado}"`,
     erros.length ? "| ERRO: " + erros.join(" ~ ").slice(0, 300) : "|");
-  await pg.screenshot({ path: "/tmp/claude-0/tela_classificar_etiquetas.png", fullPage: true });
+  await pg.screenshot({ path: `/tmp/claude-0/tela_${arquivo}.png`, fullPage: true });
 }
 
 // Retratos para olho humano: notebook, que é onde a maioria usa, e telefone.
 // A conferência acima diz que renderizou; estas dizem se dá para ler.
 const retratos = [
-  ["notebook", 1280, 800, ["/", "/campanha/", "/comercial/", "/comercial/?v=whats", "/campanha/?v=comparar", "/campanha/?v=upsell", "/guia/"]],
+  ["notebook", 1280, 800, ["/", "/campanha/", "/comercial/", "/comercial/?v=atendimento", "/campanha/?v=comparar", "/campanha/?v=upsell", "/guia/"]],
   ["telefone", 390, 844, ["/", "/campanha/", "/comercial/", "/marketing/?v=classificar", "/campanha/?v=comparar", "/comercial/?v=lancamentos", "/ajustes/"]],
 ];
 for (const [nome, width, height, rotas] of retratos) {

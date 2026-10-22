@@ -41,6 +41,7 @@ const POR_PERGUNTA: Record<Pergunta, Sugestao[]> = {
   o_que_fazer_hoje: [
     { tela: "A estrela, no canto superior direito", link: "/", porque: "O que está aberto agora e some sozinho quando alguém resolve" },
     { tela: "Hoje · Operação do dia", link: "/?v=operacao", porque: "Lead novo, lead requentado e conversa do dia, pessoa por pessoa" },
+    { tela: "Comercial · O que está escapando", link: "/comercial/?v=atendimento", porque: "A fila do que some sem ninguém ver, com nome, dono e o que fazer" },
   ],
   de_onde_vem: [
     { tela: "Marketing · Captação", link: "/marketing/", porque: "Quantos leads entraram por dia e por página, contra a meta" },
@@ -52,6 +53,7 @@ const POR_PERGUNTA: Record<Pergunta, Sugestao[]> = {
     { tela: "Comercial · Time", link: "/comercial/", porque: "Quanto cada um recebeu de lead, fechou e deixou pendurado" },
     { tela: "Comercial · Lançamentos", link: "/comercial/?v=lancamentos", porque: "A matrícula como foi lançada: aluno, curso, valor e desconto" },
     { tela: "Comercial · Agente de Pré-vendas", link: "/comercial/?v=agente", porque: "Quanto do que o agente abriu respondeu, aqueceu e chegou no comercial" },
+    { tela: "Comercial · Qualidade do lead", link: "/comercial/?v=qualidade", porque: "Quem respondeu, quanto esperou pelo atendimento e quanto virou matrícula, por canal" },
   ],
   comparar: [
     { tela: "Campanha · Turma contra turma", link: "/campanha/?v=comparar", porque: "Duas turmas sobrepostas pelo dia da turma, no mesmo ponto de venda" },
@@ -62,7 +64,7 @@ const POR_PERGUNTA: Record<Pergunta, Sugestao[]> = {
   conferir_dado: [
     { tela: "O Ⓘ ao lado de cada bloco", link: "/", porque: "Diz de onde o número vem e quais bases foram cruzadas" },
     { tela: "Clicar no número", link: "/comercial/", porque: "Onde o painel conta matrícula, clicar abre a lista nome por nome" },
-    { tela: "Comercial · O que conferir", link: "/comercial/?v=conferir", porque: "Casos que o painel marcou como estranhos e pedem olho humano" },
+    { tela: "Comercial · Lançamentos, modo O que vale conferir", link: "/comercial/?v=lancamentos", porque: "Casos que o painel marcou como estranhos e pedem olho humano" },
     { tela: "Ajustes · Acesso e integrações", link: "/ajustes/?v=sistema", porque: "Última sincronização de cada fonte e saúde dos dados" },
   ],
 };
@@ -70,6 +72,7 @@ const POR_PERGUNTA: Record<Pergunta, Sugestao[]> = {
 const DO_DIA: Record<Papel, Sugestao[]> = {
   comercial: [
     { tela: "A estrela, no canto superior direito", link: "/", porque: "Mostra só o que é seu: conversa sem resposta, lead que voltou a falar, virada de preço" },
+    { tela: "Comercial · O que está escapando", link: "/comercial/?v=atendimento", porque: "Pagamento pendente, conversa sem card e negociação dormindo, na sua mão" },
   ],
   marketing: [
     { tela: "Marketing · A classificar", link: "/marketing/?v=classificar", porque: "Página, campanha do CRM ou etiqueta captando sem curso apontado não entra na conta de campanha nenhuma" },

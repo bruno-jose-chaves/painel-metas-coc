@@ -14,7 +14,7 @@ type Campanha = { id: string; nome: string };
 
 const PAGINA = 100;
 
-export default function Vendas() {
+export default function Vendas({ embutido }: { embutido?: boolean } = {}) {
   const { volta, em, minutos } = useAtualizacao();
   const [campanhas, setCampanhas] = useState<Campanha[]>([]);
   const [campanha, setCampanha] = useState("");
@@ -92,11 +92,15 @@ export default function Vendas() {
 
   return (
     <>
-      <div className="rotulo">Vendas</div>
-      <h1>Matrícula por matrícula</h1>
-      <p className="carimbo num">
-        Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
-      </p>
+      {!embutido && (
+        <>
+          <div className="rotulo">Vendas</div>
+          <h1>Matrícula por matrícula</h1>
+          <p className="carimbo num">
+            Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
+          </p>
+        </>
+      )}
 
       <div className="filtros">
         <label>

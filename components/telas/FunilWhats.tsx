@@ -5,7 +5,7 @@ import Ajuda from "@/components/Ajuda";
 import SeletorPeriodo from "@/components/Periodo";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
-import { num, pct, dataCurta } from "@/lib/formato";
+import { num, pct } from "@/lib/formato";
 
 // Conversa do WhatsApp contra card no CRM.
 //
@@ -27,6 +27,9 @@ type Pessoa = {
   etapa_desde: string | null; dias_na_etapa: number | null;
   status_negociacao: string | null; virou_matricula: boolean;
 };
+
+// A tabela "Pessoa a pessoa" saiu daqui: repetia, sem dono e sem o que fazer, a
+// mesma gente que a fila ao lado ja lista com nome, telefone e acao.
 type Etapa = {
   funil: string; etapa: string; abertas: number;
   mediana_dias: number; media_dias: number;
@@ -34,12 +37,11 @@ type Etapa = {
   por_dono: Record<string, number> | null;
 };
 
-export default function FunilWhats() {
+export default function FunilWhats({ embutido }: { embutido?: boolean } = {}) {
   const { volta, em, minutos } = useAtualizacao();
   const [periodo, setPeriodo] = useState<Periodo>(() => ultimosDias(14));
   const [pessoas, setPessoas] = useState<Pessoa[] | null>(null);
   const [etapas, setEtapas] = useState<Etapa[] | null>(null);
-  const [soFora, setSoFora] = useState(true);
 
   useEffect(() => {
     setPessoas(null);
@@ -69,15 +71,17 @@ export default function FunilWhats() {
     return [...m.entries()].sort((a, b) => b[1].total - a[1].total);
   }, [pessoas]);
 
-  const lista = soFora ? fora : (pessoas ?? []);
-
   return (
     <>
-      <div className="rotulo">WhatsApp e CRM</div>
-      <h1>Toda conversa virou card?</h1>
-      <p className="carimbo num">
-        Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
-      </p>
+      {!embutido && (
+        <>
+          <div className="rotulo">WhatsApp e CRM</div>
+          <h1>Toda conversa virou card?</h1>
+          <p className="carimbo num">
+            Dados de {horaCurta(em)}, atualiza sozinho a cada {minutos} minutos.
+          </p>
+        </>
+      )}
 
       <p className="nota">
         Quem conversou no WhatsApp no período e se existe negociação no CRM para essa pessoa.
@@ -127,10 +131,10 @@ export default function FunilWhats() {
               WhatsApp e não tem negociação no CRM. Sem card, ninguém acompanha, e a pessoa não
               aparece em nenhuma conta de funil.
               <br />
-              Esta tela é o diagnóstico, com o período que você escolher. Para trabalhar a lista com
-              nome, dono e o que fazer, a fila está em <b>O que está escapando</b>, que olha sempre os
-              últimos 14 dias e deixa o dia de hoje de fora, porque card aberto no fim do dia é normal.
-              Por isso os dois números não são iguais.
+              Este é o diagnóstico, com o período que você escolher. Para trabalhar a lista com nome,
+              dono e o que fazer, troque para <b>Fila para trabalhar</b>, ali em cima, que olha sempre
+              os últimos 14 dias e deixa o dia de hoje de fora, porque card aberto no fim do dia é
+              normal. Por isso os dois números não são iguais.
             </p>
           )}
 
@@ -208,53 +212,6 @@ export default function FunilWhats() {
             </div>
           )}
 
-          <div className="secao-topo">
-            <h2><span className="idx" /> Pessoa a pessoa</h2>
-            <div className="atalhos">
-              <button onClick={() => setSoFora(!soFora)}>
-                {soFora ? "Ver todo mundo" : "Ver só quem está fora do CRM"}
-              </button>
-            </div>
-          </div>
-          <div className="rolar">
-            <table className="tabela">
-              <thead>
-                <tr>
-                  <th>Nome</th>
-                  <th>Telefone</th>
-                  <th>Atendente</th>
-                  <th className="n">Conversas</th>
-                  <th>Última</th>
-                  <th>No CRM</th>
-                  <th>Etapa</th>
-                  <th className="n">Parado há</th>
-                </tr>
-              </thead>
-              <tbody>
-                {lista.slice(0, 300).map((p) => (
-                  <tr key={p.telefone} className={!p.tem_negociacao ? "fora" : undefined}>
-                    <td><b>{p.nome ?? "(sem nome)"}</b></td>
-                    <td className="num">{p.telefone}</td>
-                    <td className="mudo">{p.atendente ?? "-"}</td>
-                    <td className="n">{num(p.conversas)}</td>
-                    <td className="mudo num">{dataCurta(p.ultima)}</td>
-                    <td>
-                      {p.tem_negociacao
-                        ? <span className="selo no_ritmo">sim</span>
-                        : <span className="selo atras">não</span>}
-                    </td>
-                    <td className="mudo">{p.etapa ?? "-"}</td>
-                    <td className="n mudo num">
-                      {p.dias_na_etapa == null ? "-" : num(p.dias_na_etapa) + " dias"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {lista.length > 300 && (
-            <p className="rodape">Mostrando as 300 primeiras de {num(lista.length)}.</p>
-          )}
           <p className="rodape">
             O telefone da conversa vem dos eventos de sessão do Pigeon, que começaram a chegar em
             30/09/2026. Conversa anterior a isso não tem telefone guardado e fica fora desta conta.
