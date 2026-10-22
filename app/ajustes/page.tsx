@@ -1,16 +1,13 @@
 "use client";
 import Shell from "@/components/Shell";
 import SubAbas, { useAba, type Aba } from "@/components/SubAbas";
+import { telasDe } from "@/lib/telas";
 import Cadastro from "@/components/telas/Cadastro";
 import Configuracao from "@/components/telas/Configuracao";
 import Cursos from "@/components/telas/Cursos";
 
 // O que é ajuste de sistema sai do caminho de quem só quer ver número.
-const ABAS: Aba[] = [
-  { id: "campanhas", codigo: 510, nome: "Campanhas e metas", oque: "Cadastro de campanha, fases, metas de venda e de captação, produtos e turmas por ano." },
-  { id: "cursos", codigo: 520, nome: "Cursos e produtos", oque: "Para onde cada nome de curso da planilha vai, e onde apontar o destino do que a regra não reconhece." },
-  { id: "sistema", codigo: 530, nome: "Acesso e integrações", oque: "Quem entra no painel, estado das integrações, última sincronização e saúde dos dados." },
-];
+const ABAS: Aba[] = telasDe("ajustes");
 
 function Tela({ admin }: { admin: boolean }) {
   const { aba, escolher } = useAba(ABAS);

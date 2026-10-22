@@ -98,6 +98,8 @@ export default function Guia() {
       <h1>O que você quer saber?</h1>
       <p className="nota">
         Duas perguntas e o painel diz quais telas abrir, na ordem. Nada aqui muda dado nenhum.
+        Se você já sabe o que procura, o <b>Procurar</b> lá em cima abre a tela direto pelo nome,
+        pela palavra que você usaria falando ou pelo código de três dígitos.
       </p>
 
       <h2><span className="idx" /> O que você faz</h2>

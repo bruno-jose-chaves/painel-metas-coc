@@ -6,18 +6,14 @@ import { supabase } from "@/lib/supabase";
 import Insights from "@/components/Insights";
 import { TarjaFontes } from "@/components/Fontes";
 import Indice from "@/components/Indice";
+import Busca from "@/components/Busca";
+import { AREAS } from "@/lib/telas";
 
 // Cinco áreas, no caminho que a pergunta faz: como estamos hoje, como vai a
 // campanha, quem está vendendo, de onde vem o lead, e o que é ajuste de
-// sistema. Antes eram nove abas, o que obrigava a lembrar em qual delas estava
-// cada número.
-const MENU: { href: string; nome: string; oque: string; soAdmin?: boolean }[] = [
-  { href: "/", nome: "Hoje", oque: "O dia de hoje e o cartão de cada campanha no ar" },
-  { href: "/campanha/", nome: "Campanha", oque: "Uma campanha por dentro: fases, funil, origem, histórico e upsell" },
-  { href: "/comercial/", nome: "Comercial", oque: "Quem vende, o que foi vendido e o que está parado na mão de quem" },
-  { href: "/marketing/", nome: "Marketing", oque: "De onde vem o lead e se ele chegou inteiro no comercial" },
-  { href: "/ajustes/", nome: "Ajustes", oque: "Cadastro, integrações e saúde dos dados", soAdmin: true },
-];
+// sistema. A lista mora em lib/telas.ts, que é também o que a busca lê, para
+// não existirem dois mapas do painel que podem discordar.
+const MENU = AREAS.map((a) => ({ href: a.href, nome: a.nome, oque: a.oque, soAdmin: a.soAdmin }));
 
 type Estado = "carregando" | "sem_sessao" | "nao_autorizado" | "ok";
 
@@ -127,6 +123,7 @@ export default function Shell({ children }: { children: (ctx: { admin: boolean; 
         </nav>
         {/* Era um "?" e ninguém entendia o que havia atrás. Agora diz o que é.
             Fica ao lado da estrela: um é o que fazer hoje, o outro é onde olhar. */}
+        <Busca admin={admin} />
         <a className="como-usar" href="/guia/" title="Por onde começar no painel">Como usar</a>
         <Insights />
         <button className="sair" onClick={sair}>Sair</button>

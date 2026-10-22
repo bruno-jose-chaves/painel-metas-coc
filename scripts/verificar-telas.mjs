@@ -479,6 +479,21 @@ for (const [rota, botao, esperado, arquivo] of [
   await pg.screenshot({ path: `/tmp/claude-0/tela_${arquivo}.png`, fullPage: true });
 }
 
+// A busca: escrever uma palavra que nao e o nome da tela tem que levar nela.
+for (const [termo, esperado] of [["comissao", "Comercial · Time"], ["etiqueta", "Marketing · A classificar"], ["340", "Comercial · Qualidade do lead"]]) {
+  erros.length = 0;
+  await pg.goto("http://127.0.0.1:4599/", { waitUntil: "networkidle" });
+  await pg.getByRole("button", { name: /Procurar/ }).click();
+  await pg.locator(".busca-campo").fill(termo);
+  await pg.waitForTimeout(250);
+  const primeiro = (await pg.locator(".busca-lista button").first().textContent()) ?? "";
+  const achou = primeiro.includes(esperado);
+  if (!achou || erros.length) falhou = true;
+  console.log(("busca: " + termo).padEnd(13), achou ? "render ok" : `FALTA "${esperado}" (veio "${primeiro.slice(0, 60)}")`,
+    erros.length ? "| ERRO: " + erros.join(" ~ ").slice(0, 200) : "|");
+  if (termo === "etiqueta") await pg.screenshot({ path: "/tmp/claude-0/tela_busca.png" });
+}
+
 // Retratos para olho humano: notebook, que é onde a maioria usa, e telefone.
 // A conferência acima diz que renderizou; estas dizem se dá para ler.
 const retratos = [

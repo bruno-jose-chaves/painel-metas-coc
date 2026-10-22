@@ -1,15 +1,13 @@
 "use client";
 import Shell from "@/components/Shell";
 import SubAbas, { useAba, type Aba } from "@/components/SubAbas";
+import { telasDe } from "@/lib/telas";
 import Visao from "@/components/telas/Visao";
 import Gestao from "@/components/telas/Gestao";
 
 // A primeira tela responde "como estamos hoje". O resumo é o que todo mundo vê;
 // a operação do dia, com lead novo, requentado e conversa, é leitura de diretoria.
-const ABAS: Aba[] = [
-  { id: "resumo", codigo: 110, nome: "Resumo", oque: "Matrículas, faturamento e leads do período, e o cartão de cada campanha no ar com meta, ritmo e projeção." },
-  { id: "operacao", codigo: 120, nome: "Operação do dia", oque: "Lead novo, lead requentado e conversa do dia, pessoa por pessoa. Leitura de diretoria." },
-];
+const ABAS: Aba[] = telasDe("hoje");
 
 function Tela({ admin }: { admin: boolean }) {
   const { aba, escolher } = useAba(ABAS);

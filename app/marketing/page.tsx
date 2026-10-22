@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Shell from "@/components/Shell";
 import SubAbas, { useAba, type Aba } from "@/components/SubAbas";
+import { telasDe } from "@/lib/telas";
 import Anuncios from "@/components/Anuncios";
 import Passagem from "@/components/Passagem";
 import Classificar from "@/components/telas/Classificar";
@@ -26,15 +27,14 @@ function Tela({ admin }: { admin: boolean }) {
         .filter((l) => l.situacao === "alerta").length));
   }, []);
 
-  const abas: Aba[] = [
-    { id: "captacao", codigo: 410, nome: "Captação", oque: "Quantos leads entraram por dia e por página, contra a meta de captação da campanha." },
-    { id: "anuncios", codigo: 420, nome: "Anúncios", oque: "Quantas conversas cada peça de clique para WhatsApp precisa para sair uma matrícula." },
-    { id: "passagem", codigo: 430, nome: "Passagem para o CRM", marcador: passagem, oque: "Se o lead que o formulário captou virou mesmo negociação no comercial." },
-    { id: "classificar", codigo: 440,
-      nome: "A classificar",
-      marcador: paginas == null && etiquetas == null ? null : (paginas ?? 0) + (etiquetas ?? 0),
-      oque: "Páginas, campanhas do CRM e etiquetas que já estão captando e ainda não foram ligadas a um curso." },
-  ];
+  // Os nomes e o que cada aba faz moram em lib/telas.ts, junto com o que a
+  // busca lê. Aqui só entra o marcador, que é número vivo e muda o dia todo.
+  const marcadores: Record<string, number | null> = {
+    passagem,
+    classificar: paginas == null && etiquetas == null ? null : (paginas ?? 0) + (etiquetas ?? 0),
+  };
+  const abas: Aba[] = telasDe("marketing").map((t) => ({ ...t, marcador: marcadores[t.id] ?? undefined }));
+
   const { aba, escolher } = useAba(abas);
 
   return (
