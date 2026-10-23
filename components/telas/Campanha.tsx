@@ -452,11 +452,11 @@ export default function Campanha() {
               <div className="valor num">{num(funil.dias_max)} dias</div>
             </div>
             <div>
-              <div className="rotulo">Como foram ligadas</div>
+              <div className="rotulo">De onde veio a certeza</div>
               <div className="valor num" style={{ fontSize: 20 }}>
                 {num(funil.por_email)} e-mail · {num(funil.por_telefone)} telefone
               </div>
-              <div className="mudo num">{num(funil.por_nome)} por nome, para conferir</div>
+              <div className="mudo num">{num(funil.por_nome)} por nome, que é o frágil</div>
             </div>
           </div>
 
