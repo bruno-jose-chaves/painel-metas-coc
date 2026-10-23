@@ -389,6 +389,18 @@ const rotas0 = {
     { nome: "Marcia Laurett", itens: 212, enviado_em: "2026-10-23T11:30:09Z" },
     { nome: "(consolidado)", itens: 0, enviado_em: "2026-10-23T11:30:12Z" },
   ],
+  "rpc/painel_anuncio_pessoas": [
+    { pessoa: "Ana Clara", telefone: "47988112233", quando: "2026-10-18", conversas: 2, atendente: "Marcia",
+      primeira_mensagem: "Olá! Tenho interesse no curso Missão UFSC", virou_matricula: true, curso: "Missão UFSC",
+      link: "https://pigeon.runus.com.br/redirect?type=SESSION&id=abc" },
+    { pessoa: "Bruno Henrique", telefone: "48997654321", quando: "2026-10-17", conversas: 1, atendente: "João",
+      primeira_mensagem: null, virou_matricula: false, curso: null, link: null },
+  ],
+  "rpc/painel_pendencia_pessoas": [
+    { pessoa: "Carla Souza", telefone: "47988468060", email: "carla@exemplo.com", quando: "2026-10-16",
+      onde: "Funil principal · Negociação", virou_matricula: false,
+      link: "https://pigeon.runus.com.br/redirect?type=SESSION&id=def" },
+  ],
   "rpc/fila_da_pessoa": "*Sua fila · 23/10*\n\n212 itens estão esperando você.",
 };
 
@@ -470,6 +482,23 @@ for (const [rota, esperado] of telas) {
   await pg.screenshot({ path: `/tmp/claude-0/tela${rota.replace(/\//g, "_")}.png`, fullPage: true });
 }
 
+
+// As gavetas de gente: o numero agregado tem que abrir a lista de quem.
+for (const [rota, celula, esperado, arquivo] of [
+  ["/marketing/?v=anuncios", "Ana Clara", "Quem chegou por esta peça", "anuncio_pessoas"],
+  ["/marketing/?v=classificar", "Carla Souza", "Abrir no Pigeon", "classificar_pessoas"],
+]) {
+  erros.length = 0;
+  await pg.goto("http://127.0.0.1:4599" + rota, { waitUntil: "networkidle" });
+  await pg.locator("td.abre").first().click();
+  await pg.waitForTimeout(700);
+  const corpo = await pg.textContent("body");
+  const achou = corpo.includes(esperado) && corpo.includes(celula);
+  if (!achou || erros.length) falhou = true;
+  console.log((rota + " · gaveta").padEnd(13), achou ? "render ok" : `FALTA "${esperado}"`,
+    erros.length ? "| ERRO: " + erros.join(" ~ ").slice(0, 200) : "|");
+  await pg.screenshot({ path: `/tmp/claude-0/tela_${arquivo}.png`, fullPage: true });
+}
 
 // Telas com dois modos: o segundo so aparece depois do clique.
 for (const [rota, botao, esperado, arquivo] of [

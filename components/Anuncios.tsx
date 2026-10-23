@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import FiltroCampanha, { type Campanha } from "@/components/FiltroCampanha";
 import { supabase } from "@/lib/supabase";
 import Ajuda from "@/components/Ajuda";
+import Pessoas from "@/components/Pessoas";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num } from "@/lib/formato";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
@@ -31,6 +32,7 @@ export default function Anuncios() {
   const [campanhas, setCampanhas] = useState<Campanha[]>([]);
   const [campanha, setCampanha] = useState<string | null>(null);
   const [lista, setLista] = useState<Anuncio[] | null>(null);
+  const [aberto, setAberto] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.from("resumo_campanhas").select("id,nome,inicio,fim,produto_id").order("inicio")
@@ -125,7 +127,8 @@ export default function Anuncios() {
                     )}
                   </td>
                   <td className="mudo">{nomeRede(a.rede)}</td>
-                  <td className="n"><b>{num(a.pessoas)}</b></td>
+                  <td className="n abre" title="Ver quem chegou por esta peça"
+                      onClick={() => setAberto(a.anuncio)}><b>{num(a.pessoas)}</b></td>
                   <td><div className="mini"><i style={{ width: `${(Number(a.pessoas) / maior) * 100}%` }} /></div></td>
                   <td className="n">{num(a.conversas)}</td>
                   <td className="n">{Number(a.matriculas) > 0 ? <b>{num(a.matriculas)}</b> : "-"}</td>
@@ -156,6 +159,16 @@ export default function Anuncios() {
           que traz aluno.
         </Ajuda>
       </p>
+
+      {aberto && (
+        <Pessoas
+          titulo={aberto}
+          rotulo="Quem chegou por esta peça"
+          rpc="painel_anuncio_pessoas"
+          params={{ p_anuncio: aberto, p_de: periodo.de, p_ate: periodo.ate }}
+          aoFechar={() => setAberto(null)}
+        />
+      )}
     </>
   );
 }

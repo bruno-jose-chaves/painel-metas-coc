@@ -1506,3 +1506,7 @@ select:disabled, input:disabled { color: var(--cinza-claro); background: var(--s
   max-height: 420px;
   overflow: auto;
 }
+
+/* Link com cara de botão: sem sublinhado e sem quebrar no meio do rótulo.
+   "Abrir no Pigeon" vinha quebrando em duas linhas dentro da célula. */
+a.btn { text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; }

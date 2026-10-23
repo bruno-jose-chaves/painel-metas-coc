@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Ajuda from "@/components/Ajuda";
 import Chave from "@/components/Chave";
+import Pessoas from "@/components/Pessoas";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, dataCurta } from "@/lib/formato";
 import { useIndicadores, useDestinos, partirDestino, type Indicador, type Destino } from "@/lib/indicadores";
@@ -30,6 +31,7 @@ export default function Pendencias({ admin, embutido }: { admin: boolean; embuti
   const [aviso, setAviso] = useState("");
   const [tudo, setTudo] = useState(false);
   const [apontando, setApontando] = useState<string | null>(null);
+  const [aberto, setAberto] = useState<Pendencia | null>(null);
   const indicadores = useIndicadores();
   const destinos = useDestinos();
 
@@ -171,7 +173,8 @@ export default function Pendencias({ admin, embutido }: { admin: boolean; embuti
                     )}
                   </td>
                   <td className="mudo">{TIPO[p.tipo] ?? p.tipo}</td>
-                  <td className="n"><b>{num(p.volume)}</b></td>
+                  <td className="n abre" title="Ver quem chegou por aqui"
+                      onClick={() => setAberto(p)}><b>{num(p.volume)}</b></td>
                   <td className="n">{Number(p.matriculas) > 0 ? num(p.matriculas) : "-"}</td>
                   <td className="mudo num">{dataCurta(p.primeira)} a {dataCurta(p.ultima)}</td>
                   {admin && (
@@ -211,6 +214,16 @@ export default function Pendencias({ admin, embutido }: { admin: boolean; embuti
         </div>
       )}
       {aviso && <div className="aviso ok" style={{ marginTop: 12 }}>{aviso}</div>}
+
+      {aberto && (
+        <Pessoas
+          titulo={aberto.valor}
+          rotulo={TIPO[aberto.tipo] ?? aberto.tipo}
+          rpc="painel_pendencia_pessoas"
+          params={{ p_tipo: aberto.tipo, p_valor: aberto.valor, p_desde: "2026-08-01" }}
+          aoFechar={() => setAberto(null)}
+        />
+      )}
 
       <h2><span className="idx" /> Regras já apontadas</h2>
       <p className="nota">
