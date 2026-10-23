@@ -180,7 +180,7 @@ export default function Leads() {
       <p className="rodape">
         O RD só conta visita nas páginas hospedadas por ele.
         <Ajuda titulo="Por que a conversão às vezes passa de 100%"
-          fontes={["Visitas e conversões: RD Station Marketing (tabela rd_conversoes_diarias)"]}>
+          fontes={["Visitas e conversões: RD Station Marketing"]}>
           Quando a página é feita em HTML no site de vocês e usa um formulário embutido do RD, a conversão é
           contada e a visita não. Por isso a taxa dessas páginas aparece alta demais, ou a visita aparece zerada.
         </Ajuda>

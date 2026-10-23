@@ -91,10 +91,10 @@ export default function Anuncios() {
       <p className="nota">
         Quem chegou por peça de clique para WhatsApp, ligado à matrícula pelo telefone.
         <Ajuda titulo="Como a peça vira matrícula"
-          fontes={["Conversa e peça de origem: Pigeon Post (tabelas pigeon_contatos e pigeon_conversas, campo utm)",
-                   "Matrícula: planilha comercial (tabela vendas)",
+          fontes={["Conversa e peça de origem: Pigeon Post",
+                   "Matrícula: planilha comercial",
                    "Ligação: telefone normalizado, e só vale se a venda veio depois da conversa",
-                   "Janela de atribuição: 45 dias no intensivo, 60 no Semi e no Extensivo (tabela produtos)"]}>
+                   "Janela de atribuição: 45 dias no intensivo, 60 no Semi e no Extensivo"]}>
           O lead de anúncio de clique para WhatsApp não passa por formulário, então o RD não o vê. Quem registra
           é o Pigeon, que guarda a peça que originou a conversa.
         </Ajuda>

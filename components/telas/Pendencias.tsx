@@ -126,9 +126,9 @@ export default function Pendencias({ admin, embutido }: { admin: boolean; embuti
       <p className="nota">
         Campanhas do CRM e formulários que o painel não conseguiu ligar a um curso sozinho.
         <Ajuda titulo="Por que resolver, e em que ordem"
-          fontes={["Campanhas: RD Station CRM (tabela rd_negociacoes, campo campanha)",
-                   "Formulários: RD Station Marketing (tabela rd_conversoes_diarias)",
-                   "A decisão apontada aqui vira regra na tabela captacao_regras"]}>
+          fontes={["Campanhas: RD Station CRM",
+                   "Formulários: RD Station Marketing",
+                   "A decisão apontada aqui vira regra e passa a valer para o que chegar depois"]}>
           Enquanto não forem apontados, esses leads ficam fora dos filtros por curso. O maior volume vem
           primeiro, então resolver os primeiros já fecha a maior parte do buraco. A lista olha de 01/08/2026 em
           diante: o que aparece com nome de 2025 é peça antiga que continua no ar e segue trazendo lead agora, e

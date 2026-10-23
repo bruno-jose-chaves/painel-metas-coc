@@ -83,7 +83,7 @@ export default function Gestao() {
       <p className="nota">
         O histórico de conversa importado do Pigeon começa em 01/08/2026.
         <Ajuda titulo="O que isso limita"
-          fontes={["Conversas e mensagens: Pigeon Post (tabela conversas_eventos)"]}>
+          fontes={["Conversas e mensagens: Pigeon Post"]}>
           As regras de 15 e 20 dias valem cheias de 21/08 em diante. Antes disso, quem conversou em julho pode
           aparecer como lead novo, porque o painel não enxerga a conversa anterior.
         </Ajuda>
@@ -93,8 +93,8 @@ export default function Gestao() {
       <p className="nota">
         <b>Lead novo</b> é negociação criada sem nenhuma conversa nos 20 dias anteriores.
         <Ajuda titulo="Novo, conhecido e requentado"
-          fontes={["Negociações: RD Station CRM (tabela rd_negociacoes)",
-                   "Conversas: Pigeon Post (tabela conversas_eventos), ligadas pelo telefone"]}>
+          fontes={["Negociações: RD Station CRM",
+                   "Conversas: Pigeon Post, ligadas pelo telefone"]}>
           Gente que entrou agora. Quem já falou com a gente antes disso entra como conhecido, e requentado é
           quem voltou a falar depois de um tempo parado.
         </Ajuda>

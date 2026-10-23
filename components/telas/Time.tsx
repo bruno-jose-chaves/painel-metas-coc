@@ -101,9 +101,9 @@ export default function Time() {
       <p className="nota">
         Para cobrança de meta vale a coluna <b>Alunos</b>, não a de ganhas no CRM.
         <Ajuda titulo="Por que duas contagens"
-          fontes={["Alunos: planilha comercial (tabela vendas)",
-                   "Ganhas no CRM: RD Station CRM (tabela rd_negociacoes, status ganha)",
-                   "As duas se ligam por e-mail, telefone ou nome, na tabela cruzamentos"]}>
+          fontes={["Alunos: planilha comercial",
+                   "Ganhas no CRM: negociação marcada como ganha no RD Station CRM",
+                   "As duas se ligam por e-mail, telefone ou nome"]}>
           Alunos é a planilha comercial, que é a fonte firme: a venda entra no dia em que aconteceu.
           Ganhas no CRM é outra contagem, do RD, e costuma ficar atrás porque o negócio às vezes é fechado no
           dia seguinte, e porque nem toda venda tem negócio correspondente.
@@ -127,11 +127,11 @@ export default function Time() {
       <p className="nota">
         Matrícula por dia no período e no curso escolhidos acima, com uma linha de comparação ao lado.
         <Ajuda titulo="Como ler"
-          fontes={["Planilha comercial (tabela vendas), pela data da venda",
+          fontes={["Planilha comercial, pela data da venda",
                    "Cancelada não entra",
                    "Período anterior: a mesma quantidade de dias imediatamente antes",
                    "Ano passado: as mesmas datas, um ano atrás",
-                   "Mesma turma: tabela turmas, pela janela de venda de cada turma"]}>
+                   "Mesma turma: pela janela de venda cadastrada para cada turma"]}>
           <b>Por dia</b> mostra o que entrou em cada data, que é onde se vê pico e buraco.
           <b> Acumulado</b> mostra o total somado, que é onde se vê aceleração ou freio.
           A comparação é alinhada por posição no período, dia 1 contra dia 1, não por data do calendário.
@@ -271,8 +271,8 @@ export default function Time() {
       <p className="rodape">
         <b>Conversão</b> é ganhas sobre o funil inteiro do período, não só sobre o que já foi decidido.
         <Ajuda titulo="Por que contar o funil inteiro"
-          fontes={["Negociações: RD Station CRM (tabela rd_negociacoes)",
-                   "Alunos e faturamento: planilha comercial (tabela vendas)"]}>
+          fontes={["Negociações: RD Station CRM",
+                   "Alunos e faturamento: planilha comercial"]}>
           Ganhas mais perdidas mais o que ainda está em aberto. Contar só o que já foi decidido inflava o
           número, porque a maior parte do funil ainda não decidiu. Venda automática é a matrícula fechada sem
           vendedor na planilha, ou seja a compra que o aluno fez sozinho pelo site: ela entra no faturamento mas

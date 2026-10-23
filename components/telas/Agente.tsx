@@ -83,16 +83,16 @@ export default function Agente() {
         De tudo que o agente abriu, quanto o cliente respondeu e quanto chegou no comercial.
         <Ajuda titulo="O que cada número conta"
           fontes={[
-            "Atendidos: conversas abertas no número do agente (tabela pigeon_conversas, canal pre_venda)",
-            "Responderam e aqueceu: mensagens do cliente (tabela conversas_eventos), a partir de 05/10/2026",
-            "Entregue no CRM: negociação que saiu do funil SDR (tabela rd_eventos), a partir de 30/09/2026",
+            "Atendidos: conversas abertas no número do Agente de Pré-vendas, no Pigeon Post",
+            "Responderam e aqueceu: mensagens do cliente, a partir de 05/10/2026",
+            "Entregue no CRM: negociação que saiu do funil de pré-vendas, a partir de 30/09/2026",
             "Entregue no WhatsApp: o mesmo telefone abriu conversa no número do comercial depois",
             "Virou matrícula: o telefone aparece na planilha comercial depois do atendimento",
           ]}>
           <b>Atendido</b> é toda conversa que o agente abriu. <b>Respondeu</b> é aquela em que o cliente
           mandou ao menos uma mensagem de volta. <b>Aqueceu</b> exige três ou mais, que é quando deixa de
           ser educação e vira conversa. <b>Entregue</b> aparece em dois caminhos porque a passagem
-          acontece de dois jeitos: pelo CRM, quando a negociação sai do funil SDR, e pelo WhatsApp, quando
+          acontece de dois jeitos: pelo CRM, quando a negociação sai do funil de pré-vendas, e pelo WhatsApp, quando
           o comercial abre conversa com o mesmo telefone. Os dois contam, e nem sempre coincidem.
         </Ajuda>
       </p>
@@ -124,7 +124,7 @@ export default function Agente() {
             <div>
               <div className="rotulo">Chegou no comercial</div>
               <div className="valor num">{num(entregueCrm)}</div>
-              <div className="mudo">saíram do funil SDR</div>
+              <div className="mudo">saíram do funil de pré-vendas</div>
             </div>
             <div>
               <div className="rotulo">Virou matrícula</div>
@@ -167,7 +167,7 @@ export default function Agente() {
                   <th className="n">Atendidos</th>
                   <th className="n">Responderam</th>
                   <th className="n">Aqueceu</th>
-                  <th className="n">Saiu do SDR</th>
+                  <th className="n">Saiu da pré-venda</th>
                   <th className="n">Foi ao comercial</th>
                   <th className="n">Matrículas</th>
                 </tr>
@@ -198,9 +198,9 @@ export default function Agente() {
           <p className="nota">
             A conversa mostra o esforço. O funil mostra o que sobrou dele dentro do CRM.
             <Ajuda titulo="Por que as duas leituras convivem"
-              fontes={["Funil SDR: RD Station CRM (tabela rd_negociacoes, funil SDR)",
-                       "Entrega: existe negociação do mesmo contato fora do funil SDR, criada depois",
-                       "Curso de um lead de pré-vendas vem do contato, porque o funil SDR não é classificado"]}>
+              fontes={["RD Station CRM: o funil de pré-vendas, que é por onde o agente entrega o lead",
+                       "Entrega: existe negociação do mesmo contato fora do funil de pré-vendas, criada depois",
+                       "Curso de um lead de pré-vendas vem do contato, porque o funil de pré-vendas não guarda o curso"]}>
               Este bloco conta pelo CRM e o de cima conta pela conversa. Os dois medem o mesmo agente por
               caminhos diferentes e não precisam bater: um lead pode ter respondido no WhatsApp e nunca
               ter virado negociação, e o contrário também acontece. Diferença grande entre os dois é

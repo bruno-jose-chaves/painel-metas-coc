@@ -137,8 +137,8 @@ export default function Comparar() {
       <p className="nota">
         As duas curvas são alinhadas pelo dia da turma, não pela data do calendário.
         <Ajuda titulo="Por que o eixo é o dia da turma"
-          fontes={["Planilha comercial (tabela vendas), pela turma de cada venda",
-                   "Turma = produto + ano + semestre, com janela de venda própria (tabela turmas)",
+          fontes={["Planilha comercial, pela turma de cada venda",
+                   "Turma = produto + ano + semestre, com janela de venda própria",
                    "Cancelada não entra",
                    "A turma em curso para no dia de hoje, não cai para zero no resto do eixo"]}>
           Turmas abrem em meses diferentes. Se o eixo fosse a data, o Método/1 e o Método/2 nunca

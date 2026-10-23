@@ -86,9 +86,9 @@ export default function FunilWhats({ embutido }: { embutido?: boolean } = {}) {
       <p className="nota">
         Quem conversou no WhatsApp no período e se existe negociação no CRM para essa pessoa.
         <Ajuda titulo="Por que a leitura mudou"
-          fontes={["Conversas: tabela pigeon_conversas, telefone vindo dos eventos de sessão do Pigeon",
-                   "Negociação, etapa e tempo: RD Station CRM (tabelas rd_negociacoes e rd_contatos)",
-                   "Virou matrícula: planilha comercial (tabela vendas), cruzando por telefone"]}>
+          fontes={["Conversas e telefone: Pigeon Post",
+                   "Negociação, etapa e tempo: RD Station CRM",
+                   "Virou matrícula: planilha comercial, cruzando por telefone"]}>
           Esta tela mostrava etapa do funil pela etiqueta do Pigeon, e isso estava errado na raiz. A
           etiqueta é usada como botão: o comercial põe a etiqueta só para disparar a automação que move o
           card no CRM e tira logo depois, senão a automação dispara de novo a cada resposta do cliente.
@@ -167,12 +167,12 @@ export default function FunilWhats({ embutido }: { embutido?: boolean } = {}) {
             Negociação aberta no CRM, por etapa, e há quantos dias ela não sai do lugar.
             <b> Este bloco não segue o período escolhido acima</b>: card parado está parado agora.
             <Ajuda titulo="Por que tempo, e não conversão"
-              fontes={["RD Station CRM, tabela rd_negociacoes, campo etapa_desde",
+              fontes={["RD Station CRM: desde quando o card está na etapa em que está",
                        "Só negociação com status aberta",
                        "Histórico desde setembro de 2024, preenchido em todas as linhas"]}>
               Conversão por etapa não diz nada aqui, porque <b>Aguardando Pagamento</b> quer dizer link
               enviado e não dinheiro na conta: o card entra nessa etapa quando o cliente avisa que vai
-              comprar. Já o tempo parado diz muito. Mediana alta numa etapa é lead morto ocupando funil,
+              comprar. Já o tempo parado diz muito. Quando metade dos cards de uma etapa está parada há muito tempo, é lead morto ocupando funil,
               e card parado em Aguardando Pagamento é venda que foi dada como feita e não aconteceu.
             </Ajuda>
           </p>
@@ -184,7 +184,7 @@ export default function FunilWhats({ embutido }: { embutido?: boolean } = {}) {
                     <th>Funil</th>
                     <th>Etapa</th>
                     <th className="n">Abertas</th>
-                    <th className="n">Mediana parada</th>
+                    <th className="n">Metade parada há</th>
                     <th className="n">Parados +14d</th>
                     <th className="n">Parados +30d</th>
                     <th className="n">Mais antigo</th>

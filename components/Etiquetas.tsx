@@ -81,8 +81,8 @@ export default function Etiquetas({ admin, embutido }: { admin: boolean; embutid
       <p className="nota">
         Etiquetas que chegam do RD e ainda não têm curso apontado.
         <Ajuda titulo="Por que a etiqueta importa"
-          fontes={["Etiquetas: RD Station Marketing (tabela rd_conversoes, campo tags)",
-                   "Regra apontada aqui: tabela etiqueta_regras"]}>
+          fontes={["Etiquetas: RD Station Marketing",
+                   "A regra apontada aqui fica guardada no painel"]}>
           A etiqueta é o sinal mais barato que existe na base: vem preenchida em quase toda conversão e é o
           próprio marketing que escreve. Apontar uma etiqueta para um curso classifica de uma vez todo lead que
           a carrega.

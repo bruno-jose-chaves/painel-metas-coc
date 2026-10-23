@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase, SUPABASE_URL } from "@/lib/supabase";
 import Ajuda from "@/components/Ajuda";
+import FilaManha from "@/components/FilaManha";
 import Fontes from "@/components/Fontes";
 import Importacoes from "@/components/Importacoes";
 import { dataHora, dataCurta, num } from "@/lib/formato";
@@ -41,7 +42,9 @@ function AppRD({ servico, status, recarregar }: { servico: "rd_crm" | "rd_market
   return (
     <div className="bloco">
       <div className="card-top">
-        <div><div className="rotulo">{servico === "rd_crm" ? "003" : "004"}</div><h3 style={{ margin: "4px 0" }}>{NOMES[servico]}</h3></div>
+        {/* O numero escrito a mao aqui dentro nao e secao: o codigo da secao quem
+            da e o indice. Dois cartoes do mesmo bloco so precisam do nome. */}
+        <div><h3 style={{ margin: "4px 0" }}>{NOMES[servico]}</h3></div>
         <span className={"selo " + (status?.conectado ? "no_ritmo" : "nao_iniciada")}>{status?.conectado ? "Conectado" : status?.app_configurado ? "App cadastrado" : "Pendente"}</span>
       </div>
       <p className="mudo">URL de callback para cadastrar no App Publisher do RD:</p>
@@ -234,6 +237,8 @@ export default function Configuracao({ admin }: { admin: boolean }) {
 
       </div>
 
+      <FilaManha admin={admin} />
+
       <h2><span className="idx" /> Pigeon Post</h2>
       <div className="bloco">
         <div className="card-top">
@@ -288,8 +293,8 @@ export default function Configuracao({ admin }: { admin: boolean }) {
       <p className="nota">
         As conversões do RD Marketing vêm dia a dia, e dia que não foi buscado não aparece em lugar nenhum.
         <Ajuda titulo="Por que isso importa"
-          fontes={["Dias já buscados: tabela rd_mkt_dias",
-                   "Conversões: tabela rd_conversoes_diarias"]}>
+          fontes={["Dias já buscados do RD Marketing",
+                   "Conversões de formulário do RD Marketing"]}>
           Um buraco aqui faz todo número de captação do período ficar por baixo, sem erro visível em lugar
           nenhum. Por isso a cobertura é acompanhada dia a dia e o buraco vira aviso na estrela.
         </Ajuda>

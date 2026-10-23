@@ -90,10 +90,10 @@ export default function Cursos({ admin }: { admin: boolean }) {
       <p className="nota">
         Todo nome de curso que aparece na planilha, com o produto de destino e por qual caminho.
         <Ajuda titulo="Como o destino é resolvido"
-          fontes={["Nomes de curso: tabela vendas, coluna curso",
-                   "De-para manual: tabela curso_produto",
-                   "Regra por expressão: tabela produtos, campo regra_curso",
-                   "Material avulso não conta como aluno: tabela produtos, campo conta_aluno"]}>
+          fontes={["Nomes de curso: a coluna Curso da planilha comercial",
+                   "O que foi apontado à mão nesta tela",
+                   "A regra automática pelo nome, cadastrada em cada produto",
+                   "Material avulso não conta como aluno: marcado no cadastro do produto"]}>
           Primeiro o painel procura o nome no de-para manual. Se não achar, tenta as expressões de cada
           produto, na ordem. O manual sempre ganha da regra, então apontar aqui resolve de vez.
           Maiúscula, acento e espaço repetido são ignorados na comparação, por isso "Coc Aprova Med" e

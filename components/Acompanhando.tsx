@@ -96,8 +96,8 @@ export default function Acompanhando({ volta }: { volta: number }) {
         <p className="nota">
           Nada escolhido. Serve para ficar de olho em turma que ainda não virou campanha, como as de 2027.
           <Ajuda titulo="Por que isto existe separado das campanhas"
-            fontes={["Turmas e janela de venda: tabela turmas",
-                     "Matrículas: planilha comercial (tabela vendas), pela turma de cada venda",
+            fontes={["Turmas e janela de venda: cadastro em Ajustes, Campanhas e metas",
+                     "Matrículas: planilha comercial, pela turma de cada venda",
                      "Comparação: a turma equivalente do ano anterior, no mesmo dia de vida"]}>
             Campanha cadastrada tem meta, fase e projeção, e por isso ganha cartão próprio acima. Turma que
             ainda não é campanha não tem nada disso e simplesmente não aparece, que foi o que aconteceu com

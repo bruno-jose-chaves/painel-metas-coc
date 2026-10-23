@@ -6,7 +6,8 @@
 // busca leem todos desta lista.
 //
 // "termos" são as palavras que a pessoa usa quando procura, e que não aparecem
-// no nome da aba: ninguém procura por "Time", procura por "comissão".
+// no nome da aba: ninguém procura por "Time", procura por "vendedor"; ninguém
+// procura por "A classificar", procura por "etiqueta".
 
 export type Tela = {
   id: string;
@@ -62,8 +63,11 @@ export const AREAS: Area[] = [
     oque: "Quem vende, o que foi vendido e o que está parado na mão de quem",
     telas: [
       { id: "time", codigo: 310, nome: "Time",
-        oque: "Quanto cada vendedor recebeu de lead, quanto fechou e quanto está pendurado, com comissão e bônus no período.",
-        termos: ["comissão", "bônus", "vendedor", "meta do time", "conversão"] },
+        oque: "Quanto cada vendedor recebeu de lead, quanto fechou, quanto perdeu e quanto está pendurado, com o tempo que cada etapa está segurando negociação.",
+        // "comissão" e "bônus" ficaram de fora de propósito: o painel ainda não
+        // calcula nenhum dos dois, e apelido que leva a uma tela que não tem a
+        // resposta é pior do que não achar nada.
+        termos: ["vendedor", "quem vendeu", "ranking", "leads recebidos", "conversão", "perdidas", "motivo de perda"] },
       { id: "lancamentos", codigo: 320, nome: "Lançamentos",
         oque: "A matrícula como ela foi lançada (aluno, curso, valor de tabela, desconto e vendedor), e o que saiu estranho e vale conferir.",
         termos: ["desconto", "valor de tabela", "aluno", "matrícula", "cancelado", "conferir", "estranho", "erro na planilha"] },

@@ -157,8 +157,8 @@ export default function Historico() {
       <p className="nota">
         Alinhada pela semana do ano, não pelo dia da campanha.
         <Ajuda titulo="Por que pela semana"
-          fontes={["Planilha comercial (tabela vendas), pela data da venda",
-                   "Semestre resolvido pela janela de venda da turma (tabela turmas)"]}>
+          fontes={["Planilha comercial, pela data da venda",
+                   "Semestre resolvido pela janela de venda da turma"]}>
           A campanha muda de data a cada ano, então comparar pelo dia da campanha compara coisas diferentes.
           Lido pela semana do ano dá para ver se o curso está à frente ou atrás do mesmo momento dos anos
           anteriores.
@@ -213,7 +213,7 @@ export default function Historico() {
       <p className="rodape">
         <b>Até esta data</b> compara maçã com maçã: conta só a venda feita até o mesmo dia do ano.
         <Ajuda titulo="O que cada coluna conta"
-          fontes={["Planilha comercial (tabela vendas)",
+          fontes={["Planilha comercial",
                    "Turma e semestre: tabela turmas, pela janela de venda de cada uma"]}>
           Vale para os anos anteriores também, e dentro do mesmo semestre quando o curso tem duas turmas: o
           Método ACAFE do 1º semestre vende de janeiro a junho e o do 2º de julho a dezembro, então somar os

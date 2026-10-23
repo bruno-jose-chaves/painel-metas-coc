@@ -31,7 +31,7 @@ const PORQUE: Record<string, string> = {
   "Conversa sem card": "Falou com o comercial no WhatsApp e não tem negociação nenhuma no CRM. Não aparece em lista, em relatório, nem em follow-up de ninguém.",
   "Negociação parada": "Chegou até a negociação e dormiu. Ou volta para a mesa, ou vira perdida com motivo, que pelo menos ensina alguma coisa.",
   "Qualificação parada": "Base velha que ninguém mexe. Não é tarefa da semana, é faxina, por isso fica fora da fila.",
-  "Lead do SDR sem contato": "Lead que entrou no funil de pré-vendas e nunca foi tocado. O volume aqui é grande demais para fila: é decisão de campanha, não de pessoa.",
+  "Lead de pré-vendas sem contato": "Lead que entrou no funil de pré-vendas e nunca foi tocado. O volume aqui é grande demais para fila: é decisão de campanha, não de pessoa.",
 };
 
 const TIPOS = ["Pagamento pendente", "Conversa sem card", "Negociação parada"];
@@ -70,13 +70,13 @@ export default function Escapando({ embutido }: { embutido?: boolean } = {}) {
       <p className="nota">
         Lead some por caminhos diferentes, e cada caminho morava em uma tela diferente. Aqui é uma fila só.
         <Ajuda titulo="Como a fila é montada"
-          fontes={["Pagamento pendente e negociação parada: RD Station CRM (rd_negociacoes), campo etapa_desde",
+          fontes={["Pagamento pendente e negociação parada: RD Station CRM, pela data em que o card entrou na etapa",
                    "Conversa sem card: conversas do Pigeon cruzadas com negociações do CRM pelo telefone",
-                   "Já é aluno: planilha comercial (tabela vendas)"]}>
+                   "Já é aluno: planilha comercial"]}>
           A ordem é por quanto custa deixar parado, não por quando apareceu. <b>Pagamento pendente</b> vem
           primeiro porque é a venda mais perto de acontecer. O valor da negociação ficou de fora da
           ordenação de propósito: está preenchido em 1 de 1.991 negociações abertas, e ordenar por um
-          campo que o time não preenche é inventar prioridade.
+          informação que o time não preenche é inventar prioridade.
         </Ajuda>
       </p>
 
@@ -96,7 +96,7 @@ export default function Escapando({ embutido }: { embutido?: boolean } = {}) {
                   {num(r.quantos)}
                 </div>
                 <div className="mudo num">
-                  parado há {num(r.mediana_dias)} dias na mediana
+                  metade parada há mais de {num(r.mediana_dias)} dias
                 </div>
               </div>
             ))}
@@ -113,7 +113,7 @@ export default function Escapando({ embutido }: { embutido?: boolean } = {}) {
                 <tr>
                   <th>Tipo</th>
                   <th className="n">Quantos</th>
-                  <th className="n">Mediana</th>
+                  <th className="n">Metade parada há</th>
                   <th className="n">Mais parado</th>
                   <th>Por dono</th>
                   <th>Por que importa</th>

@@ -116,8 +116,8 @@ export default function Upsell() {
       <p className="nota">
         Escolha de um lado a base de alunos e do outro o curso que quer saber se eles compraram também.
         <Ajuda titulo="Como o cruzamento é feito"
-          fontes={["Planilha comercial (tabela vendas), pela turma de cada venda",
-                   "Turma = produto + ano + semestre (tabela turmas)",
+          fontes={["Planilha comercial, pela turma de cada venda",
+                   "Turma = produto + ano + semestre",
                    "Cruzamento por e-mail, telefone e nome normalizados",
                    "Conta pessoa, não matrícula: quem comprou o destino duas vezes conta uma"]}>
           Pode marcar mais de uma turma em cada lado. O painel traz junto o mesmo recorte do ano anterior, com

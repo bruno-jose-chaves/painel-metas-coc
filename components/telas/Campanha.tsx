@@ -305,8 +305,8 @@ export default function Campanha() {
       <p className="nota">
         A <b>meta ajustada</b> é a meta da fase corrigida pelo que as anteriores deixaram de trazer.
         <Ajuda titulo="Como a meta ajustada é calculada"
-          fontes={["Metas por fase: cadastro da campanha (tabela fases)",
-                   "Alunos: planilha comercial (tabela vendas), pela data dentro da fase",
+          fontes={["Metas por fase: cadastro da campanha",
+                   "Alunos: planilha comercial, pela data dentro da fase",
                    "saldo anterior = soma de (alunos - meta) das fases anteriores",
                    "meta ajustada = meta da fase - saldo anterior"]}>
           Fase que vende abaixo não some: o buraco cai na próxima, porque a meta da campanha não muda. Se cada
@@ -445,7 +445,7 @@ export default function Campanha() {
             <div>
               <div className="rotulo">Tempo até a matrícula</div>
               <div className="valor num">{num(funil.dias_mediana)} dias</div>
-              <div className="mudo num">mediana · média {num(funil.dias_medio)}</div>
+              <div className="mudo num">metade fecha em até isso · média {num(funil.dias_medio)}</div>
             </div>
             <div>
               <div className="rotulo">Lead mais antigo convertido</div>
@@ -493,10 +493,10 @@ export default function Campanha() {
           <p className="rodape">
         Cada matrícula é ligada à negociação do CRM que deu origem a ela.
         <Ajuda titulo="Como a ligação é feita"
-          fontes={["Matrícula: planilha comercial (tabela vendas)",
-                   "Negociação: RD Station CRM (tabela rd_negociacoes)",
+          fontes={["Matrícula: planilha comercial",
+                   "Negociação: RD Station CRM",
                    "Chaves, nessa ordem: e-mail, telefone e nome normalizados",
-                   "O resultado de cada ligação fica na tabela cruzamentos"]}>
+                   "O resultado de cada ligação entre as bases fica guardado no painel"]}>
           O que não tem par é venda que entrou sem passar pelo CRM, ou com dado diferente nos dois lugares.
           A cobertura diz quanto do total conseguiu ser ligado: quanto mais alta, mais confiável fica toda
           leitura de origem e de tempo de fechamento.
@@ -525,7 +525,7 @@ export default function Campanha() {
           <p className="rodape">
         Rematrícula é quem fez o mesmo curso na edição anterior e voltou.
         <Ajuda titulo="O que cada linha conta"
-          fontes={["Planilha comercial (tabela vendas), cruzando por e-mail, telefone e nome"]}>
+          fontes={["Planilha comercial, cruzando por e-mail, telefone e nome"]}>
           As outras linhas olham se a pessoa também tem compra de outro curso, antes ou depois. Conta pessoa,
           não matrícula.
         </Ajuda>

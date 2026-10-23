@@ -147,7 +147,7 @@ const escapandoResumo = [
   { tipo: "Conversa sem card", prioridade: 2, quantos: 61, mediana_dias: 7, mais_parado: 12, na_fila: true, por_dono: { Marcia: 39, "João": 22 } },
   { tipo: "Negociação parada", prioridade: 3, quantos: 205, mediana_dias: 68, mais_parado: 201, na_fila: true, por_dono: { "Marcia  Laurett": 168, "João Pedro Beraldo": 20, "Tarso Brietzke Iracet": 17 } },
   { tipo: "Qualificação parada", prioridade: 4, quantos: 364, mediana_dias: 68, mais_parado: 110, na_fila: false, por_dono: { "Marcia  Laurett": 300, "João Pedro Beraldo": 64 } },
-  { tipo: "Lead do SDR sem contato", prioridade: 5, quantos: 5701, mediana_dias: 172, mais_parado: 417, na_fila: false, por_dono: { "sem dono": 5701 } },
+  { tipo: "Lead de pré-vendas sem contato", prioridade: 5, quantos: 5701, mediana_dias: 172, mais_parado: 417, na_fila: false, por_dono: { "sem dono": 5701 } },
 ];
 const escapando = [
   { tipo: "Pagamento pendente", prioridade: 1, pessoa: "Juliana Reis", telefone: "47988112233", dono: "Marcia  Laurett", onde: "Funil principal · Aguardando Pagamento", dias: 164, desde: "2026-05-08", ja_e_aluno: false, o_que_fazer: "Cobrar o pagamento ou devolver o card para Negociação" },
@@ -380,6 +380,16 @@ const rotas0 = {
   vendas,
   sincronizacoes: [{ id: 1, fonte: "planilha:Vendas 2026", terminado_em: "2026-10-02T13:05:00Z", lidas: 860, importadas: 858, rejeitadas: 2, status: "ok" }],
   usuarios_autorizados: [{ email: "brunojose_chaves@hotmail.com", nome: "Bruno", papel: "admin" }],
+  pessoas_fila: [
+    { id: 1, nome: "Marcia Laurett", apelidos: ["Marcia", "Marcia  Laurett"], telefone: "47999990001", ativo: true },
+    { id: 2, nome: "João Pedro Beraldo", apelidos: ["João"], telefone: "47999990002", ativo: true },
+  ],
+  "rpc/fila_donos_sem_cadastro": [{ dono: "Tarso Brietzke Iracet", quantos: 33 }, { dono: "Kathleen", quantos: 3 }],
+  "rpc/fila_ultimos_envios": [
+    { nome: "Marcia Laurett", itens: 212, enviado_em: "2026-10-23T11:30:09Z" },
+    { nome: "(consolidado)", itens: 0, enviado_em: "2026-10-23T11:30:12Z" },
+  ],
+  "rpc/fila_da_pessoa": "*Sua fila · 23/10*\n\n212 itens estão esperando você.",
 };
 
 
@@ -480,7 +490,7 @@ for (const [rota, botao, esperado, arquivo] of [
 }
 
 // A busca: escrever uma palavra que nao e o nome da tela tem que levar nela.
-for (const [termo, esperado] of [["comissao", "Comercial · Time"], ["etiqueta", "Marketing · A classificar"], ["340", "Comercial · Qualidade do lead"]]) {
+for (const [termo, esperado] of [["vendedor", "Comercial · Time"], ["etiqueta", "Marketing · A classificar"], ["340", "Comercial · Qualidade do lead"]]) {
   erros.length = 0;
   await pg.goto("http://127.0.0.1:4599/", { waitUntil: "networkidle" });
   await pg.getByRole("button", { name: /Procurar/ }).click();

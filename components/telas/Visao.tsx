@@ -68,9 +68,9 @@ const naFaixa = (c: Resumo, f: Faixa) =>
 // por elas que se confere o número sem precisar abrir o RD.
 function fontesDoIndicador(m: MetaLead) {
   const f = [
-    "Conversões de formulário: RD Station Marketing (tabela rd_conversoes_diarias)",
-    "Pessoas no CRM: RD Station CRM (tabela rd_negociacoes)",
-    "Quais páginas entram neste indicador: tabela captacao_regras",
+    "Conversões de formulário: RD Station Marketing",
+    "Pessoas no CRM: RD Station CRM",
+    "Quais páginas entram neste indicador: as regras apontadas em Marketing, A classificar",
   ];
   if (m.identificadores?.length) f.push("Páginas contadas: " + m.identificadores.join(" · "));
   return f;
@@ -368,10 +368,10 @@ export default function Visao() {
           <p className="rodape">
         O Ⓘ ao lado de cada indicador diz o que ele conta e quais páginas entram.
         <Ajuda titulo="O que entra em cada indicador"
-          fontes={["Conversões de formulário: RD Station Marketing (tabela rd_conversoes_diarias)",
-                   "Pessoas no CRM: RD Station CRM (tabela rd_negociacoes)",
-                   "Quais formulários contam em cada indicador: tabela captacao_regras",
-                   "Material rico não conta como lead: tabela indicadores_captacao"]}>
+          fontes={["Conversões de formulário: RD Station Marketing",
+                   "Pessoas no CRM: RD Station CRM",
+                   "Quais formulários contam em cada indicador: as regras apontadas em Marketing, A classificar",
+                   "Material rico não conta como lead: definido no cadastro do indicador"]}>
           Material rico aparece separado e fora da conta de leads captados: quem baixa material vai para o
           Agente de Pré-vendas, não para a fila do comercial, e somar os dois inflaria a captação e pioraria a
           conversão do time sem ninguém ter feito nada errado. Leads captados e inscritos nas lives contam
@@ -463,7 +463,7 @@ export default function Visao() {
           <p className="rodape">
         Média e ritmo contam só dia útil.
         <Ajuda titulo="Por que só dia útil"
-          fontes={["Planilha comercial (tabela vendas)"]}>
+          fontes={["Planilha comercial"]}>
           Sábado e domingo somam pouco mais de três por cento das matrículas e, contados como dia normal,
           puxavam a média para baixo e faziam o ritmo necessário parecer menor do que é.
         </Ajuda>
@@ -471,9 +471,9 @@ export default function Visao() {
           <p className="rodape">
             São três leituras diferentes e elas podem discordar entre si.
             <Ajuda titulo="Por que as três leituras discordam"
-              fontes={["Esperado hoje: escada de fases da campanha (tabela campanha_fases)",
-                       "Ritmo das últimas semanas: média de 7 dias úteis (tabela vendas)",
-                       "Projeção: curva do mesmo curso no ano anterior (tabela vendas)"]}>
+              fontes={["Esperado hoje: escada de fases da campanha",
+                       "Ritmo das últimas semanas: média de 7 dias úteis",
+                       "Projeção: curva do mesmo curso no ano anterior"]}>
               <b>Esperado hoje</b> vem da escada de fases, então uma campanha que concentra venda no fim
               aparece adiantada no começo.<b> No ritmo das últimas semanas</b> repete a média de 7 dias até
               o fim, sem considerar sazonalidade. O <b>fecha em</b> do card da campanha pesa a curva do ano
