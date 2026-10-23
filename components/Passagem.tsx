@@ -14,6 +14,7 @@ type Linha = {
   identificador: string; conversoes: number; campanhas: string[] | null; pessoas_crm: number;
   taxa: number | null; situacao: string; primeira: string; ultima: string;
   diagnostico: string; sugestao: string | null;
+  sugestao_produto: string | null; sugestao_produto_nome: string | null; sugestao_indicador: string | null;
 };
 type Dia = { dia: string; conversoes: number; negocios: number; razao: number | null };
 
@@ -93,10 +94,13 @@ export default function Passagem({ admin }: { admin: boolean }) {
       <h2><span className="idx" /> Formulário por formulário</h2>
       <p className="nota">
         Ter formulário não faz o lead chegar no comercial: é preciso um fluxo no RD Marketing criando a negociação.
-        <Ajuda titulo="O que esta conta compara"
+        <Ajuda titulo="O que é apontar, e o que esta conta compara"
           fontes={["Conversões do formulário: RD Station Marketing",
                    "Pessoas no CRM: RD Station CRM, pela campanha ligada ao formulário",
                    "A ligação entre os dois é apontada à mão em Marketing, A classificar"]}>
+          <b>Apontar</b> é dizer ao painel duas coisas: de que curso é aquele formulário e qual campanha
+          do CRM o fluxo do RD cria quando alguém se inscreve nele. Sem esse par, o painel não tem como
+          saber que as duas pontas são a mesma coisa, e a passagem fica sem conferência.
           O nome desse fluxo é o que o comercial vê como campanha. Quando alguém publica um formulário e esquece
           o fluxo, a captação aparece no marketing e ninguém recebe o lead. Aqui a conta é direta: quanto o
           formulário converteu contra quantas pessoas entraram no CRM pela campanha ligada a ele.
@@ -112,7 +116,7 @@ export default function Passagem({ admin }: { admin: boolean }) {
               <tr>
                 <th>Formulário</th><th className="n">Conversões</th><th className="n">Pessoas no CRM</th>
                 <th className="n">Passagem</th><th>Situação</th><th>O que isso quer dizer</th>
-                {admin && <th>Ligar ao fluxo</th>}
+                {admin && <th>Apontar curso e campanha</th>}
               </tr>
             </thead>
             <tbody>
@@ -135,7 +139,7 @@ export default function Passagem({ admin }: { admin: boolean }) {
                   {admin && (
                     <td style={{ minWidth: 190 }}>
                       {l.situacao !== "sem_fluxo" ? (
-                        <span className="mudo">já ligado</span>
+                        <span className="mudo">já apontado</span>
                       ) : apontando === l.identificador ? (
                         <Apontar
                           linha={l}
@@ -145,10 +149,20 @@ export default function Passagem({ admin }: { admin: boolean }) {
                           aoCancelar={() => setApontando(null)}
                         />
                       ) : (
-                        <>
-                          {l.sugestao && <div className="ids" style={{ marginBottom: 4 }}>parece {l.sugestao}</div>}
-                          <button className="btn claro" onClick={() => setApontando(l.identificador)}>Ligar</button>
-                        </>
+                        <div style={{ display: "grid", gap: 6 }}>
+                          {/* O palpite já sabe o curso pelo nome do formulário:
+                              "mr" é material rico, "ufsc" é Missão UFSC. Quando
+                              sabe o curso e a campanha, vira um clique só. */}
+                          {l.sugestao_produto && l.sugestao && (
+                            <button className="btn" onClick={() => apontar(l, "p:" + l.sugestao_produto, l.sugestao_indicador ?? "leads", l.sugestao!)}>
+                              {l.sugestao_produto_nome} · {indicadores.find((i) => i.id === l.sugestao_indicador)?.nome ?? "Leads"}
+                            </button>
+                          )}
+                          {l.sugestao && <div className="ids">campanha no CRM: {l.sugestao}</div>}
+                          <button className="btn claro" onClick={() => setApontando(l.identificador)}>
+                            {l.sugestao_produto && l.sugestao ? "Outro destino" : "Apontar"}
+                          </button>
+                        </div>
                       )}
                     </td>
                   )}
@@ -196,8 +210,8 @@ function Apontar({
   aoConfirmar: (l: Linha, destino: string, indicador: string, campanhaCrm: string) => void;
   aoCancelar: () => void;
 }) {
-  const [destino, setDestino] = useState("");
-  const [indicador, setIndicador] = useState("leads");
+  const [destino, setDestino] = useState(linha.sugestao_produto ? "p:" + linha.sugestao_produto : "");
+  const [indicador, setIndicador] = useState(linha.sugestao_indicador ?? "leads");
   const [campanhaCrm, setCampanhaCrm] = useState(linha.sugestao ?? "");
   const grupos = Array.from(new Set(destinos.map((d) => d.grupo)));
 
@@ -227,7 +241,7 @@ function Apontar({
           disabled={!destino || !campanhaCrm.trim()}
           onClick={() => aoConfirmar(linha, destino, indicador, campanhaCrm.trim())}
         >
-          Ligar
+          Apontar
         </button>
         <button className="btn claro" onClick={aoCancelar}>Cancelar</button>
       </div>

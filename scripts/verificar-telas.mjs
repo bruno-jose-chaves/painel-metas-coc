@@ -230,8 +230,8 @@ const rotas0 = {
     { recorte: "ano anterior", base_nomes: ["Semi Extensivo 2025/1"], alvo_nomes: ["Método ACAFE 2025/2"], pessoas_base: 162, pessoas_alvo: 258, cruzaram: 16, taxa: 0.0988, faturamento_alvo: 7844.28, ticket_alvo: 490.27, dias_medio: 212 },
   ],
   "rpc/painel_passagem_crm": [
-    { identificador: "live-acafe-21-a-23-do-09", conversoes: 1031, campanhas: ["[ACAFE 26/2] LIVE"], pessoas_crm: 707, taxa: 0.6857, situacao: "atencao", primeira: "2026-08-06", ultima: "2026-10-06", diagnostico: "Parte dos inscritos não virou negociação.", sugestao: null },
-    { identificador: "reservas-metodo-acafe-26-2", conversoes: 513, campanhas: [], pessoas_crm: 0, taxa: null, situacao: "sem_fluxo", primeira: "2026-08-25", ultima: "2026-10-07", diagnostico: "Nenhum fluxo apontado para este formulário.", sugestao: "RESERVA MÉTODO ACAFE 2026/2" },
+    { identificador: "live-acafe-21-a-23-do-09", conversoes: 1031, campanhas: ["[ACAFE 26/2] LIVE"], pessoas_crm: 707, taxa: 0.6857, situacao: "atencao", primeira: "2026-08-06", ultima: "2026-10-06", diagnostico: "Parte dos inscritos não virou negociação.", sugestao: null, sugestao_produto: "metodo-acafe", sugestao_produto_nome: "Método de Aprovação ACAFE", sugestao_indicador: "inscritos_lives" },
+    { identificador: "reservas-metodo-acafe-26-2", conversoes: 513, campanhas: [], pessoas_crm: 0, taxa: null, situacao: "sem_fluxo", primeira: "2026-08-25", ultima: "2026-10-07", diagnostico: "Nenhum fluxo apontado para este formulário.", sugestao: "RESERVA MÉTODO ACAFE 2026/2", sugestao_produto: "metodo-acafe", sugestao_produto_nome: "Método de Aprovação ACAFE", sugestao_indicador: "reservas" },
   ],
   "rpc/painel_passagem_dia": [
     { dia: "2026-10-05", conversoes: 96, negocios: 61, razao: 0.635 },

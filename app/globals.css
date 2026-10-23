@@ -1052,6 +1052,14 @@ select:disabled, input:disabled { color: var(--cinza-claro); background: var(--s
 .abre { cursor: pointer; }
 
 .tabela tr.abre:hover td { background: var(--lima-suave); }
+/* Linha inteira clicável também precisa dizer isso parada, não só no hover. */
+.tabela tr.abre > td:first-child > b { border-bottom: 1px dashed var(--cinza); padding-bottom: 1px; }
+.tabela tr.abre > td:last-child::after {
+  content: "›";
+  margin-left: 8px;
+  color: var(--cinza);
+  font-weight: 700;
+}
 
 .tabela td.abre { transition: background .12s; }
 .tabela td.abre:hover { background: var(--lima-suave); }
