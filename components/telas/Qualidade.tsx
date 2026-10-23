@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useUltima } from "@/lib/consulta";
 import Ajuda from "@/components/Ajuda";
 import SeletorPeriodo from "@/components/Periodo";
 import Chave from "@/components/Chave";
@@ -39,6 +40,7 @@ type Espera = {
 type Filtro = { tipo: string; valor: string; rotulo: string; quantos: number };
 
 export default function Qualidade() {
+  const ultima = useUltima();
   const { volta, em, minutos } = useAtualizacao();
   const [periodo, setPeriodo] = useState<Periodo>(() => ultimosDias(30));
   const [atendente, setAtendente] = useState<string>("");
@@ -51,20 +53,20 @@ export default function Qualidade() {
 
   useEffect(() => {
     setLinhas(null);
-    supabase.rpc("painel_qualidade_lead", {
+    ultima("linhas", supabase.rpc("painel_qualidade_lead", {
       p_de: periodo.de, p_ate: periodo.ate,
       p_atendente: atendente || null, p_turma: turma || null,
       p_so_dia_util: soDiaUtil, p_so_horario_comercial: soComercial,
-    }).then(({ data }) => setLinhas((data as Linha[]) ?? []));
+    }), ({ data }) => setLinhas((data as Linha[]) ?? []));
   }, [periodo, atendente, turma, soDiaUtil, soComercial, volta]);
 
   useEffect(() => {
     // O bloco por dia da semana não recebe os filtros de dia útil e horário:
     // seria esconder justamente o que ele existe para mostrar.
-    supabase.rpc("painel_espera_atendimento", {
+    ultima("espera", supabase.rpc("painel_espera_atendimento", {
       p_de: periodo.de, p_ate: periodo.ate,
       p_atendente: atendente || null, p_turma: turma || null,
-    }).then(({ data }) => setEspera((data as Espera[]) ?? []));
+    }), ({ data }) => setEspera((data as Espera[]) ?? []));
     supabase.rpc("painel_filtros_conversa", { p_de: periodo.de, p_ate: periodo.ate })
       .then(({ data }) => setFiltros((data as Filtro[]) ?? []));
   }, [periodo, atendente, turma, volta]);

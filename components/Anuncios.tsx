@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import FiltroCampanha, { type Campanha } from "@/components/FiltroCampanha";
 import { supabase } from "@/lib/supabase";
+import { useUltima } from "@/lib/consulta";
 import Ajuda from "@/components/Ajuda";
 import Pessoas from "@/components/Pessoas";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
@@ -27,6 +28,7 @@ const nomeRede = (r: string | null) => {
 };
 
 export default function Anuncios() {
+  const ultima = useUltima();
   const { volta, em, minutos } = useAtualizacao();
   const [periodo, setPeriodo] = useState<Periodo>(ultimosDias(60));
   const [campanhas, setCampanhas] = useState<Campanha[]>([]);
@@ -43,8 +45,8 @@ export default function Anuncios() {
 
   useEffect(() => {
     setLista(null);
-    supabase.rpc("painel_anuncios", { p_de: periodo.de, p_ate: periodo.ate, p_produto: produto })
-      .then(({ data }) => setLista((data as Anuncio[]) ?? []));
+    ultima("anuncios", supabase.rpc("painel_anuncios", { p_de: periodo.de, p_ate: periodo.ate, p_produto: produto }),
+      ({ data }) => setLista((data as Anuncio[]) ?? []));
   }, [periodo, produto, volta]);
 
   const pessoas = lista?.reduce((s, a) => s + Number(a.pessoas), 0) ?? 0;

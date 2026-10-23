@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import FiltroCampanha, { type Campanha } from "@/components/FiltroCampanha";
 import Curva from "@/components/Curva";
 import { supabase } from "@/lib/supabase";
+import { useUltima } from "@/lib/consulta";
 import Ajuda from "@/components/Ajuda";
 import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
@@ -17,6 +18,7 @@ type Tag = { tag: string; leads: number; conversoes: number };
 const TIPO: Record<string, string> = { landing_page: "Landing page do RD", formulario: "Formulário embutido" };
 
 export default function Leads() {
+  const ultima = useUltima();
   const { volta, em, minutos } = useAtualizacao();
   const [periodo, setPeriodo] = useState<Periodo>(ultimosDias(30));
   const [campanhas, setCampanhas] = useState<Campanha[]>([]);
@@ -36,10 +38,10 @@ export default function Leads() {
   useEffect(() => {
     const p = { p_de: periodo.de, p_ate: periodo.ate, p_produto: produto };
     setDias(null); setOrigens(null); setFontes(null); setTags(null);
-    supabase.rpc("painel_leads_dia", p).then(({ data }) => setDias((data as Dia[]) ?? []));
-    supabase.rpc("painel_leads_origem", p).then(({ data }) => setOrigens((data as Origem[]) ?? []));
+    ultima("dias", supabase.rpc("painel_leads_dia", p), ({ data }) => setDias((data as Dia[]) ?? []));
+    ultima("origens", supabase.rpc("painel_leads_origem", p), ({ data }) => setOrigens((data as Origem[]) ?? []));
     supabase.rpc("painel_fontes", p).then(({ data }) => setFontes((data as Fonte[]) ?? []));
-    supabase.rpc("painel_tags", p).then(({ data }) => setTags((data as Tag[]) ?? []));
+    ultima("tags", supabase.rpc("painel_tags", p), ({ data }) => setTags((data as Tag[]) ?? []));
   }, [periodo, produto, volta]);
 
   const totalConv = dias?.reduce((s, d) => s + Number(d.conversoes), 0) ?? 0;

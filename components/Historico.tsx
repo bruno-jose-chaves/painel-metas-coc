@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Curva, { type Serie } from "@/components/Curva";
 import { supabase } from "@/lib/supabase";
+import { useUltima } from "@/lib/consulta";
 import Ajuda from "@/components/Ajuda";
 import { COR as CORES } from "@/lib/cores";
 import Detalhe, { type Recorte } from "@/components/Detalhe";
@@ -28,6 +29,7 @@ const variacao = (v: number | null | undefined) => {
 };
 
 export default function Historico() {
+  const ultima = useUltima();
   const { volta, em, minutos } = useAtualizacao();
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [produto, setProduto] = useState<string | null>(null);
@@ -56,10 +58,10 @@ export default function Historico() {
     if (!produto) return;
     setAnos(null); setCurva(null);
     const t = duas ? temporada : null;
-    supabase.rpc("painel_historico_anos", { p_produto: produto, p_temporada: t })
-      .then(({ data }) => setAnos((data as Ano[]) ?? []));
-    supabase.rpc("painel_historico_curva", { p_produto: produto, p_anos: quantos, p_temporada: t })
-      .then(({ data }) => setCurva((data as Ponto[]) ?? []));
+    ultima("anos", supabase.rpc("painel_historico_anos", { p_produto: produto, p_temporada: t }),
+      ({ data }) => setAnos((data as Ano[]) ?? []));
+    ultima("curva", supabase.rpc("painel_historico_curva", { p_produto: produto, p_anos: quantos, p_temporada: t }),
+      ({ data }) => setCurva((data as Ponto[]) ?? []));
   }, [produto, quantos, temporada, duas, volta]);
 
   const nomeProduto = produtos.find((p) => p.id === produto)?.nome ?? "";

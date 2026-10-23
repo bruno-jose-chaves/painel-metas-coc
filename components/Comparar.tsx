@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useUltima } from "@/lib/consulta";
 import Curva from "@/components/Curva";
 import Ajuda from "@/components/Ajuda";
 import Detalhe, { type Recorte } from "@/components/Detalhe";
@@ -55,6 +56,7 @@ function Delta({ v, casas = 1 }: { v: number | null; casas?: number }) {
 }
 
 export default function Comparar() {
+  const ultima = useUltima();
   const { volta, em, minutos } = useAtualizacao();
   const [turmas, setTurmas] = useState<Turma[] | null>(null);
   const [a, setA] = useState<string>("");
@@ -82,10 +84,10 @@ export default function Comparar() {
 
   useEffect(() => {
     if (!a || !b || a === b) { setCurva(null); setResumo(null); return; }
-    supabase.rpc("painel_comparar_turmas", { p_a: a, p_b: b })
-      .then(({ data }) => setCurva((data as Ponto[]) ?? []));
-    supabase.rpc("painel_comparar_turmas_resumo", { p_a: a, p_b: b })
-      .then(({ data }) => setResumo((data as Resumo[]) ?? []));
+    ultima("curva", supabase.rpc("painel_comparar_turmas", { p_a: a, p_b: b }),
+      ({ data }) => setCurva((data as Ponto[]) ?? []));
+    ultima("resumo", supabase.rpc("painel_comparar_turmas_resumo", { p_a: a, p_b: b }),
+      ({ data }) => setResumo((data as Resumo[]) ?? []));
   }, [a, b, volta]);
 
   const ta = turmas?.find((t) => t.id === a);

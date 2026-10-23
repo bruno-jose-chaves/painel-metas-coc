@@ -1045,14 +1045,35 @@ select:disabled, input:disabled { color: var(--cinza-claro); background: var(--s
 /* Tudo que abre detalhe se comporta igual: o cursor muda e o fundo acende em
    lima. Linha de tabela, célula da faixa de números ou número grande, é sempre
    a mesma promessa visual. */
-.tabela tr.abre { cursor: pointer; }
+/* O que abre uma lista precisa parecer que abre uma lista. Antes o número
+   clicável era idêntico ao número que não fazia nada, e ninguém descobria o
+   clique sozinho. Agora todo lugar que abre usa a mesma marca: traço pontilhado
+   embaixo do valor e um ">" discreto depois dele. */
+.abre { cursor: pointer; }
+
 .tabela tr.abre:hover td { background: var(--lima-suave); }
 
-.faixa > div.abre { cursor: pointer; transition: background .12s; }
-.faixa > div.abre:hover { background: var(--lima-suave); }
+.tabela td.abre { transition: background .12s; }
+.tabela td.abre:hover { background: var(--lima-suave); }
+.tabela td.abre > b, .tabela td.abre > span:first-child {
+  border-bottom: 1px dashed var(--cinza);
+  padding-bottom: 1px;
+}
+.tabela td.abre::after {
+  content: "›";
+  margin-left: 6px;
+  color: var(--cinza);
+  font-weight: 700;
+}
 
-.grande.abre { cursor: pointer; width: fit-content; border-radius: 6px; transition: background .12s; }
+.faixa > div.abre { transition: background .12s; border-radius: var(--raio-p); }
+.faixa > div.abre:hover { background: var(--lima-suave); }
+.faixa > div.abre .valor { border-bottom: 1px dashed var(--cinza); display: inline-block; }
+.faixa > div.abre .valor::after { content: "›"; margin-left: 6px; color: var(--cinza); }
+
+.grande.abre { width: fit-content; border-radius: 6px; transition: background .12s; }
 .grande.abre:hover { background: var(--lima-suave); }
+.grande.abre::after { content: "›"; margin-left: 8px; color: var(--cinza); font-size: .7em; vertical-align: middle; }
 
 .gaveta-titulo {
   margin: 4px 0 0;

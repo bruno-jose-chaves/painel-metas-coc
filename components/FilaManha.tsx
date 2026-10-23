@@ -58,6 +58,15 @@ export default function FilaManha({ admin }: { admin: boolean }) {
     carregar();
   }
 
+  async function tirar(p: Pessoa) {
+    if (!confirm(`Tirar ${p.nome} da fila de manhã? Ela para de receber a mensagem. O trabalho dela continua aparecendo no painel.`)) return;
+    const { error } = await supabase.from("pessoas_fila").delete().eq("id", p.id);
+    if (error) { setAviso(error.message); return; }
+    setAviso(`${p.nome} saiu da lista e não recebe mais a fila.`);
+    if (editando === p.id) { setEditando(null); setForm({ ...vazia }); }
+    carregar();
+  }
+
   async function verMensagem(nome: string) {
     setPrevia({ nome, texto: "Montando..." });
     const { data, error } = await supabase.rpc("fila_da_pessoa", { p_nome: nome });
@@ -84,9 +93,9 @@ export default function FilaManha({ admin }: { admin: boolean }) {
             fontes={["A fila é a mesma de Comercial, O que está escapando",
                      "O envio usa o mesmo caminho da mensagem das 20h",
                      "Quem está com a fila limpa não recebe mensagem"]}>
-            A mensagem traz os dez primeiros itens, na ordem do que custa mais caro ficar parado, com
-            nome, telefone, há quantos dias está assim e o que fazer. Quem está sem nada parado não
-            recebe nada: mensagem vazia todo dia ensina o time a ignorar as que importam.
+            A mensagem traz, de cada tipo de problema, os três mais antigos, com nome, telefone, há
+            quantos dias está parado e o que fazer, e diz quantos ficaram de fora. Quem está sem nada
+            parado não recebe nada: mensagem vazia todo dia ensina o time a ignorar as que importam.
           </Ajuda>
         </p>
 
@@ -130,10 +139,13 @@ export default function FilaManha({ admin }: { admin: boolean }) {
                     <td style={{ display: "flex", gap: 6 }}>
                       <button className="btn claro" onClick={() => verMensagem(p.nome)}>Ver a mensagem</button>
                       {admin && (
-                        <button className="btn claro" onClick={() => {
-                          setEditando(p.id);
-                          setForm({ nome: p.nome, apelidos: p.apelidos.join(", "), telefone: p.telefone, ativo: p.ativo });
-                        }}>Mudar</button>
+                        <>
+                          <button className="btn claro" onClick={() => {
+                            setEditando(p.id);
+                            setForm({ nome: p.nome, apelidos: p.apelidos.join(", "), telefone: p.telefone, ativo: p.ativo });
+                          }}>Mudar</button>
+                          <button className="btn claro" onClick={() => tirar(p)}>Tirar</button>
+                        </>
                       )}
                     </td>
                   </tr>
@@ -174,7 +186,10 @@ export default function FilaManha({ admin }: { admin: boolean }) {
         {admin && (pessoas?.length ?? 0) > 0 && (
           <p className="rodape" style={{ display: "flex", gap: 10, alignItems: "center" }}>
             <button className="btn claro" onClick={enviarAgora}>Enviar agora, sem esperar amanhã</button>
-            <span>Manda a mensagem de verdade para todo mundo da lista.</span>
+            <span>
+              Manda a mensagem de verdade para todo mundo que está com <b>Recebe: sim</b>. Para testar
+              sem envolver o time, deixe só você na lista, ou ponha os outros em <b>Recebe: não</b>.
+            </span>
           </p>
         )}
 

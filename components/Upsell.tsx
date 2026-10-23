@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useUltima } from "@/lib/consulta";
 import Ajuda from "@/components/Ajuda";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct } from "@/lib/formato";
@@ -61,6 +62,7 @@ function Escolha({
 }
 
 export default function Upsell() {
+  const ultima = useUltima();
   const { volta, em, minutos } = useAtualizacao();
   const [turmas, setTurmas] = useState<Turma[] | null>(null);
   const [base, setBase] = useState<string[]>([]);
@@ -91,8 +93,8 @@ export default function Upsell() {
   useEffect(() => {
     if (base.length === 0 || alvo.length === 0) { setRes(null); return; }
     setBuscando(true);
-    supabase.rpc("painel_upsell_modular", { p_base: base, p_alvo: alvo, p_ano_anterior: true })
-      .then(({ data }) => { setRes((data as Resultado[]) ?? []); setBuscando(false); });
+    ultima("upsell", supabase.rpc("painel_upsell_modular", { p_base: base, p_alvo: alvo, p_ano_anterior: true }),
+      ({ data }) => { setRes((data as Resultado[]) ?? []); setBuscando(false); });
   }, [base, alvo, volta]);
 
   const atual = res?.find((r) => r.recorte === "atual");
