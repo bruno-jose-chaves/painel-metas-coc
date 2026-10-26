@@ -165,11 +165,21 @@ export default function Etiquetas({ admin, embutido }: { admin: boolean; embutid
         </div>
       )}
       <p className="rodape">
-        A etiqueta é o segundo degrau da classificação de curso.
-        <Ajuda titulo="A ordem da classificação">
-          Primeiro a regra apontada à mão, depois a campanha do CRM, depois a etiqueta, depois o anúncio e a
-          primeira mensagem do cliente. O que foi classificado por um degrau acima não é reclassificado por
-          este.
+        A etiqueta do RD é o quarto degrau da classificação de curso.
+        <Ajuda titulo="A ordem da conferência, degrau por degrau">
+          O painel tenta nesta ordem e para no primeiro que responde, então o que foi classificado por um
+          degrau acima não é reclassificado por um de baixo:
+          <br />1. a regra apontada à mão nesta tela e em A classificar;
+          <br />2. a regra do formulário que a pessoa preencheu;
+          <br />3. o nome da campanha no CRM;
+          <br />4. a etiqueta do RD Station;
+          <br />5. o anúncio pelo qual a pessoa chegou;
+          <br />6. a primeira mensagem que ela mandou no WhatsApp;
+          <br />7. a etiqueta do Pigeon, pelo histórico de troca de etiqueta, porque ela não fica no contato;
+          <br />8. o que a pessoa comprou, que só vale para quem já fechou.
+          <br /><br />
+          O dono do contato segue a mesma lógica: primeiro o dono da negociação no CRM, depois a etiqueta de
+          dono no Pigeon, depois quem atendeu a conversa.
         </Ajuda>
       </p>
     </>

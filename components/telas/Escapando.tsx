@@ -29,7 +29,8 @@ type Resumo = {
 const PORQUE: Record<string, string> = {
   "Pagamento pendente": "O cliente disse que ia comprar e o link foi enviado. É a venda mais perto de acontecer que existe, e está parada.",
   "Conversa sem card": "Falou com o comercial no WhatsApp e não tem negociação nenhuma no CRM. Não aparece em lista, em relatório, nem em follow-up de ninguém.",
-  "Negociação parada": "Chegou até a negociação e dormiu. Ou volta para a mesa, ou vira perdida com motivo, que pelo menos ensina alguma coisa.",
+  "Negociação parada": "Chegou até a negociação e dormiu. Entra na fila a partir de 15 dias parada, que é quando vale avisar, e sai aos 90, porque depois disso não é mais follow-up.",
+  "Parado há mais de 90 dias": "Passou do ponto de retomar. Não é tarefa do dia, é faxina de base: ou vira perdida com motivo, ou entra numa campanha de reativação inteira.",
   "Qualificação parada": "Base velha que ninguém mexe. Não é tarefa da semana, é faxina, por isso fica fora da fila.",
   "Lead de pré-vendas sem contato": "Lead que entrou no funil de pré-vendas e nunca foi tocado. O volume aqui é grande demais para fila: é decisão de campanha, não de pessoa.",
 };
@@ -77,12 +78,17 @@ export default function Escapando({ embutido }: { embutido?: boolean } = {}) {
           primeiro porque é a venda mais perto de acontecer. O valor da negociação ficou de fora da
           ordenação de propósito: está preenchido em 1 de 1.991 negociações abertas, e ordenar por um
           informação que o time não preenche é inventar prioridade.
+          <br /><br />
+          A fila tem janela: negociação entra a partir de <b>15 dias</b> parada, que é quando vale avisar,
+          e sai aos <b>90</b>, porque acima disso não é follow-up, é faxina de base. O que passou de 90
+          continua contado, fora da fila, para o tamanho do problema não sumir.
         </Ajuda>
       </p>
 
       <p className="nota" style={{ marginTop: 0 }}>
         A fila não tem filtro de período de propósito: ela é a foto de agora. Card parado está parado
-        hoje, e conversa sem card olha sempre os últimos 14 dias.
+        hoje, e conversa sem card olha sempre os últimos 14 dias. O dono vem do CRM e, quando o card não
+        existe, da etiqueta de dono no Pigeon.
       </p>
 
       {!resumo ? <p className="rotulo">Carregando</p> : (

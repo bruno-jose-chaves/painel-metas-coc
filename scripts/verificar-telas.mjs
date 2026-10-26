@@ -146,8 +146,9 @@ const escapandoResumo = [
   { tipo: "Pagamento pendente", prioridade: 1, quantos: 28, mediana_dias: 48, mais_parado: 164, na_fila: true, por_dono: { "Marcia  Laurett": 21, "João Pedro Beraldo": 7 } },
   { tipo: "Conversa sem card", prioridade: 2, quantos: 61, mediana_dias: 7, mais_parado: 12, na_fila: true, por_dono: { Marcia: 39, "João": 22 } },
   { tipo: "Negociação parada", prioridade: 3, quantos: 205, mediana_dias: 68, mais_parado: 201, na_fila: true, por_dono: { "Marcia  Laurett": 168, "João Pedro Beraldo": 20, "Tarso Brietzke Iracet": 17 } },
-  { tipo: "Qualificação parada", prioridade: 4, quantos: 364, mediana_dias: 68, mais_parado: 110, na_fila: false, por_dono: { "Marcia  Laurett": 300, "João Pedro Beraldo": 64 } },
-  { tipo: "Lead de pré-vendas sem contato", prioridade: 5, quantos: 5701, mediana_dias: 172, mais_parado: 417, na_fila: false, por_dono: { "sem dono": 5701 } },
+  { tipo: "Parado há mais de 90 dias", prioridade: 4, quantos: 90, mediana_dias: 123, mais_parado: 205, na_fila: false, por_dono: { "Marcia  Laurett": 62, "Tarso Brietzke Iracet": 19 } },
+  { tipo: "Qualificação parada", prioridade: 5, quantos: 364, mediana_dias: 68, mais_parado: 110, na_fila: false, por_dono: { "Marcia  Laurett": 300, "João Pedro Beraldo": 64 } },
+  { tipo: "Lead de pré-vendas sem contato", prioridade: 6, quantos: 5701, mediana_dias: 172, mais_parado: 417, na_fila: false, por_dono: { "sem dono": 5701 } },
 ];
 const escapando = [
   { tipo: "Pagamento pendente", prioridade: 1, pessoa: "Juliana Reis", telefone: "47988112233", dono: "Marcia  Laurett", onde: "Funil principal · Aguardando Pagamento", dias: 164, desde: "2026-05-08", ja_e_aluno: false, o_que_fazer: "Cobrar o pagamento ou devolver o card para Negociação" },

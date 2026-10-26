@@ -87,8 +87,10 @@ export default function FilaManha({ admin }: { admin: boolean }) {
       <h2><span className="idx" /> Fila de manhã</h2>
       <div className="bloco">
         <p style={{ marginTop: 0 }}>
-          Toda manhã, às 8h30, de segunda a sexta, cada pessoa recebe no WhatsApp só o que está parado
-          na mão dela, e a diretoria recebe o consolidado.
+          <b>O envio automático está desligado.</b> O texto da mensagem ainda não está bom o bastante
+          para ir ao time todo dia, então por enquanto só sai no botão aqui embaixo, quando você mandar.
+          Quem recebe é cada pessoa da lista, com o que está parado na mão dela, e a diretoria recebe o
+          consolidado.
           <Ajuda titulo="Como a mensagem é montada"
             fontes={["A fila é a mesma de Comercial, O que está escapando",
                      "O envio usa o mesmo caminho da mensagem das 20h",
