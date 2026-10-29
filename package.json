@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "verificar": "node --experimental-strip-types scripts/verificar-telas.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.0",

@@ -168,7 +168,7 @@ export default function Qualidade() {
 
       {!linhas ? <p className="rotulo">Carregando</p> : (
         <>
-          <h2><span className="idx" />Procurou contra foi procurado</h2>
+          <h2><span className="idx" /> Procurou contra foi procurado</h2>
           <div className="faixa">
             <div>
               <div className="rotulo">O cliente procurou</div>
@@ -213,7 +213,7 @@ export default function Qualidade() {
             </p>
           )}
 
-          <h2><span className="idx" />Cada canal por inteiro</h2>
+          <h2><span className="idx" /> Cada canal por inteiro</h2>
           <div className="rolar">
             <table className="tabela">
               <thead>
@@ -275,7 +275,7 @@ export default function Qualidade() {
             tem telefone guardado, porque sem telefone não dá para cruzar com a planilha.
           </p>
 
-          <h2><span className="idx" />Quanto o cliente espera, por dia da semana</h2>
+          <h2><span className="idx" /> Quanto o cliente espera, por dia da semana</h2>
           <p className="nota">
             Só conversa que o cliente começou, e aqui a semana aparece inteira, sem os filtros de cima.
             <Ajuda titulo="Por que o fim de semana continua aqui">

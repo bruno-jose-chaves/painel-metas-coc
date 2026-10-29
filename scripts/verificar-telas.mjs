@@ -1,6 +1,11 @@
 // Verificação das telas com a rede do Supabase interceptada, para exercitar
 // o render real de cada página sem depender de login.
+//
+// Rode com "npm run verificar", com o site estático servido em 127.0.0.1:4599
+// (npm run build && npx serve out -l 4599). O script lê lib/telas.ts direto,
+// então precisa do --experimental-strip-types que o npm script já passa.
 import { chromium } from "playwright";
+import { AREAS } from "../lib/telas.ts";
 
 const REF = "raelmxfhzplsvipnthrd";
 
@@ -519,8 +524,35 @@ for (const [rota, botao, esperado, arquivo] of [
   await pg.screenshot({ path: `/tmp/claude-0/tela_${arquivo}.png`, fullPage: true });
 }
 
+// O registro de blocos em lib/telas.ts alimenta a busca. Se alguem renomear um
+// h2 e esquecer o registro, a busca passa a mandar a pessoa para um quadro que
+// nao existe mais com aquele nome. Entao a conferencia compara os dois.
+for (const area of AREAS) {
+  for (const tela of area.telas) {
+    if (!tela.blocos) continue;
+    const rota = tela.id === area.telas[0].id ? area.href : `${area.href}?v=${tela.id}`;
+    await pg.goto("http://127.0.0.1:4599" + rota, { waitUntil: "networkidle" });
+    await pg.waitForTimeout(600);
+    const naTela = (await pg.$$eval("main h2", (hs) => hs.map((h) => (h.textContent ?? "").trim())))
+      .map((t) => t.replace(/^\d+\s*/, "").trim());
+    const igual = naTela.length === tela.blocos.length
+      && naTela.every((t, i) => t === tela.blocos[i]);
+    if (!igual) falhou = true;
+    console.log(("blocos " + rota).padEnd(13), igual ? "render ok" : "FORA DO REGISTRO",
+      igual ? "|" : "| tela: " + JSON.stringify(naTela) + " registro: " + JSON.stringify(tela.blocos));
+  }
+}
+
 // A busca: escrever uma palavra que nao e o nome da tela tem que levar nela.
-for (const [termo, esperado] of [["vendedor", "Comercial · Time"], ["etiqueta", "Marketing · A classificar"], ["340", "Comercial · Qualidade do lead"]]) {
+for (const [termo, esperado] of [
+  ["vendedor", "Comercial · Time"],
+  ["etiqueta", "Marketing · A classificar"],
+  ["340", "Comercial · Qualidade do lead"],
+  ["vendas por dia", "Vendas dia a dia"],
+  ["matriculas dia a dia", "dia a dia"],
+  ["311", "Vendas dia a dia"],
+  ["motivo de perda", "Motivos de perda"],
+]) {
   erros.length = 0;
   await pg.goto("http://127.0.0.1:4599/", { waitUntil: "networkidle" });
   await pg.getByRole("button", { name: /Procurar/ }).click();
