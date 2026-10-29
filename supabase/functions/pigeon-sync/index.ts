@@ -74,6 +74,10 @@ function linhaConversa(s: any) {
 }
 
 async function sincronizar(recurso: string, base: string, token: string, inicio: number) {
+  // "conversas_historico" lê o mesmo endereço de "conversas", mas tem estado
+  // próprio: assim a carga do passado anda em paralelo sem parar o sincronismo
+  // do dia, que é o que importa para as telas.
+  const alvo = recurso.replace(/_historico$/, "");
   const { data: e } = await db.from("pigeon_sync_estado").select("*").eq("recurso", recurso).single();
   const est = e as Estado;
   if (!est) throw new Error("recurso desconhecido: " + recurso);
@@ -92,7 +96,7 @@ async function sincronizar(recurso: string, base: string, token: string, inicio:
   const inicioDaVolta = new Date().toISOString();
 
   while (Date.now() - inicio < ORCAMENTO_MS) {
-    const url = new URL(base + CAMINHO[recurso]);
+    const url = new URL(base + CAMINHO[alvo]);
     url.searchParams.set("PageSize", String(TAMANHO_PAGINA));
     url.searchParams.set("PageNumber", String(pagina));
     url.searchParams.set("OrderBy", "createdAt");
@@ -109,8 +113,8 @@ async function sincronizar(recurso: string, base: string, token: string, inicio:
     paginasTotal = Array.isArray(corpo) ? 1 : (corpo.totalPages ?? 1);
 
     if (itens.length) {
-      const tabela = recurso === "contatos" ? "pigeon_contatos" : "pigeon_conversas";
-      const linhas = itens.map(recurso === "contatos" ? linhaContato : linhaConversa);
+      const tabela = alvo === "contatos" ? "pigeon_contatos" : "pigeon_conversas";
+      const linhas = itens.map(alvo === "contatos" ? linhaContato : linhaConversa);
       const { error } = await db.from(tabela).upsert(linhas, { onConflict: "id" });
       if (error) throw new Error("gravação: " + error.message);
       gravados += linhas.length;
