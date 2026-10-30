@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import Pessoas from "@/components/Pessoas";
 import { useUltima } from "@/lib/consulta";
 import Ajuda from "@/components/Ajuda";
 import SeletorPeriodo from "@/components/Periodo";
@@ -50,6 +51,11 @@ export default function Qualidade() {
   const [linhas, setLinhas] = useState<Linha[] | null>(null);
   const [espera, setEspera] = useState<Espera[] | null>(null);
   const [filtros, setFiltros] = useState<Filtro[]>([]);
+  // Quem está por trás do número: o lead que nunca respondeu tem nome,
+  // telefone e conversa, e é com ele que o comercial vai falar.
+  const [gaveta, setGaveta] = useState<
+    { titulo: string; rotulo: string; situacao: string | null; canal: string; quem: string } | null
+  >(null);
 
   useEffect(() => {
     setLinhas(null);
@@ -222,6 +228,7 @@ export default function Qualidade() {
                   <th>Quem começou</th>
                   <th className="n">Conversas</th>
                   <th className="n">Responderam</th>
+                  <th className="n">Nunca responderam</th>
                   <th className="n">Até atender</th>
                   <th className="n">Pior 10%</th>
                   <th className="n">Viraram matrícula</th>
@@ -242,14 +249,30 @@ export default function Qualidade() {
                           {l.quem_comecou}
                         </span>
                       </td>
-                      <td className="n"><b>{num(l.conversas)}</b></td>
-                      <td className="n">
+                      <td className="n abre" title="Ver as conversas deste canal"
+                          onClick={() => setGaveta({
+                            titulo: l.canal + " · " + l.quem_comecou,
+                            rotulo: "Todas as conversas",
+                            situacao: null, canal: l.canal, quem: l.quem_comecou,
+                          })}><b>{num(l.conversas)}</b></td>
+                      <td className="n abre" title="Ver quem respondeu"
+                          onClick={() => setGaveta({
+                            titulo: l.canal + " · " + l.quem_comecou,
+                            rotulo: "Quem respondeu",
+                            situacao: "responderam", canal: l.canal, quem: l.quem_comecou,
+                          })}>
                         <b>{num(l.responderam)}</b>
                         <div className="ids num">
                           {l.conversas ? pct(Number(l.responderam) / Number(l.conversas)) : ""}
-                          {Number(l.nunca_responderam) > 0
-                            ? ` · ${num(l.nunca_responderam)} nunca` : ""}
                         </div>
+                      </td>
+                      <td className="n abre" title="Ver quem nunca respondeu"
+                          onClick={() => setGaveta({
+                            titulo: l.canal + " · " + l.quem_comecou,
+                            rotulo: "Quem nunca respondeu",
+                            situacao: "nunca", canal: l.canal, quem: l.quem_comecou,
+                          })}>
+                        <b>{num(l.nunca_responderam)}</b>
                       </td>
                       <td className="n num">{duracao(l.minutos_ate_atender)}</td>
                       <td className="n num mudo">{duracao(l.p90_minutos)}</td>
@@ -345,6 +368,20 @@ export default function Qualidade() {
           )}
           <p className="rodape">O horário é o de Brasília.</p>
         </>
+      )}
+      {gaveta && (
+        <Pessoas
+          titulo={gaveta.titulo}
+          rotulo={gaveta.rotulo}
+          rpc="painel_qualidade_pessoas"
+          params={{
+            p_de: periodo.de, p_ate: periodo.ate,
+            p_canal: gaveta.canal, p_quem_comecou: gaveta.quem, p_situacao: gaveta.situacao,
+            p_atendente: atendente || null, p_turma: turma || null,
+            p_so_dia_util: soDiaUtil, p_so_horario_comercial: soComercial,
+          }}
+          aoFechar={() => setGaveta(null)}
+        />
       )}
     </>
   );

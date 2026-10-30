@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 import FiltroCampanha, { type Campanha } from "@/components/FiltroCampanha";
 import Curva from "@/components/Curva";
 import Detalhe, { type Recorte } from "@/components/Detalhe";
+import Pessoas from "@/components/Pessoas";
 import Ajuda from "@/components/Ajuda";
 import { supabase } from "@/lib/supabase";
+import { useUltima } from "@/lib/consulta";
 import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta } from "@/lib/formato";
@@ -34,6 +36,7 @@ const COMPARACOES = [
 ] as const;
 
 export default function Time() {
+  const ultima = useUltima();
   const { volta, em, minutos } = useAtualizacao();
   const [periodo, setPeriodo] = useState<Periodo>(ultimosDias(30));
   const [campanhas, setCampanhas] = useState<Campanha[]>([]);
@@ -45,6 +48,10 @@ export default function Time() {
   const [vista, setVista] = useState<"dia" | "acumulado">("dia");
   const [comparar, setComparar] = useState<string>("anterior");
   const [detalhe, setDetalhe] = useState<{ titulo: string; recorte: Recorte } | null>(null);
+  // Gaveta de gente: todo número desta tela abre quem está por trás dele.
+  const [gaveta, setGaveta] = useState<
+    { titulo: string; rotulo: string; rpc: string; params: Record<string, unknown> } | null
+  >(null);
 
   useEffect(() => {
     supabase.from("resumo_campanhas").select("id,nome,inicio,fim,produto_id").order("inicio")
@@ -56,17 +63,17 @@ export default function Time() {
   useEffect(() => {
     const p = { p_de: periodo.de, p_ate: periodo.ate };
     setTime(null); setParados(null); setMotivos(null); setDiasVenda(null);
-    supabase.rpc("painel_time_comercial", { ...p, p_produto: produto })
-      .then(({ data }) => setTime((data as Linha[]) ?? []));
-    supabase.rpc("painel_parados", { ...p, p_trilha: "comercial", p_produto: produto })
-      .then(({ data }) => setParados((data as Parado[]) ?? []));
-    supabase.rpc("painel_motivos_perda", { ...p, p_produto: produto })
-      .then(({ data }) => setMotivos((data as Motivo[]) ?? []));
+    ultima("time", supabase.rpc("painel_time_comercial", { ...p, p_produto: produto }),
+      ({ data }) => setTime((data as Linha[]) ?? []));
+    ultima("parados", supabase.rpc("painel_parados", { ...p, p_trilha: "comercial", p_produto: produto }),
+      ({ data }) => setParados((data as Parado[]) ?? []));
+    ultima("motivos", supabase.rpc("painel_motivos_perda", { ...p, p_produto: produto }),
+      ({ data }) => setMotivos((data as Motivo[]) ?? []));
     // O bloco do pré-vendas também respeita o curso escolhido. Antes ele era o
     // único da tela que ignorava o filtro, e quem lia achava que o número era
     // daquele curso.
-    supabase.rpc("painel_vendas_periodo", { ...p, p_produto: produto, p_comparar: comparar || null })
-      .then(({ data }) => setDiasVenda((data as DiaVenda[]) ?? []));
+    ultima("dias", supabase.rpc("painel_vendas_periodo", { ...p, p_produto: produto, p_comparar: comparar || null }),
+      ({ data }) => setDiasVenda((data as DiaVenda[]) ?? []));
   }, [periodo, produto, comparar, volta]);
 
   // Tirar o curso do filtro tira o sentido da comparação por turma. Em vez de
@@ -302,7 +309,14 @@ export default function Time() {
                   return (
                     <tr key={p.funil + p.etapa}>
                       <td><b>{p.etapa}</b><div className="rotulo">{p.funil}</div></td>
-                      <td className="n">{num(p.abertas)}</td>
+                      <td className="n abre" title="Ver quem está parado nesta etapa"
+                          onClick={() => setGaveta({
+                            titulo: p.etapa,
+                            rotulo: "Quem está parado nesta etapa",
+                            rpc: "painel_parados_pessoas",
+                            params: { p_de: periodo.de, p_ate: periodo.ate, p_etapa: p.etapa,
+                                      p_trilha: "comercial", p_produto: produto },
+                          })}><b>{num(p.abertas)}</b></td>
                       <td><div className="pilha">{faixas.map((f, i) => <i key={i} style={{ width: `${f}%` }} />)}</div></td>
                       <td className="n">{num(p.ate_3d)}</td>
                       <td className="n">{num(p.d4_7)}</td>
@@ -333,7 +347,13 @@ export default function Time() {
               {motivos.map((m) => (
                 <tr key={m.motivo}>
                   <td>{m.motivo}</td>
-                  <td className="n">{num(m.perdidas)}</td>
+                  <td className="n abre" title="Ver quem foi perdido por este motivo"
+                      onClick={() => setGaveta({
+                        titulo: m.motivo,
+                        rotulo: "Quem foi perdido por este motivo",
+                        rpc: "painel_perdas_pessoas",
+                        params: { p_de: periodo.de, p_ate: periodo.ate, p_motivo: m.motivo, p_produto: produto },
+                      })}><b>{num(m.perdidas)}</b></td>
                   <td><div className="mini"><i style={{ width: `${Number(m.fatia) * 100}%` }} /></div></td>
                   <td className="n">{pct(Number(m.fatia))}</td>
                 </tr>
@@ -354,6 +374,15 @@ export default function Time() {
 
       {detalhe && (
         <Detalhe titulo={detalhe.titulo} recorte={detalhe.recorte} aoFechar={() => setDetalhe(null)} />
+      )}
+      {gaveta && (
+        <Pessoas
+          titulo={gaveta.titulo}
+          rotulo={gaveta.rotulo}
+          rpc={gaveta.rpc}
+          params={gaveta.params}
+          aoFechar={() => setGaveta(null)}
+        />
       )}
     </>
   );

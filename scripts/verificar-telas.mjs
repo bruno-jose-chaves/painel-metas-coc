@@ -395,6 +395,22 @@ const rotas0 = {
     { nome: "Marcia Laurett", itens: 212, enviado_em: "2026-10-23T11:30:09Z" },
     { nome: "(consolidado)", itens: 0, enviado_em: "2026-10-23T11:30:12Z" },
   ],
+  "rpc/painel_perdas_pessoas": [
+    { pessoa: "Renata Lima", telefone: "47988112233", email: "renata@exemplo.com", quando: "2026-10-12",
+      onde: "Sem retorno", atendente: "Marcia Laurett", virou_matricula: false,
+      link: "https://pigeon.runus.com.br/redirect?type=SESSION&id=ghi" },
+  ],
+  "rpc/painel_parados_pessoas": [
+    { pessoa: "Caio Ferreira", telefone: "48997654321", email: null, quando: "2026-09-02",
+      onde: "Funil principal · Negociação · parado há 58 dias", atendente: "João Pedro Beraldo",
+      virou_matricula: false, link: null },
+  ],
+  "rpc/painel_qualidade_pessoas": [
+    { pessoa: "Marina Alves", telefone: "47999887766", quando: "2026-10-20",
+      onde: "WhatsApp comercial · Nós procuramos · nunca respondeu", atendente: "Marcia",
+      primeira_mensagem: null, virou_matricula: false,
+      link: "https://pigeon.runus.com.br/redirect?type=SESSION&id=jkl" },
+  ],
   "rpc/painel_anuncio_pessoas": [
     { pessoa: "Ana Clara", telefone: "47988112233", quando: "2026-10-18", conversas: 2, atendente: "Marcia",
       primeira_mensagem: "Olá! Tenho interesse no curso Missão UFSC", virou_matricula: true, curso: "Missão UFSC",
@@ -493,6 +509,8 @@ for (const [rota, esperado] of telas) {
 for (const [rota, celula, esperado, arquivo] of [
   ["/marketing/?v=anuncios", "Ana Clara", "Quem chegou por esta peça", "anuncio_pessoas"],
   ["/marketing/?v=classificar", "Carla Souza", "Abrir no Pigeon", "classificar_pessoas"],
+  ["/comercial/", "Caio Ferreira", "Quem está parado nesta etapa", "time_parados"],
+  ["/comercial/?v=qualidade", "Marina Alves", "Todas as conversas", "qualidade_pessoas"],
 ]) {
   erros.length = 0;
   await pg.goto("http://127.0.0.1:4599" + rota, { waitUntil: "networkidle" });

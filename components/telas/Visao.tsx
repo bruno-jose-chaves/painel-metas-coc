@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useUltima } from "@/lib/consulta";
 import Ajuda from "@/components/Ajuda";
 import Acompanhando from "@/components/Acompanhando";
 import { useIndicadores } from "@/lib/indicadores";
@@ -90,6 +91,7 @@ type Ritmo = {
 };
 
 export default function Visao() {
+  const ultima = useUltima();
   const { volta, em, minutos } = useAtualizacao();
   const indicadores = useIndicadores();
   const [detalhe, setDetalhe] = useState<{ titulo: string; recorte: Recorte } | null>(null);
@@ -130,8 +132,8 @@ export default function Visao() {
   useEffect(() => {
     const { de, ate } = intervalo(janela);
     setPeriodo(null);
-    supabase.rpc("painel_resumo_periodo", { p_de: de, p_ate: ate })
-      .then(({ data }) => setPeriodo(((data as Resumo7[]) ?? [])[0] ?? null));
+    ultima("periodo", supabase.rpc("painel_resumo_periodo", { p_de: de, p_ate: ate }),
+      ({ data }) => setPeriodo(((data as Resumo7[]) ?? [])[0] ?? null));
   }, [janela, volta]);
 
   if (!dados) return <p className="rotulo">Carregando</p>;

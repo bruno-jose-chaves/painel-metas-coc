@@ -1,0 +1,24 @@
+-- Update 46 · 30/10/2026
+-- O número abre a lista de gente em mais três lugares, e cada um deles já
+-- carrega o link da conversa no Pigeon.
+--
+-- 1. Motivos de perda (314): quem foi perdido por aquele motivo. É o pedido
+--    direto do Bruno: ver quem nunca respondeu ou parou de responder, com a
+--    conversa do lado.
+-- 2. Negócios em aberto por etapa (313): quem está parado naquela etapa.
+-- 3. Qualidade do lead (341): quem respondeu, quem nunca respondeu e quem
+--    virou matrícula, respeitando todos os filtros da tela.
+--
+-- As três respeitam o período e o curso escolhidos em cima, e as duas do CRM
+-- usam o mesmo recorte das funções que desenham o número, para a lista nunca
+-- discordar do total.
+
+-- (corpos aplicados no banco em 30/10/2026)
+--   painel_perdas_pessoas(p_de, p_ate, p_motivo, p_produto, p_limite)
+--   painel_parados_pessoas(p_de, p_ate, p_etapa, p_trilha, p_produto, p_limite)
+--   painel_qualidade_pessoas(p_de, p_ate, p_canal, p_quem_comecou, p_situacao,
+--                            p_atendente, p_turma, p_so_dia_util,
+--                            p_so_horario_comercial, p_limite)
+--
+-- Todas: stable, security definer, search_path em public, is_autorizado() no
+-- where, revoke de public e anon, grant para authenticated.

@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import Curva from "@/components/Curva";
 import SeletorPeriodo from "@/components/Periodo";
 import { supabase } from "@/lib/supabase";
+import Pessoas from "@/components/Pessoas";
+import { useUltima } from "@/lib/consulta";
 import Ajuda from "@/components/Ajuda";
 import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
@@ -26,6 +28,7 @@ const CLASSE: Record<string, string> = {
 };
 
 export default function Passagem({ admin }: { admin: boolean }) {
+  const ultima = useUltima();
   const { volta, em, minutos } = useAtualizacao();
   const [periodo, setPeriodo] = useState<Periodo>(ultimosDias(60));
   const [lista, setLista] = useState<Linha[] | null>(null);
@@ -34,12 +37,13 @@ export default function Passagem({ admin }: { admin: boolean }) {
   const indicadores = useIndicadores();
   const destinos = useDestinos();
   const [aviso, setAviso] = useState("");
+  const [gaveta, setGaveta] = useState<string | null>(null);
 
   function carregar() {
-    supabase.rpc("painel_passagem_crm", { p_desde: periodo.de, p_ate: periodo.ate })
-      .then(({ data }) => setLista((data as Linha[]) ?? []));
-    supabase.rpc("painel_passagem_dia", { p_de: periodo.de, p_ate: periodo.ate })
-      .then(({ data }) => setDias((data as Dia[]) ?? []));
+    ultima("lista", supabase.rpc("painel_passagem_crm", { p_desde: periodo.de, p_ate: periodo.ate }),
+      ({ data }) => setLista((data as Linha[]) ?? []));
+    ultima("dias", supabase.rpc("painel_passagem_dia", { p_de: periodo.de, p_ate: periodo.ate }),
+      ({ data }) => setDias((data as Dia[]) ?? []));
   }
 
   useEffect(() => { setLista(null); setDias(null); carregar(); }, [periodo, volta]);
@@ -131,7 +135,8 @@ export default function Passagem({ admin }: { admin: boolean }) {
                       {dataCurta(l.primeira)} a {dataCurta(l.ultima)}
                     </div>
                   </td>
-                  <td className="n"><b>{num(l.conversoes)}</b></td>
+                  <td className="n abre" title="Ver quem se inscreveu neste formulário"
+                      onClick={() => setGaveta(l.identificador)}><b>{num(l.conversoes)}</b></td>
                   <td className="n">{l.situacao === "sem_fluxo" ? "-" : num(l.pessoas_crm)}</td>
                   <td className="n">{l.taxa == null ? "-" : pct(l.taxa)}</td>
                   <td><span className={"selo " + (CLASSE[l.situacao] ?? "")}>{SITUACAO[l.situacao] ?? l.situacao}</span></td>
@@ -173,6 +178,16 @@ export default function Passagem({ admin }: { admin: boolean }) {
         </div>
       )}
       {aviso && <div className="aviso ok" style={{ marginTop: 12 }}>{aviso}</div>}
+
+      {gaveta && (
+        <Pessoas
+          titulo={gaveta}
+          rotulo="Quem se inscreveu neste formulário"
+          rpc="painel_pendencia_pessoas"
+          params={{ p_tipo: "formulario", p_valor: gaveta, p_desde: periodo.de }}
+          aoFechar={() => setGaveta(null)}
+        />
+      )}
 
       <h2><span className="idx" /> Captação e entrada no CRM, dia a dia</h2>
       <p className="nota">

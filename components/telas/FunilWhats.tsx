@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useUltima } from "@/lib/consulta";
 import Ajuda from "@/components/Ajuda";
 import SeletorPeriodo from "@/components/Periodo";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
@@ -38,6 +39,7 @@ type Etapa = {
 };
 
 export default function FunilWhats({ embutido }: { embutido?: boolean } = {}) {
+  const ultima = useUltima();
   const { volta, em, minutos } = useAtualizacao();
   const [periodo, setPeriodo] = useState<Periodo>(() => ultimosDias(14));
   const [pessoas, setPessoas] = useState<Pessoa[] | null>(null);
@@ -45,8 +47,8 @@ export default function FunilWhats({ embutido }: { embutido?: boolean } = {}) {
 
   useEffect(() => {
     setPessoas(null);
-    supabase.rpc("painel_whats_crm", { p_de: periodo.de, p_ate: periodo.ate })
-      .then(({ data }) => setPessoas((data as Pessoa[]) ?? []));
+    ultima("pessoas", supabase.rpc("painel_whats_crm", { p_de: periodo.de, p_ate: periodo.ate }),
+      ({ data }) => setPessoas((data as Pessoa[]) ?? []));
     // Este bloco não recebe período de propósito: card parado está parado
     // agora, não "no período". Antes isso não estava escrito em lugar nenhum e
     // quem trocava o filtro achava que a tabela tinha mudado junto.

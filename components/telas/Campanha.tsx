@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import Curva from "@/components/Curva";
 import Detalhe, { type Recorte } from "@/components/Detalhe";
 import { supabase } from "@/lib/supabase";
+import { useUltima } from "@/lib/consulta";
 import Ajuda from "@/components/Ajuda";
 import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
@@ -67,6 +68,7 @@ const ESTADO: Record<string, string> = {
 };
 
 export default function Campanha() {
+  const ultima = useUltima();
   const { volta, em, minutos } = useAtualizacao();
   const [campanhas, setCampanhas] = useState<Resumo[] | null>(null);
   const [id, setId] = useState<string>("");
@@ -94,22 +96,22 @@ export default function Campanha() {
     if (!id) return;
     setFases(null); setPontos(null); setProj(null); setCenarios(null); setFunil(null); setOrigens(null); setRecompra(null); setOrigemUpsell(null);
     const p = { p_campanha: id };
-    supabase.rpc("painel_fases", p).then(({ data }) => setFases((data as Fase[]) ?? []));
-    supabase.rpc("painel_curva", p).then(({ data }) => setPontos((data as Ponto[]) ?? []));
-    supabase.rpc("painel_projecao", p).then(({ data }) => setProj(((data as Projecao[]) ?? [])[0] ?? null));
-    supabase.rpc("painel_cenarios", p).then(({ data }) => setCenarios((data as Cenario[]) ?? []));
-    supabase.rpc("painel_funil", p).then(({ data }) => setFunil(((data as Funil[]) ?? [])[0] ?? null));
+    ultima("fases", supabase.rpc("painel_fases", p), ({ data }) => setFases((data as Fase[]) ?? []));
+    ultima("curva", supabase.rpc("painel_curva", p), ({ data }) => setPontos((data as Ponto[]) ?? []));
+    ultima("projecao", supabase.rpc("painel_projecao", p), ({ data }) => setProj(((data as Projecao[]) ?? [])[0] ?? null));
+    ultima("cenarios", supabase.rpc("painel_cenarios", p), ({ data }) => setCenarios((data as Cenario[]) ?? []));
+    ultima("funil", supabase.rpc("painel_funil", p), ({ data }) => setFunil(((data as Funil[]) ?? [])[0] ?? null));
     supabase.rpc("painel_ritmo").then(({ data }) =>
       setRitmo(((data as Ritmo[]) ?? []).find((r) => r.campanha_id === id) ?? null));
-    supabase.rpc("painel_recompra", p).then(({ data }) => setRecompra((data as Recompra[]) ?? []));
-    supabase.rpc("painel_upsell_origem", p).then(({ data }) => setOrigemUpsell((data as UpsellOrigem[]) ?? []));
+    ultima("recompra", supabase.rpc("painel_recompra", p), ({ data }) => setRecompra((data as Recompra[]) ?? []));
+    ultima("upsell", supabase.rpc("painel_upsell_origem", p), ({ data }) => setOrigemUpsell((data as UpsellOrigem[]) ?? []));
   }, [id, volta]);
 
   useEffect(() => {
     if (!id) return;
     setOrigens(null);
-    supabase.rpc("painel_origem_matriculas", { p_campanha: id, p_por: porOrigem })
-      .then(({ data }) => setOrigens((data as Origem[]) ?? []));
+    ultima("origens", supabase.rpc("painel_origem_matriculas", { p_campanha: id, p_por: porOrigem }),
+      ({ data }) => setOrigens((data as Origem[]) ?? []));
   }, [id, porOrigem, volta]);
 
   const c = campanhas?.find((x) => x.id === id);

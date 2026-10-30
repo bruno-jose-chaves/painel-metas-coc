@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import Pessoas from "@/components/Pessoas";
+import { useUltima } from "@/lib/consulta";
 import Curva from "@/components/Curva";
 import Ajuda from "@/components/Ajuda";
 import SeletorPeriodo from "@/components/Periodo";
@@ -43,18 +45,22 @@ const soma = (l: Dia[], campo: keyof Dia) =>
   l.reduce((s, d) => s + Number(d[campo] ?? 0), 0);
 
 export default function Agente() {
+  const ultima = useUltima();
   const { volta, em, minutos } = useAtualizacao();
   const [periodo, setPeriodo] = useState<Periodo>(() => ultimosDias(30));
   const [dias, setDias] = useState<Dia[] | null>(null);
   const [crm, setCrm] = useState<PreVenda | null>(null);
+  // O número do agente também abre a lista: é com essas pessoas que alguém vai
+  // falar, e a conversa está a um clique.
+  const [gaveta, setGaveta] = useState<{ titulo: string; rotulo: string; situacao: string | null } | null>(null);
 
   useEffect(() => {
     setDias(null);
     setCrm(null);
-    supabase.rpc("painel_apv_dia", { p_de: periodo.de, p_ate: periodo.ate })
-      .then(({ data }) => setDias((data as Dia[]) ?? []));
-    supabase.rpc("painel_pre_venda", { p_de: periodo.de, p_ate: periodo.ate, p_produto: null })
-      .then(({ data }) => setCrm(((data as PreVenda[]) ?? [])[0] ?? null));
+    ultima("dias", supabase.rpc("painel_apv_dia", { p_de: periodo.de, p_ate: periodo.ate }),
+      ({ data }) => setDias((data as Dia[]) ?? []));
+    ultima("crm", supabase.rpc("painel_pre_venda", { p_de: periodo.de, p_ate: periodo.ate, p_produto: null }),
+      ({ data }) => setCrm(((data as PreVenda[]) ?? [])[0] ?? null));
   }, [periodo, volta]);
 
   // Dentro da janela de medição de mensagem, que é o único recorte em que
@@ -111,7 +117,9 @@ export default function Agente() {
         <>
           <h2><span className="idx" /> A qualidade do agente</h2>
           <div className="faixa">
-            <div>
+            <div className="abre" title="Ver quem respondeu ao agente"
+                 onClick={() => setGaveta({ titulo: "Quem o agente abriu e respondeu",
+                                            rotulo: "Responderam ao agente", situacao: "responderam" })}>
               <div className="rotulo">Respondeu</div>
               <div className="valor num">{atendidos ? pct(responderam / atendidos) : "-"}</div>
               <div className="mudo num">{num(responderam)} de {num(atendidos)} atendidos</div>
@@ -126,14 +134,18 @@ export default function Agente() {
               <div className="valor num">{num(entregueCrm)}</div>
               <div className="mudo">saíram do funil de pré-vendas</div>
             </div>
-            <div>
+            <div className="abre" title="Ver quem virou matrícula"
+                 onClick={() => setGaveta({ titulo: "Quem o agente abriu e virou matrícula",
+                                            rotulo: "Viraram matrícula", situacao: "matricula" })}>
               <div className="rotulo">Virou matrícula</div>
               <div className="valor num">{num(matriculas)}</div>
               <div className="mudo num">
                 {atendidos ? pct(matriculas / atendidos, 2) + " do atendido" : ""}
               </div>
             </div>
-            <div>
+            <div className="abre" title="Ver todo mundo que o agente abriu"
+                 onClick={() => setGaveta({ titulo: "Tudo que o agente abriu",
+                                            rotulo: "Conversas do agente", situacao: null })}>
               <div className="rotulo">Atendidos</div>
               <div className="valor num">{num(atendidos)}</div>
               <div className="mudo">no período já medido</div>
@@ -246,6 +258,18 @@ export default function Agente() {
             </div>
           )}
         </>
+      )}
+      {gaveta && (
+        <Pessoas
+          titulo={gaveta.titulo}
+          rotulo={gaveta.rotulo}
+          rpc="painel_qualidade_pessoas"
+          params={{
+            p_de: periodo.de, p_ate: periodo.ate,
+            p_canal: "WhatsApp pré-vendas", p_quem_comecou: null, p_situacao: gaveta.situacao,
+          }}
+          aoFechar={() => setGaveta(null)}
+        />
       )}
     </>
   );

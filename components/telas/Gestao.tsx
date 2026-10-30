@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import SeletorPeriodo from "@/components/Periodo";
 import Curva from "@/components/Curva";
 import { supabase } from "@/lib/supabase";
+import { useUltima } from "@/lib/consulta";
 import Ajuda from "@/components/Ajuda";
 import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
@@ -13,6 +14,7 @@ type Linha = { indicador: string; rotulo: string; valor: number; detalhe: string
 type Dia = { dia: string; conversas_novas: number; requentados: number; leads_novos: number };
 
 export default function Gestao() {
+  const ultima = useUltima();
   const { volta, em, minutos } = useAtualizacao();
   const [periodo, setPeriodo] = useState<Periodo>(ultimosDias(7));
   const [linhas, setLinhas] = useState<Linha[] | null>(null);
@@ -21,8 +23,8 @@ export default function Gestao() {
   useEffect(() => {
     const p = { p_de: periodo.de, p_ate: periodo.ate };
     setLinhas(null); setDias(null);
-    supabase.rpc("painel_gestao", p).then(({ data }) => setLinhas((data as Linha[]) ?? []));
-    supabase.rpc("painel_gestao_dia", p).then(({ data }) => setDias((data as Dia[]) ?? []));
+    ultima("linhas", supabase.rpc("painel_gestao", p), ({ data }) => setLinhas((data as Linha[]) ?? []));
+    ultima("dias", supabase.rpc("painel_gestao_dia", p), ({ data }) => setDias((data as Dia[]) ?? []));
   }, [periodo, volta]);
 
   const v = (id: string) => Number(linhas?.find((l) => l.indicador === id)?.valor ?? 0);
