@@ -59,8 +59,10 @@ const parados = [
 ];
 
 const motivos = [
-  { motivo: "Lead duplicado", perdidas: 98, fatia: 0.6901 },
-  { motivo: "Dados Incorretos/Inválidos", perdidas: 30, fatia: 0.2113 },
+  { motivo: "Nunca respondeu", grupo: "sumico", perdidas: 2329, fatia: 0.5401, fatia_no_grupo: 0.5681, veio_da_pre_venda: 512, tinha_resposta: 931 },
+  { motivo: "Parou de responder", grupo: "sumico", perdidas: 1770, fatia: 0.4104, fatia_no_grupo: 0.4319, veio_da_pre_venda: 372, tinha_resposta: 701 },
+  { motivo: "Lead duplicado", grupo: "comercial", perdidas: 98, fatia: 0.0227, fatia_no_grupo: 0.6901, veio_da_pre_venda: 21, tinha_resposta: 44 },
+  { motivo: "Dados Incorretos/Inválidos", grupo: "comercial", perdidas: 30, fatia: 0.0069, fatia_no_grupo: 0.2113, veio_da_pre_venda: 6, tinha_resposta: 9 },
 ];
 
 const preVenda = [{ captados: 1888, contatados: 44, sem_contato: 1844, entregues: 160, ganhos: 21, parados_7d: 1586, parados_30d: 439 }];

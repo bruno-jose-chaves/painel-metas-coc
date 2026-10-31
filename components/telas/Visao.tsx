@@ -108,21 +108,23 @@ export default function Visao() {
   useEffect(() => {
     supabase.from("resumo_campanhas").select("*").order("inicio").then(({ data }) => {
       const lista = (data as Resumo[]) ?? [];
-      let respondidas = 0;
       setDados(lista);
-      lista.forEach((c) => {
-        supabase.rpc("painel_projecao", { p_campanha: c.id }).then(({ data: pr }) => {
-          const linha = ((pr as Projecao[]) ?? [])[0];
-          if (linha) setProj((atual) => ({ ...atual, [c.id]: linha }));
-        });
-        supabase.rpc("painel_metas_leads", { p_campanha: c.id }).then(({ data: ml }) => {
-          const linhas = (ml as MetaLead[]) ?? [];
-          if (linhas.length) setMetasLeads((atual) => ({ ...atual, [c.id]: linhas }));
-          respondidas += 1;
-          if (respondidas >= lista.length) setMetasProntas(true);
-        });
+      // Uma consulta para todas as campanhas, em vez de duas por campanha
+      // dentro do laço. Era a consulta mais cara do painel: 1.429 chamadas de
+      // 1,8 s só para montar as metas de captação desta tela.
+      supabase.rpc("painel_projecao_todas", {}).then(({ data: pr }) => {
+        const linhas = (pr as (Projecao & { campanha_id: string })[]) ?? [];
+        const mapa: Record<string, Projecao> = {};
+        for (const l of linhas) mapa[l.campanha_id] = l;
+        setProj(mapa);
       });
-      if (lista.length === 0) setMetasProntas(true);
+      supabase.rpc("painel_metas_leads_todas", {}).then(({ data: ml }) => {
+        const linhas = (ml as (MetaLead & { campanha_id: string })[]) ?? [];
+        const mapa: Record<string, MetaLead[]> = {};
+        for (const l of linhas) (mapa[l.campanha_id] ??= []).push(l);
+        setMetasLeads(mapa);
+        setMetasProntas(true);
+      });
     });
     supabase.rpc("painel_ritmo").then(({ data }) => setRitmo((data as Ritmo[]) ?? []));
     supabase.from("sincronizacoes").select("terminado_em").eq("status", "ok").like("fonte", "planilha:%")

@@ -20,7 +20,10 @@ type Parado = {
   funil: string; etapa: string; etapa_ordem: number; abertas: number;
   ate_3d: number; d4_7: number; d8_15: number; d16_30: number; mais_30: number; dias_medio: number;
 };
-type Motivo = { motivo: string; perdidas: number; fatia: number };
+type Motivo = {
+  motivo: string; grupo: string; perdidas: number; fatia: number; fatia_no_grupo: number;
+  veio_da_pre_venda: number; tinha_resposta: number;
+};
 type DiaVenda = {
   dia: string; alunos: number; faturamento: number; acumulado: number;
   dia_comp: string | null; alunos_comp: number | null; acumulado_comp: number | null;
@@ -337,30 +340,84 @@ export default function Time() {
       )}
 
       <h2><span className="idx" /> Motivos de perda</h2>
+      <p className="nota">
+        Separado em dois, porque são duas conversas diferentes.
+        <Ajuda titulo="Por que sumiço fica separado"
+          fontes={["RD Station CRM, negociação marcada como perdida no período, pelo motivo escrito lá",
+                   "Veio da pré-venda: o mesmo contato tem negociação no funil de pré-vendas",
+                   "Tinha resposta: existe mensagem do cliente no WhatsApp, apesar do motivo dizer que não"]}>
+          <b>Sumiço</b> é quem nunca respondeu ou parou de responder. São 98 de cada 100 perdas e não dizem
+          nada sobre a oferta: são ritmo de follow-up e qualidade do lead que entrou. Misturados com preço,
+          concorrente e curso, eles afogavam justamente o que ensina alguma coisa.
+          <br /><br />
+          <b>Motivo comercial</b> é o que a pessoa falou: preço, concorrente, curso que não atende, não vai
+          prestar vestibular. São poucos e valem um por um.
+        </Ajuda>
+      </p>
       {!motivos ? <p className="rotulo">Carregando</p> : motivos.length === 0 ? (
         <p className="mudo">Nenhuma perda registrada no período.</p>
       ) : (
-        <div className="rolar">
-          <table className="tabela">
-            <thead><tr><th>Motivo</th><th className="n">Perdas</th><th style={{ minWidth: 140 }} /><th className="n">Fatia</th></tr></thead>
-            <tbody>
-              {motivos.map((m) => (
-                <tr key={m.motivo}>
-                  <td>{m.motivo}</td>
-                  <td className="n abre" title="Ver quem foi perdido por este motivo"
-                      onClick={() => setGaveta({
-                        titulo: m.motivo,
-                        rotulo: "Quem foi perdido por este motivo",
-                        rpc: "painel_perdas_pessoas",
-                        params: { p_de: periodo.de, p_ate: periodo.ate, p_motivo: m.motivo, p_produto: produto },
-                      })}><b>{num(m.perdidas)}</b></td>
-                  <td><div className="mini"><i style={{ width: `${Number(m.fatia) * 100}%` }} /></div></td>
-                  <td className="n">{pct(Number(m.fatia))}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <>
+          {(["comercial", "sumico"] as const).map((g) => {
+            const lista = motivos.filter((m) => m.grupo === g);
+            if (lista.length === 0) return null;
+            const total = lista.reduce((s2, m) => s2 + Number(m.perdidas), 0);
+            return (
+              <div key={g} style={{ marginBottom: 18 }}>
+                <div className="rotulo" style={{ marginBottom: 6 }}>
+                  {g === "comercial"
+                    ? `O que a pessoa falou · ${num(total)} perdas`
+                    : `Sumiço, que não é motivo comercial · ${num(total)} perdas`}
+                </div>
+                <div className="rolar">
+                  <table className="tabela">
+                    <thead>
+                      <tr>
+                        <th>Motivo</th><th className="n">Perdas</th><th style={{ minWidth: 120 }} />
+                        <th className="n">Fatia do grupo</th>
+                        <th className="n">Veio da pré-venda</th>
+                        <th className="n">Tinha resposta no WhatsApp</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {lista.map((m) => (
+                        <tr key={m.motivo}>
+                          <td>{m.motivo}</td>
+                          <td className="n abre" title="Ver quem foi perdido por este motivo"
+                              onClick={() => setGaveta({
+                                titulo: m.motivo,
+                                rotulo: "Quem foi perdido por este motivo",
+                                rpc: "painel_perdas_pessoas",
+                                params: { p_de: periodo.de, p_ate: periodo.ate, p_motivo: m.motivo, p_produto: produto },
+                              })}><b>{num(m.perdidas)}</b></td>
+                          <td><div className="mini"><i style={{ width: `${Number(m.fatia_no_grupo) * 100}%` }} /></div></td>
+                          <td className="n">{pct(Number(m.fatia_no_grupo))}</td>
+                          <td className="n mudo">
+                            {num(m.veio_da_pre_venda)}
+                            {Number(m.perdidas) > 0
+                              ? ` · ${pct(Number(m.veio_da_pre_venda) / Number(m.perdidas))}` : ""}
+                          </td>
+                          <td className="n mudo">
+                            {num(m.tinha_resposta)}
+                            {Number(m.perdidas) > 0
+                              ? ` · ${pct(Number(m.tinha_resposta) / Number(m.perdidas))}` : ""}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            );
+          })}
+          <p className="rodape">
+            <b>Veio da pré-venda</b> é a pessoa que passou pelo funil de pré-vendas antes de chegar no
+            comercial: ali o contato nasceu de disparo, não de alguém que procurou a gente, e a leitura da
+            perda muda. <b>Tinha resposta no WhatsApp</b> é quando o motivo diz que a pessoa não respondeu
+            e existe mensagem dela na conversa. Não é erro de conta: é o motivo escrito no automático, e
+            vale saber o tamanho disso antes de usar esse número para cobrar alguém.
+          </p>
+        </>
       )}
 
       {/* O bloco do APV saiu daqui e foi para Comercial > Agente de Pré-vendas,
