@@ -7,6 +7,7 @@ import Lancamentos from "@/components/telas/Lancamentos";
 import Agente from "@/components/telas/Agente";
 import Atendimento from "@/components/telas/Atendimento";
 import Qualidade from "@/components/telas/Qualidade";
+import Performance from "@/components/telas/Performance";
 
 // Time e Lançamentos respondem à mesma pergunta por ângulos diferentes: quem
 // está entregando, e o que exatamente foi vendido.
@@ -22,6 +23,7 @@ function Tela() {
       {aba === "agente" && <Agente />}
       {aba === "qualidade" && <Qualidade />}
       {aba === "atendimento" && <Atendimento />}
+      {aba === "performance" && <Performance />}
     </>
   );
 }

@@ -402,6 +402,17 @@ const rotas0 = {
       onde: "Sem retorno", atendente: "Marcia Laurett", virou_matricula: false,
       link: "https://pigeon.runus.com.br/redirect?type=SESSION&id=ghi" },
   ],
+  "rpc/painel_performance_hoje": [
+    { vendedor: "Márcia Laurett", carteira: 456, parada_mais_antiga: 63, atendidos_hoje: 22, vendas_hoje: 4, vendas_mes: 4, faturamento_mes: 3179.6, ticket_mes: 795, cobertura_whats: 0.709 },
+    { vendedor: "João Pedro Beraldo", carteira: 179, parada_mais_antiga: 32, atendidos_hoje: 12, vendas_hoje: 1, vendas_mes: 1, faturamento_mes: 594.9, ticket_mes: 595, cobertura_whats: 0.709 },
+    { vendedor: "Kathleen", carteira: 1377, parada_mais_antiga: 130, atendidos_hoje: 0, vendas_hoje: 0, vendas_mes: 0, faturamento_mes: 0, ticket_mes: null, cobertura_whats: 0.709 },
+  ],
+  "rpc/painel_performance_semana": [
+    { semana: "2026-10-26", vendedor: "Márcia Laurett", pessoas: 76, conversas: 78, dias_trabalhados: 6, responderam: 58, taxa_resposta: 0.7436, vendas: 14, faturamento: 6188, ticket_medio: 442, conv_semana: 0.1842, coorte_compraram: 5, conv_coorte: 0.0658, coorte_fechada: false },
+    { semana: "2026-10-26", vendedor: "João Pedro Beraldo", pessoas: 33, conversas: 33, dias_trabalhados: 5, responderam: 17, taxa_resposta: 0.5152, vendas: 3, faturamento: 1986, ticket_medio: 662, conv_semana: 0.0909, coorte_compraram: 0, conv_coorte: 0, coorte_fechada: false },
+    { semana: "2026-10-19", vendedor: "Márcia Laurett", pessoas: 211, conversas: 215, dias_trabalhados: 7, responderam: 127, taxa_resposta: 0.5907, vendas: 38, faturamento: 25118, ticket_medio: 661, conv_semana: 0.1801, coorte_compraram: 15, conv_coorte: 0.0711, coorte_fechada: true },
+    { semana: "2026-10-19", vendedor: "João Pedro Beraldo", pessoas: 157, conversas: 157, dias_trabalhados: 7, responderam: 90, taxa_resposta: 0.5732, vendas: 30, faturamento: 20850, ticket_medio: 695, conv_semana: 0.1911, coorte_compraram: 12, conv_coorte: 0.0764, coorte_fechada: true },
+  ],
   "rpc/painel_parados_pessoas": [
     { pessoa: "Caio Ferreira", telefone: "48997654321", email: null, quando: "2026-09-02",
       onde: "Funil principal · Negociação · parado há 58 dias", atendente: "João Pedro Beraldo",
@@ -483,6 +494,7 @@ const telas = [
   ["/comercial/?v=qualidade", "Quem chega, quem responde, quanto espera"],
   ["/comercial/?v=atendimento", "O tamanho de cada buraco"],
   ["/comercial/?v=lancamentos", "Matrícula por matrícula"],
+  ["/comercial/?v=performance", "Performance individual"],
   ["/comercial/", "Agente de Pré-vendas"],
   ["/marketing/", "Formulário embutido"],
   ["/guia/", "O que você quer saber?"],
@@ -593,7 +605,7 @@ for (const [termo, esperado] of [
 // Retratos para olho humano: notebook, que é onde a maioria usa, e telefone.
 // A conferência acima diz que renderizou; estas dizem se dá para ler.
 const retratos = [
-  ["notebook", 1280, 800, ["/", "/campanha/", "/comercial/", "/comercial/?v=atendimento", "/campanha/?v=comparar", "/campanha/?v=upsell", "/guia/"]],
+  ["notebook", 1280, 800, ["/", "/campanha/", "/comercial/", "/comercial/?v=atendimento", "/comercial/?v=performance", "/campanha/?v=comparar", "/campanha/?v=upsell", "/guia/"]],
   ["telefone", 390, 844, ["/", "/campanha/", "/comercial/", "/marketing/?v=classificar", "/campanha/?v=comparar", "/comercial/?v=lancamentos", "/ajustes/"]],
 ];
 for (const [nome, width, height, rotas] of retratos) {

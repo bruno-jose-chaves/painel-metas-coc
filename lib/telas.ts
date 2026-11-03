@@ -107,6 +107,11 @@ export const AREAS: Area[] = [
         blocos: ["O tamanho de cada buraco", "A fila"],
         modo2: { id: "diagnostico", nome: "Diagnóstico",
                  blocos: ["A passagem", "Por atendente", "Quanto tempo o card fica parado"] } },
+      { id: "performance", codigo: 360, nome: "Performance individual",
+        oque: "Quanto cada comercial atendeu, vendeu e converteu, semana por semana, e o que está na mão de cada um agora.",
+        termos: ["performance", "individual", "por vendedor", "quantas pessoas atendeu", "carteira",
+                 "dias trabalhados", "coorte", "ticket por vendedor", "gestao de performance"],
+        blocos: ["A foto de agora", "Semana a semana", "Quantas pessoas cada um atendeu"] },
     ],
   },
   {
