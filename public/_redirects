@@ -10,8 +10,8 @@
 /time            /comercial/                 301
 /leads/*         /marketing/                 301
 /leads           /marketing/                 301
-/pendencias/*    /marketing/?v=paginas       301
-/pendencias      /marketing/?v=paginas       301
+/pendencias/*    /marketing/?v=classificar       301
+/pendencias      /marketing/?v=classificar       301
 /gestao/*        /?v=operacao                301
 /gestao          /?v=operacao                301
 /campanhas/*     /ajustes/                   301
