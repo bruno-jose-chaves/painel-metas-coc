@@ -110,8 +110,11 @@ export const AREAS: Area[] = [
       { id: "performance", codigo: 360, nome: "Performance individual",
         oque: "Quanto cada comercial atendeu, vendeu e converteu, semana por semana, e o que está na mão de cada um agora.",
         termos: ["performance", "individual", "por vendedor", "quantas pessoas atendeu", "carteira",
-                 "dias trabalhados", "coorte", "ticket por vendedor", "gestao de performance"],
-        blocos: ["A foto de agora", "Semana a semana", "Quantas pessoas cada um atendeu"] },
+                 "dias trabalhados", "coorte", "ticket por vendedor", "gestão de performance",
+                 "mapa de calor", "quadro de horário", "hora do dia", "mensagens enviadas",
+                 "quando o cliente responde", "plantão"],
+        blocos: ["Lado a lado no período", "Hoje e o que está na mão de cada um",
+                 "Semana a semana", "A curva de cada um", "O quadro de horário"] },
     ],
   },
   {

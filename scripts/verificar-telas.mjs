@@ -402,6 +402,16 @@ const rotas0 = {
       onde: "Sem retorno", atendente: "Marcia Laurett", virou_matricula: false,
       link: "https://pigeon.runus.com.br/redirect?type=SESSION&id=ghi" },
   ],
+  "rpc/painel_mapa_calor": (() => {
+    const fora = [];
+    for (const d of [1, 2, 3, 4, 5, 6, 0]) {
+      for (let h = 8; h <= 20; h++) {
+        const v = Math.max(0, Math.round(40 * Math.sin((h - 7) / 5) * (d === 0 || d === 6 ? 0.2 : 1)));
+        if (v > 0) fora.push({ dia_semana: d, nome_dia: ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"][d], hora: h, valor: v, base: v });
+      }
+    }
+    return fora;
+  })(),
   "rpc/painel_performance_hoje": [
     { vendedor: "Márcia Laurett", carteira: 456, parada_mais_antiga: 63, atendidos_hoje: 22, vendas_hoje: 4, vendas_mes: 4, faturamento_mes: 3179.6, ticket_mes: 795, cobertura_whats: 0.709 },
     { vendedor: "João Pedro Beraldo", carteira: 179, parada_mais_antiga: 32, atendidos_hoje: 12, vendas_hoje: 1, vendas_mes: 1, faturamento_mes: 594.9, ticket_mes: 595, cobertura_whats: 0.709 },

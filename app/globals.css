@@ -1556,3 +1556,35 @@ a.btn { text-decoration: none; white-space: nowrap; display: inline-flex; align-
 .bloco,
 .cards,
 main .rolar { scroll-margin-top: 112px; }
+
+/* ---------- mapa de calor ---------- */
+/* Uma cor só, do claro ao escuro: a grandeza tem ordem, então a escala também
+   precisa ter. O respiro de 2px entre células é o que deixa cada uma ser lida
+   como um valor, e não como uma mancha contínua. */
+.calor-caixa {
+  background: var(--superficie); border: 1px solid var(--linha);
+  border-radius: var(--raio); padding: 16px;
+}
+.calor { border-collapse: separate; border-spacing: 2px; width: 100%; }
+.calor th {
+  font-size: 11px; font-weight: 600; color: var(--cinza);
+  text-transform: uppercase; letter-spacing: .04em; padding: 2px 4px; text-align: center;
+}
+.calor tbody th { text-align: right; white-space: nowrap; padding-right: 8px; }
+.calor tr.fds tbody th, .calor tr.fds th { color: var(--cinza-claro); }
+.calor td {
+  background: #1212110A; border-radius: 4px; height: 30px; min-width: 30px;
+  text-align: center; font-size: 11px; font-weight: 600;
+  font-variant-numeric: tabular-nums; color: var(--cinza-claro);
+}
+.calor td.abre { cursor: pointer; }
+.calor td.abre:hover { outline: 2px solid var(--lima); outline-offset: -2px; }
+.calor-pe {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; margin-top: 12px;
+}
+.calor-escala { display: flex; align-items: center; gap: 4px; }
+.calor-escala i { width: 20px; height: 10px; border-radius: 2px; display: block; }
+@media (max-width: 760px) {
+  .calor td { height: 26px; min-width: 26px; font-size: 10px; }
+}
