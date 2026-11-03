@@ -402,6 +402,28 @@ const rotas0 = {
       onde: "Sem retorno", atendente: "Marcia Laurett", virou_matricula: false,
       link: "https://pigeon.runus.com.br/redirect?type=SESSION&id=ghi" },
   ],
+  "rpc/painel_performance_resposta": [
+    { vendedor: "João Pedro Beraldo", procuraram: 452, mediana_min: 24, p90_min: 310, ate_15min: 170, ate_1h: 128, mais_de_1h: 154, sem_resposta: 79 },
+    { vendedor: "Márcia Laurett", procuraram: 465, mediana_min: 33, p90_min: 402, ate_15min: 151, ate_1h: 156, mais_de_1h: 158, sem_resposta: 92 },
+  ],
+  "rpc/painel_performance_mix": [
+    { vendedor: "João Pedro Beraldo", produto_id: "metodo-acafe", produto: "Método de Aprovação ACAFE", vendas: 127, faturamento: 82296, ticket: 648, fatia: 0.602 },
+    { vendedor: "João Pedro Beraldo", produto_id: "missao-ufsc", produto: "Missão UFSC", vendas: 70, faturamento: 43400, ticket: 620, fatia: 0.332 },
+    { vendedor: "João Pedro Beraldo", produto_id: "semi-extensivo", produto: "Semi Extensivo", vendas: 13, faturamento: 92859, ticket: 7143, fatia: 0.062 },
+    { vendedor: "Márcia Laurett", produto_id: "metodo-acafe", produto: "Método de Aprovação ACAFE", vendas: 100, faturamento: 65600, ticket: 656, fatia: 0.532 },
+    { vendedor: "Márcia Laurett", produto_id: "missao-ufsc", produto: "Missão UFSC", vendas: 72, faturamento: 44496, ticket: 618, fatia: 0.383 },
+  ],
+  "rpc/painel_performance_carteira": [
+    { vendedor: "Márcia Laurett", abertas: 456, ate_7: 180, d8_15: 90, d16_30: 86, d31_60: 60, mais_60: 40, dias_mediana: 12 },
+    { vendedor: "João Pedro Beraldo", abertas: 179, ate_7: 90, d8_15: 40, d16_30: 29, d31_60: 15, mais_60: 5, dias_mediana: 8 },
+    { vendedor: "Kathleen", abertas: 1377, ate_7: 0, d8_15: 2, d16_30: 11, d31_60: 180, mais_60: 1184, dias_mediana: 118 },
+  ],
+  "rpc/painel_performance_perdas": [
+    { vendedor: "João Pedro Beraldo", motivo: "Público não corresponde ao da campanha", grupo: "comercial", perdidas: 54, fatia_no_grupo: 0.41 },
+    { vendedor: "João Pedro Beraldo", motivo: "Nunca respondeu", grupo: "sumico", perdidas: 1830, fatia_no_grupo: 0.58 },
+    { vendedor: "Márcia Laurett", motivo: "Não fechou pelo preço", grupo: "comercial", perdidas: 12, fatia_no_grupo: 0.18 },
+    { vendedor: "Márcia Laurett", motivo: "Parou de responder", grupo: "sumico", perdidas: 1402, fatia_no_grupo: 0.44 },
+  ],
   "rpc/painel_mapa_calor": (() => {
     const fora = [];
     for (const d of [1, 2, 3, 4, 5, 6, 0]) {

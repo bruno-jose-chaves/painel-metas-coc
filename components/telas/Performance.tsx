@@ -46,11 +46,24 @@ type Agora = {
 };
 type MEDIDA = "pessoas" | "vendas" | "conv" | "ticket";
 type CALOR = "enviadas" | "recebidas" | "chamadas" | "procuraram" | "ganhas" | "espera";
+type Resposta = {
+  vendedor: string; procuraram: number; mediana_min: number | null; p90_min: number | null;
+  ate_15min: number; ate_1h: number; mais_de_1h: number; sem_resposta: number;
+};
+type Mix = {
+  vendedor: string; produto_id: string | null; produto: string; vendas: number;
+  faturamento: number; ticket: number | null; fatia: number;
+};
+type Carteira = {
+  vendedor: string; abertas: number; ate_7: number; d8_15: number; d16_30: number;
+  d31_60: number; mais_60: number; dias_mediana: number | null;
+};
+type Perda = { vendedor: string; motivo: string; grupo: string; perdidas: number; fatia_no_grupo: number };
 
 const MEDIDAS: { id: MEDIDA; nome: string }[] = [
   { id: "pessoas", nome: "Pessoas atendidas" },
   { id: "vendas", nome: "Matrículas" },
-  { id: "conv", nome: "Conversão da semana" },
+  { id: "conv", nome: "Conversão" },
   { id: "ticket", nome: "Ticket médio" },
 ];
 
@@ -90,6 +103,17 @@ export default function Performance() {
   const [medida, setMedida] = useState<MEDIDA>("pessoas");
   const [calor, setCalor] = useState<CALOR>("enviadas");
   const [grade, setGrade] = useState<Celula[] | null>(null);
+  const [resposta, setResposta] = useState<Resposta[] | null>(null);
+  const [mix, setMix] = useState<Mix[] | null>(null);
+  const [carteira, setCarteira] = useState<Carteira[] | null>(null);
+  const [perdas, setPerdas] = useState<Perda[] | null>(null);
+
+  // Em período curto a semana some: sobra um ponto ou dois, e dois pontos não
+  // formam leitura. Abaixo de três semanas a tela passa a falar em dia.
+  const dias = Math.round(
+    (new Date(periodo.ate).getTime() - new Date(periodo.de).getTime()) / 86400000) + 1;
+  const passo: "dia" | "semana" = dias <= 21 ? "dia" : "semana";
+  const nomePasso = passo === "dia" ? "Dia" : "Semana";
   const [detalhe, setDetalhe] = useState<{ titulo: string; recorte: Recorte } | null>(null);
   const [gaveta, setGaveta] = useState<
     { titulo: string; rotulo: string; rpc: string; params: Record<string, unknown> } | null
@@ -97,12 +121,21 @@ export default function Performance() {
 
   useEffect(() => {
     supabase.rpc("painel_performance_hoje").then(({ data }) => setAgora((data as Agora[]) ?? []));
+    supabase.rpc("painel_performance_carteira").then(({ data }) => setCarteira((data as Carteira[]) ?? []));
   }, [volta]);
 
   useEffect(() => {
     setSemanas(null);
-    ultima("semanas", supabase.rpc("painel_performance_semana", { p_de: periodo.de, p_ate: periodo.ate }),
+    ultima("semanas", supabase.rpc("painel_performance_semana",
+      { p_de: periodo.de, p_ate: periodo.ate, p_passo: passo }),
       ({ data }) => setSemanas((data as Semana[]) ?? []));
+    setResposta(null); setMix(null); setPerdas(null);
+    ultima("resposta", supabase.rpc("painel_performance_resposta", { p_de: periodo.de, p_ate: periodo.ate }),
+      ({ data }) => setResposta((data as Resposta[]) ?? []));
+    ultima("mix", supabase.rpc("painel_performance_mix", { p_de: periodo.de, p_ate: periodo.ate }),
+      ({ data }) => setMix((data as Mix[]) ?? []));
+    ultima("perdas", supabase.rpc("painel_performance_perdas", { p_de: periodo.de, p_ate: periodo.ate }),
+      ({ data }) => setPerdas((data as Perda[]) ?? []));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [periodo.de, periodo.ate, volta]);
 
@@ -198,10 +231,15 @@ export default function Performance() {
           <b>Pessoas</b> é gente diferente que aquele comercial atendeu no WhatsApp no período.
           A mesma pessoa em três conversas conta uma vez.
           <br /><br />
-          <b>Dias trabalhados</b> é em quantos dias do período ele atendeu pelo menos uma
-          pessoa. Serve para separar quem produziu pouco de quem produziu pouco porque esteve
-          fora: 20 matrículas em 18 dias e 20 matrículas em 6 dias são performances bem
-          diferentes.
+          <b>Dias com atendimento</b> conta os dias do período em que aquela pessoa falou com
+          pelo menos um cliente no WhatsApp. "13 de 64" quer dizer: o período tem 64 dias, e
+          em 13 deles ela atendeu alguém. Os outros 51 ela não abriu nenhuma conversa.
+          <br /><br />
+          Não é controle de ponto nem jornada: é frequência de atendimento. Serve para ler o
+          resto da linha direito. 20 matrículas feitas em 18 dias de atendimento e 20 feitas
+          em 6 dias são performances bem diferentes, e sem essa coluna as duas aparecem
+          iguais. Também é o jeito mais rápido de ver férias, afastamento ou alguém que
+          simplesmente parou de abrir conversa.
           <br /><br />
           <b>Carteira</b> é negociação aberta na mão dele hoje, segundo o CRM, e a coluna ao
           lado é há quantos dias está parada a mais antiga. Carteira grande com venda baixa e
@@ -217,7 +255,7 @@ export default function Performance() {
               <tr>
                 <th>Comercial</th>
                 <th className="n">Pessoas</th><th style={{ minWidth: 70 }} />
-                <th className="n">Dias trabalhados</th><th className="n">Responderam</th>
+                <th className="n">Dias com atendimento</th><th className="n">Responderam</th>
                 <th className="n">Matrículas</th><th style={{ minWidth: 70 }} />
                 <th className="n">Faturamento</th><th className="n">Ticket</th>
                 <th className="n">Conversão</th>
@@ -234,7 +272,10 @@ export default function Performance() {
                       params: { p_de: periodo.de, p_ate: periodo.ate, p_atendente: primeiro(p.vendedor), p_limite: 300 },
                     })}><b>{num(p.pessoas)}</b></td>
                     <td><div className="mini"><i style={{ width: `${(p.pessoas / maior((x) => x.pessoas)) * 100}%` }} /></div></td>
-                    <td className="n num">{num(p.dias)}</td>
+                    <td className="n num">
+                      {num(p.dias)}
+                      <div className="rotulo num">de {num(dias)}</div>
+                    </td>
                     <td className="n">
                       {num(p.responderam)}
                       <div className="rotulo num">{pct(p.conversas ? p.responderam / p.conversas : null)}</div>
@@ -260,8 +301,17 @@ export default function Performance() {
       <h2><span className="idx" /> Hoje e o que está na mão de cada um</h2>
       <p className="nota">
         A foto de agora, que não depende do período escolhido acima. Carteira é negociação
-        aberta na mão da pessoa hoje, segundo o CRM, e a coluna ao lado é há quantos dias está
-        parada a mais antiga delas.
+        aberta na mão da pessoa hoje, segundo o CRM, quebrada por quanto tempo cada uma está
+        sem receber nenhuma mexida.
+        <Ajuda titulo="Por que quebrar a carteira por tempo">
+          Carteira grande não é sinal de trabalho: pode ser lead estacionado. Quem tem 400
+          negociações com metade parada há menos de uma semana está trabalhando; quem tem 1.300
+          com quase tudo parado há mais de dois meses está só segurando nome que já esfriou.
+          <br /><br />
+          As duas últimas faixas vêm em vermelho de propósito. Acima de 30 dias sem contato, a
+          chance de a pessoa lembrar da gente é baixa, e o certo é devolver para o funil ou
+          encerrar, não deixar envelhecendo na mão de alguém.
+        </Ajuda>
       </p>
       {!agora ? <p className="rotulo">Carregando</p> : agoraFiltrado.length === 0 ? (
         <p className="mudo">Nenhuma atividade comercial hoje.</p>
@@ -272,9 +322,10 @@ export default function Performance() {
               <tr>
                 <th>Comercial</th>
                 <th className="n">Carteira aberta</th><th style={{ minWidth: 70 }} />
-                <th className="n">Parada há</th>
+                <th className="n">Até 7 d</th><th className="n">8 a 15</th>
+                <th className="n">16 a 30</th><th className="n">31 a 60</th><th className="n">+ de 60</th>
                 <th className="n">Atendeu hoje</th><th className="n">Vendeu hoje</th>
-                <th className="n">Matrículas no mês</th><th className="n">Faturamento no mês</th>
+                <th className="n">Matrículas no mês</th>
               </tr>
             </thead>
             <tbody>
@@ -289,13 +340,21 @@ export default function Performance() {
                       <i style={{ width: `${(a.carteira / Math.max(1, ...agoraFiltrado.map((x) => x.carteira))) * 100}%` }} />
                     </div>
                   </td>
-                  <td className={"n num " + (Number(a.parada_mais_antiga) > 60 ? "alerta" : "mudo")}>
-                    {a.parada_mais_antiga == null ? "-" : num(a.parada_mais_antiga) + " d"}
-                  </td>
+                  {(() => {
+                    const f = (carteira ?? []).find((c) => c.vendedor === a.vendedor);
+                    const cel = (v: number | undefined, alerta = false) => (
+                      <td className={"n num " + (v ? (alerta ? "alerta" : "") : "mudo")}>{num(v ?? 0)}</td>
+                    );
+                    return (
+                      <>
+                        {cel(f?.ate_7)}{cel(f?.d8_15)}{cel(f?.d16_30)}
+                        {cel(f?.d31_60, true)}{cel(f?.mais_60, true)}
+                      </>
+                    );
+                  })()}
                   <td className="n">{num(a.atendidos_hoje)}</td>
                   <td className="n">{num(a.vendas_hoje)}</td>
                   <td className="n">{num(a.vendas_mes)}</td>
-                  <td className="n">{brl(a.faturamento_mes)}</td>
                 </tr>
               ))}
             </tbody>
@@ -303,24 +362,31 @@ export default function Performance() {
         </div>
       )}
 
-      <h2><span className="idx" /> Semana a semana</h2>
+      <h2><span className="idx" /> {passo === "dia" ? "Dia a dia" : "Semana a semana"}</h2>
       <p className="nota">
-        A mesma leitura, quebrada por semana, para ver constância em vez de média.
+        A mesma leitura, quebrada por {passo === "dia" ? "dia" : "semana"}, para ver constância
+        em vez de média.
         {cobertura != null && (
-          <> Hoje {pct(cobertura)} das matrículas dão para amarrar numa conversa, e é esse o
-          teto da coluna de coorte.</>
+          <> Hoje {pct(cobertura)} das matrículas dão para amarrar numa conversa de WhatsApp,
+          e é esse o teto da última coluna: o que não casa por telefone não entra lá.</>
         )}
-        <Ajuda titulo="As duas conversões">
-          <b>Conversão da semana</b> é matrícula da semana sobre pessoa atendida na semana.
-          Serve para comparar ritmo entre semanas, mas mistura gente abordada antes.
+        <Ajuda titulo="A diferença entre as duas últimas colunas">
+          <b>Fechou no período</b> divide as matrículas daquela linha pelas pessoas atendidas
+          naquela linha. É a conta do caixa: o que entrou contra o que foi trabalhado. Só que
+          as duas pontas não são as mesmas pessoas, porque quem comprou segunda pode ter sido
+          abordado duas semanas antes.
           <br /><br />
-          <b>Coorte</b> pega as pessoas que aquele comercial abordou naquela semana e pergunta
-          quantas compraram até hoje. É a conversão real da pessoa. Semana marcada com "em jogo"
-          ainda vai subir, porque a decisão leva semanas.
+          <b>Converteu até hoje</b> faz a pergunta certa: das pessoas que essa pessoa abordou
+          naquela semana, quantas compraram, em qualquer momento depois. Acompanha as mesmas
+          pessoas do começo ao fim, e por isso é a conversão de verdade.
           <br /><br />
-          A coorte conta a pessoa na primeira semana em que aquele comercial falou com ela. Se
-          dois comerciais falaram com a mesma pessoa, ela aparece na coorte dos dois. O canal de
-          Marketing (Instagram e afins) fica fora da conta: não tem telefone, então não dá para
+          A linha marcada com <b>ainda pode subir</b> é recente demais para fechar essa conta.
+          A decisão de matrícula leva semanas, então gente abordada anteontem ainda está
+          decidindo: aquele número só vai crescer.
+          <br /><br />
+          Uma pessoa entra na conta uma vez só, na primeira vez que aquele comercial falou com
+          ela. Se dois comerciais falaram com a mesma pessoa, ela conta para os dois. O canal de
+          Marketing (Instagram e afins) fica de fora: não tem telefone, então não dá para
           amarrar na matrícula.
         </Ajuda>
       </p>
@@ -331,37 +397,38 @@ export default function Performance() {
           <table className="tabela">
             <thead>
               <tr>
-                <th>Semana</th>{!quem && <th>Comercial</th>}
+                <th>{nomePasso}</th>{!quem && <th>Comercial</th>}
                 <th className="n">Pessoas</th><th className="n">Conversas</th>
-                <th className="n">Dias trabalhados</th><th className="n">Responderam</th>
+                {passo === "semana" && <th className="n">Dias com atendimento</th>}
+                <th className="n">Responderam</th>
                 <th className="n">Matrículas</th><th className="n">Ticket</th>
-                <th className="n">Conv. da semana</th><th className="n">Coorte</th>
+                <th className="n">Fechou no período</th><th className="n">Converteu até hoje</th>
               </tr>
             </thead>
             <tbody>
               {lista.map((s) => (
                 <tr key={s.semana + s.vendedor}>
                   <td>
-                    <b>{semanaCurta(s.semana)}</b>
-                    {!s.coorte_fechada && <div className="rotulo">coorte em jogo</div>}
+                    <b>{passo === "dia" ? dataCurta(s.semana) : semanaCurta(s.semana)}</b>
+                    {!s.coorte_fechada && <div className="rotulo">ainda pode subir</div>}
                   </td>
                   {!quem && <td>{primeiro(s.vendedor)}</td>}
                   <td className="n abre" onClick={() => setGaveta({
-                    titulo: s.vendedor + ", " + semanaCurta(s.semana),
-                    rotulo: "pessoas atendidas na semana",
+                    titulo: s.vendedor + ", " + (passo === "dia" ? dataCurta(s.semana) : semanaCurta(s.semana)),
+                    rotulo: "pessoas atendidas no período",
                     rpc: "painel_qualidade_pessoas",
-                    params: { p_de: s.semana, p_ate: fimDaSemana(s.semana), p_atendente: primeiro(s.vendedor), p_limite: 300 },
+                    params: { p_de: s.semana, p_ate: passo === "dia" ? s.semana : fimDaSemana(s.semana), p_atendente: primeiro(s.vendedor), p_limite: 300 },
                   })}><b>{num(s.pessoas)}</b></td>
                   <td className="n">{num(s.conversas)}</td>
-                  <td className="n num">{num(s.dias_trabalhados)}</td>
+                  {passo === "semana" && <td className="n num">{num(s.dias_trabalhados)} de 7</td>}
                   <td className="n">
                     {num(s.responderam)}
                     <div className="rotulo num">{pct(s.taxa_resposta)}</div>
                   </td>
                   <td className={"n" + (s.vendas > 0 ? " abre" : "")}
                       onClick={s.vendas > 0 ? () => setDetalhe({
-                        titulo: s.vendedor + ", " + semanaCurta(s.semana),
-                        recorte: { p_de: s.semana, p_ate: fimDaSemana(s.semana), p_vendedor: s.vendedor },
+                        titulo: s.vendedor + ", " + (passo === "dia" ? dataCurta(s.semana) : semanaCurta(s.semana)),
+                        recorte: { p_de: s.semana, p_ate: passo === "dia" ? s.semana : fimDaSemana(s.semana), p_vendedor: s.vendedor },
                       }) : undefined}>
                     {s.vendas > 0 ? <b>{num(s.vendas)}</b> : <span className="mudo num">0</span>}
                   </td>
@@ -380,8 +447,9 @@ export default function Performance() {
 
       <h2><span className="idx" /> A curva de cada um</h2>
       <p className="nota">
-        Uma medida por vez, porque duas escalas no mesmo eixo mentem sobre a proporção. Troque
-        a medida no botão para comparar outra coisa.
+        Um ponto por {passo === "dia" ? "dia" : "semana"}, seguindo o período escolhido: até
+        três semanas a curva vai por dia, acima disso por semana. Uma medida por vez, porque
+        duas escalas no mesmo eixo mentem sobre a proporção.
       </p>
       <div className="filtros">
         <div className="atalhos">
@@ -427,6 +495,131 @@ export default function Performance() {
           rotuloValor={CALORES.find((c) => c.id === calor)?.unidade ?? ""}
           formatar={(v) => calor === "espera" ? duracao(v) : num(Math.round(v))}
         />
+      )}
+
+      <h2><span className="idx" /> Quanto o cliente espera por cada um</h2>
+      <p className="nota">
+        Só conversa que o cliente começou, porque quando somos nós que abrimos a primeira
+        resposta é a nossa própria mensagem e a conta mediria o disparo, não o atendimento.
+        <Ajuda titulo="Por que mediana e não média">
+          Uma conversa respondida três dias depois puxa a média do mês inteiro para cima e faz
+          parecer que todo mundo espera horas. A mediana diz o que acontece no caso do meio: se
+          está em 24 minutos, metade das pessoas foi atendida em menos que isso.
+          <br /><br />
+          A coluna <b>90% esperaram até</b> é o outro lado: é o atraso que quase ninguém passa.
+          Entre as duas você vê a rotina e o pior caso, que é onde o cliente desiste.
+        </Ajuda>
+      </p>
+      {!resposta ? <p className="rotulo">Carregando</p> : resposta.length === 0 ? (
+        <p className="mudo">Ninguém procurou a gente no período.</p>
+      ) : (
+        <div className="rolar">
+          <table className="tabela">
+            <thead>
+              <tr>
+                <th>Comercial</th><th className="n">Procuraram</th>
+                <th className="n">Mediana</th><th className="n">90% esperaram até</th>
+                <th className="n">Até 15 min</th><th className="n">15 min a 1 h</th>
+                <th className="n">Mais de 1 h</th><th className="n">Sem resposta</th>
+              </tr>
+            </thead>
+            <tbody>
+              {resposta.filter((r) => !quem || r.vendedor === quem).map((r) => (
+                <tr key={r.vendedor}>
+                  <td><b>{r.vendedor}</b></td>
+                  <td className="n">{num(r.procuraram)}</td>
+                  <td className="n num">{duracao(r.mediana_min)}</td>
+                  <td className="n num">{duracao(r.p90_min)}</td>
+                  <td className="n">
+                    {num(r.ate_15min)}
+                    <div className="rotulo num">{pct(r.procuraram ? r.ate_15min / r.procuraram : null)}</div>
+                  </td>
+                  <td className="n">{num(r.ate_1h)}</td>
+                  <td className="n alerta">
+                    {num(r.mais_de_1h)}
+                    <div className="rotulo num">{pct(r.procuraram ? r.mais_de_1h / r.procuraram : null)}</div>
+                  </td>
+                  <td className="n alerta">
+                    {num(r.sem_resposta)}
+                    <div className="rotulo num">{pct(r.procuraram ? r.sem_resposta / r.procuraram : null)}</div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <h2><span className="idx" /> O que cada um vende</h2>
+      <p className="nota">
+        Ticket médio sozinho engana. R$ 602 de um e R$ 692 do outro só quer dizer alguma coisa
+        sabendo o que cada um vendeu: intensivo e extensivo têm ticket dez vezes diferente, e
+        uma venda de Semi muda o ticket do mês inteiro.
+      </p>
+      {!mix ? <p className="rotulo">Carregando</p> : mix.length === 0 ? (
+        <p className="mudo">Sem matrícula no período.</p>
+      ) : (
+        <div className="rolar">
+          <table className="tabela">
+            <thead>
+              <tr>
+                <th>Comercial</th><th>Produto</th><th className="n">Matrículas</th>
+                <th style={{ minWidth: 90 }}>Fatia do que ele vendeu</th>
+                <th className="n">Ticket</th><th className="n">Faturamento</th>
+              </tr>
+            </thead>
+            <tbody>
+              {mix.filter((m) => !quem || m.vendedor === quem).map((m, i, arr) => (
+                <tr key={m.vendedor + m.produto}>
+                  <td>{i === 0 || arr[i - 1].vendedor !== m.vendedor ? <b>{m.vendedor}</b> : ""}</td>
+                  <td>{m.produto}</td>
+                  <td className="n">{num(m.vendas)}</td>
+                  <td>
+                    <div className="mini"><i style={{ width: `${Number(m.fatia) * 100}%` }} /></div>
+                    <div className="rotulo num">{pct(m.fatia)}</div>
+                  </td>
+                  <td className="n">{brl(m.ticket)}</td>
+                  <td className="n">{brl(m.faturamento)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <h2><span className="idx" /> Por que cada um perde</h2>
+      <p className="nota">
+        Os mesmos dois grupos da tela 314: sumiço de um lado, perda comercial do outro. Quem
+        perde por preço e quem perde por público errado precisam de conversas diferentes.
+      </p>
+      {!perdas ? <p className="rotulo">Carregando</p> : perdas.length === 0 ? (
+        <p className="mudo">Nenhuma perda registrada no período.</p>
+      ) : (
+        <div className="rolar">
+          <table className="tabela">
+            <thead>
+              <tr>
+                <th>Comercial</th><th>Motivo</th><th>Grupo</th>
+                <th className="n">Perdidas</th>
+                <th style={{ minWidth: 90 }}>Fatia dentro do grupo</th>
+              </tr>
+            </thead>
+            <tbody>
+              {perdas.filter((x) => !quem || x.vendedor === quem).map((x, i, arr) => (
+                <tr key={x.vendedor + x.motivo}>
+                  <td>{i === 0 || arr[i - 1].vendedor !== x.vendedor ? <b>{x.vendedor}</b> : ""}</td>
+                  <td>{x.motivo}</td>
+                  <td className="mudo">{x.grupo === "sumico" ? "Sumiço" : "Comercial"}</td>
+                  <td className="n">{num(x.perdidas)}</td>
+                  <td>
+                    <div className="mini"><i style={{ width: `${Number(x.fatia_no_grupo) * 100}%` }} /></div>
+                    <div className="rotulo num">{pct(x.fatia_no_grupo)}</div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {detalhe && (
