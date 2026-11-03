@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useAba, type Aba } from "@/components/SubAbas";
 import Escapando from "@/components/telas/Escapando";
 import FunilWhats from "@/components/telas/FunilWhats";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
@@ -10,16 +10,16 @@ import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 // período escolhido), as duas davam números diferentes para a mesma coisa e
 // cada uma precisava de um parágrafo explicando a outra. Mesmo lugar, dois
 // modos, e a explicação vira uma frase só.
-const MODOS = [
+// O modo vai no endereço (&m=diagnostico), então a busca leva direto ao
+// quadro certo e o link que você manda para alguém abre no mesmo lugar.
+const MODOS: Aba[] = [
   { id: "fila", nome: "Fila para trabalhar" },
   { id: "diagnostico", nome: "Diagnóstico" },
-] as const;
-
-type Modo = (typeof MODOS)[number]["id"];
+];
 
 export default function Atendimento() {
   const { em, minutos } = useAtualizacao();
-  const [modo, setModo] = useState<Modo>("fila");
+  const { aba: modo, escolher } = useAba(MODOS, "m");
 
   return (
     <>
@@ -32,7 +32,7 @@ export default function Atendimento() {
       <div className="filtros">
         <div className="atalhos">
           {MODOS.map((m) => (
-            <button key={m.id} className={modo === m.id ? "ativo" : ""} onClick={() => setModo(m.id)}>
+            <button key={m.id} className={modo === m.id ? "ativo" : ""} onClick={() => escolher(m.id)}>
               {m.nome}
             </button>
           ))}

@@ -578,8 +578,12 @@ for (const [termo, esperado] of [
   await pg.getByRole("button", { name: /Procurar/ }).click();
   await pg.locator(".busca-campo").fill(termo);
   await pg.waitForTimeout(250);
-  const primeiro = (await pg.locator(".busca-lista button").first().textContent()) ?? "";
-  const achou = primeiro.includes(esperado);
+  // Confere a lista inteira, não só o primeiro: "etiqueta" acha tanto o quadro
+  // de tags dos leads quanto a tela de classificar, e as duas respostas estão
+  // certas. O que não pode é a tela certa ficar de fora.
+  const lista = await pg.locator(".busca-lista button").allTextContents();
+  const primeiro = lista[0] ?? "";
+  const achou = lista.some((t) => t.includes(esperado));
   if (!achou || erros.length) falhou = true;
   console.log(("busca: " + termo).padEnd(13), achou ? "render ok" : `FALTA "${esperado}" (veio "${primeiro.slice(0, 60)}")`,
     erros.length ? "| ERRO: " + erros.join(" ~ ").slice(0, 200) : "|");

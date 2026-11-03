@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useAba, type Aba } from "@/components/SubAbas";
 import { supabase } from "@/lib/supabase";
 import Sugestoes from "@/components/Sugestoes";
 import Vendas from "@/components/telas/Vendas";
@@ -9,9 +10,14 @@ import { num } from "@/lib/formato";
 // "O que conferir" nunca foi outra tela: é a mesma matrícula lançada, filtrada
 // pelo que saiu estranho. Virou o segundo modo daqui, com a contagem no botão,
 // para quem abre Lançamentos ver que existe coisa torta sem procurar por ela.
+const MODOS: Aba[] = [
+  { id: "lista", nome: "Todas as matrículas" },
+  { id: "conferir", nome: "O que vale conferir" },
+];
+
 export default function Lancamentos() {
   const { volta, em, minutos } = useAtualizacao();
-  const [modo, setModo] = useState<"lista" | "conferir">("lista");
+  const { aba: modo, escolher } = useAba(MODOS, "m");
   const [aConferir, setAConferir] = useState<number | null>(null);
 
   useEffect(() => {
@@ -29,10 +35,10 @@ export default function Lancamentos() {
 
       <div className="filtros">
         <div className="atalhos">
-          <button className={modo === "lista" ? "ativo" : ""} onClick={() => setModo("lista")}>
+          <button className={modo === "lista" ? "ativo" : ""} onClick={() => escolher("lista")}>
             Todas as matrículas
           </button>
-          <button className={modo === "conferir" ? "ativo" : ""} onClick={() => setModo("conferir")}>
+          <button className={modo === "conferir" ? "ativo" : ""} onClick={() => escolher("conferir")}>
             O que vale conferir
             {aConferir != null ? ` (${num(aConferir)})` : ""}
           </button>

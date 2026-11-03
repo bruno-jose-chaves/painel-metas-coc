@@ -20,6 +20,11 @@ export type Tela = {
   // aba Time inteira. A conferência das telas compara esta lista com os
   // títulos que a página desenha, então ela não envelhece em silêncio.
   blocos?: string[];
+  // Tela de dois modos: o segundo tem os seus próprios quadros, e eles
+  // continuam a numeração do primeiro. O modo vai no endereço (&m=), então a
+  // busca leva direto ao quadro certo e o link mandado para alguém abre no
+  // mesmo lugar.
+  modo2?: { id: string; nome: string; blocos: string[] };
 };
 
 export type Area = {
@@ -39,7 +44,8 @@ export const AREAS: Area[] = [
     telas: [
       { id: "resumo", codigo: 110, nome: "Resumo",
         oque: "Matrículas, faturamento e leads do período, e o cartão de cada campanha no ar com meta, ritmo e projeção.",
-        termos: ["meta", "faturamento", "matrículas", "ritmo", "projeção", "fatia de mercado", "ticket"],
+        termos: ["meta", "faturamento", "matrículas", "ritmo", "projeção", "fatia de mercado",
+                 "ticket", "ticket médio", "mês", "período", "semana"],
         blocos: ["Campanhas", "Acompanhando", "Metas de captação", "Ritmo diário de matrículas"] },
       { id: "operacao", codigo: 120, nome: "Operação do dia",
         oque: "Lead novo, lead requentado e conversa do dia, pessoa por pessoa. Leitura de diretoria.",
@@ -78,12 +84,15 @@ export const AREAS: Area[] = [
         // "comissão" e "bônus" ficaram de fora de propósito: o painel ainda não
         // calcula nenhum dos dois, e apelido que leva a uma tela que não tem a
         // resposta é pior do que não achar nada.
-        termos: ["vendedor", "quem vendeu", "ranking", "leads recebidos", "conversão", "perdidas", "motivo de perda"],
+        termos: ["vendedor", "quem vendeu", "ranking", "leads recebidos", "conversão", "perdidas",
+                 "motivo de perda", "funil", "taxa de conversão", "objeção"],
         blocos: ["Vendas dia a dia", "Ranking de vendas", "Negócios em aberto e tempo parado", "Motivos de perda"] },
       { id: "lancamentos", codigo: 320, nome: "Lançamentos",
         oque: "A matrícula como ela foi lançada (aluno, curso, valor de tabela, desconto e vendedor), e o que saiu estranho e vale conferir.",
-        termos: ["desconto", "valor de tabela", "aluno", "matrícula", "cancelado", "conferir", "estranho", "erro na planilha"],
-        blocos: ["Lançamentos"] },
+        termos: ["desconto", "desconto médio", "valor de tabela", "aluno", "matrícula", "cancelado",
+                 "conferir", "estranho", "erro na planilha", "cidade", "turma"],
+        blocos: ["Lançamentos"],
+        modo2: { id: "conferir", nome: "A conferir", blocos: ["Lista de conferência"] } },
       { id: "agente", codigo: 330, nome: "Agente de Pré-vendas",
         oque: "A qualidade do agente: de tudo que ele abriu, quanto respondeu, quanto virou conversa e quanto chegou no comercial.",
         termos: ["agente", "pré-vendas", "apv", "sdr", "disparo", "aquecimento"],
@@ -95,7 +104,9 @@ export const AREAS: Area[] = [
       { id: "atendimento", codigo: 350, nome: "O que está escapando",
         oque: "A fila do que some sem ninguém ver, com nome, dono e o que fazer, e o diagnóstico de conversa que não virou card no CRM.",
         termos: ["fila", "pagamento pendente", "sem card", "negociação parada", "crm", "parado", "escapando"],
-        blocos: ["O tamanho de cada buraco", "A fila"] },
+        blocos: ["O tamanho de cada buraco", "A fila"],
+        modo2: { id: "diagnostico", nome: "Diagnóstico",
+                 blocos: ["A passagem", "Por atendente", "Quanto tempo o card fica parado"] } },
     ],
   },
   {
@@ -104,7 +115,8 @@ export const AREAS: Area[] = [
     telas: [
       { id: "captacao", codigo: 410, nome: "Captação",
         oque: "Quantos leads entraram por dia e por página, contra a meta de captação da campanha.",
-        termos: ["leads captados", "formulário", "página", "meta de captação", "inscritos"],
+        termos: ["leads captados", "formulário", "página", "meta de captação", "inscritos",
+                 "landing page", "lp", "visitas", "site", "conversão da página"],
         blocos: ["Conversões por dia", "Páginas e formulários", "Tags dos leads", "Origem dos negócios no CRM"] },
       { id: "anuncios", codigo: 420, nome: "Anúncios",
         oque: "Quantas conversas cada peça de clique para WhatsApp precisa para sair uma matrícula.",
@@ -116,7 +128,7 @@ export const AREAS: Area[] = [
         blocos: ["Formulário por formulário", "Captação e entrada no CRM, dia a dia"] },
       { id: "classificar", codigo: 440, nome: "A classificar",
         oque: "Páginas, campanhas do CRM e etiquetas que já estão captando e ainda não foram ligadas a um curso.",
-        termos: ["etiqueta", "sem curso", "classificar", "apontar", "regra"],
+        termos: ["etiqueta", "sem curso", "curso do lead", "sem campanha", "classificar", "apontar", "regra"],
         blocos: ["Esperando a sua decisão", "Regras já apontadas"] },
     ],
   },
@@ -158,10 +170,10 @@ const semPlural = (s: string) => s.replace(/(\w{3,}?)s\b/g, "$1");
 // matrículas". Cada linha é um grupo de palavras que valem umas pelas outras,
 // nos dois sentidos.
 const SINONIMOS: string[][] = [
-  ["matricula", "matriculas", "venda", "vendas", "vendeu", "aluno", "alunos", "fechamento"],
+  ["matricula", "matriculas", "venda", "vendas", "vendeu", "aluno", "alunos", "fechamento", "fechei", "fechou", "fechadas"],
   ["lead", "leads", "contato", "contatos", "inscrito", "inscritos", "pessoa", "pessoas"],
   ["anuncio", "anuncios", "peca", "pecas", "criativo", "criativos", "trafego", "campanha paga"],
-  ["conversa", "conversas", "whatsapp", "atendimento", "pigeon"],
+  ["conversa", "conversas", "whatsapp", "whats", "zap", "atendimento", "atender", "pigeon"],
   ["negociacao", "negociacoes", "card", "cards", "negocio", "negocios", "crm"],
   ["curso", "cursos", "produto", "produtos"],
   ["turma", "turmas", "classe"],
@@ -170,7 +182,35 @@ const SINONIMOS: string[][] = [
   ["desconto", "descontos", "abatimento"],
   ["meta", "metas", "objetivo"],
   ["parado", "parada", "paradas", "dormindo", "escapando", "atrasado"],
+  ["motivo", "motivos", "objecao", "objecoes", "perda", "perdas", "perdeu", "perdido"],
+  ["resposta", "respondeu", "responder", "retorno", "respondido"],
+  ["dono", "donos", "responsavel", "atribuido", "carteira"],
+  ["ticket", "ticket medio", "valor medio"],
+  ["cidade", "cidades", "regiao", "praca", "onde mora"],
+  ["projecao", "projetado", "previsao", "tendencia", "fechamento previsto"],
+  ["faturamento", "receita", "faturou", "dinheiro"],
+  ["funil", "etapa", "etapas", "estagio", "estagios", "fase", "fases"],
+  ["upsell", "subiu", "med", "coc med", "progressao"],
+  ["pendencia", "pendencias", "conferir", "conferencia", "faltando", "incompleto"],
+  ["captacao", "captado", "captados", "conversao", "conversoes", "converte", "taxa"],
+  ["chegou", "entrou", "entrada", "novo", "novos", "chegando"],
+  ["origem", "origens", "fonte", "fontes", "veio de"],
+  ["etiqueta", "etiquetas", "tag", "tags"],
 ];
+
+// Palavra que a pessoa escreve para fazer a pergunta, não para dizer o que
+// procura. "quantas vendas por dia" e "vendas por dia" têm que achar a mesma
+// coisa, então essas saem antes da comparação.
+const PAREM = new Set([
+  "a", "o", "as", "os", "de", "do", "da", "dos", "das", "em", "no", "na", "nos", "nas",
+  "por", "para", "pra", "com", "que", "qual", "quais", "quanto", "quantos", "quantas",
+  "quanta", "meu", "minha", "meus", "minhas", "eu", "me", "mais", "ja", "esta", "estao",
+  "estar", "e", "ou", "um", "uma", "ao", "aos", "sobre", "tem", "foi", "ser", "vai",
+  "como", "quem", "ver", "lista", "listar", "mostrar", "mostra", "preciso", "quero",
+  "qual o", "tao", "esse", "essa", "isso", "aqui", "agora e", "nosso", "nossa",
+  "aparece", "acontece", "melhor", "pior", "traz", "leva", "usa", "usam", "quer",
+  "comigo", "praticado", "registrado", "acontecendo", "vem", "onde", "pode", "deve",
+]);
 
 // Devolve o termo e tudo que vale por ele, para a busca achar o bloco mesmo
 // quando a pessoa chamou a coisa pelo outro nome.
@@ -201,49 +241,92 @@ export function procurar(texto: string, admin: boolean): Achado[] {
 
   const blocos: Achado[] = AREAS
     .filter((a) => admin || !a.soAdmin)
-    .flatMap((area) => area.telas.flatMap((tela) =>
-      (tela.blocos ?? []).map((nome, i) => ({
+    .flatMap((area) => area.telas.flatMap((tela) => {
+      const base = linkDa(area, tela);
+      const primeiros = (tela.blocos ?? []).map((nome, i) => ({
         area, tela,
-        link: linkDa(area, tela) + "#s" + (i + 1),
+        link: base + "#s" + (i + 1),
         bloco: { nome, codigo: tela.codigo + i + 1, ancora: "s" + (i + 1) },
-      }))));
+      }));
+      if (!tela.modo2) return primeiros;
+      const pulo = (tela.blocos ?? []).length;
+      const junta = base.includes("?") ? "&" : "?";
+      return primeiros.concat(tela.modo2.blocos.map((nome, i) => ({
+        area, tela,
+        link: `${base}${junta}m=${tela.modo2!.id}#s` + (i + 1),
+        bloco: { nome, codigo: tela.codigo + pulo + i + 1, ancora: "s" + (i + 1) },
+      })));
+    }));
 
   if (!q) return telas;
 
   const qs = variantes(q);
-  const casa = (alvo: string, nota: { igual: number; comeca: number; dentro: number }) => {
+
+  // Cada palavra da pergunta vale por ela e por tudo que é a mesma coisa
+  // dentro de casa. "ranking do time" não é o nome de nenhum quadro, mas
+  // "ranking" e "time" estão os dois no de vendedores.
+  const alternativas = (p: string): string[] => {
+    const fora = new Set([p]);
+    for (const grupo of SINONIMOS) {
+      const limpo = grupo.map((x) => semPlural(limpar(x)));
+      if (!limpo.includes(p)) continue;
+      for (const x of limpo) fora.add(x);
+    }
+    return [...fora];
+  };
+
+  // Tira a palavra de pergunta antes de tirar o plural: semPlural deixaria
+  // "mais" virar "mai", que não é palavra nenhuma e nunca casa com nada.
+  const cheias = q.split(/\s+/).filter(Boolean);
+  const uteis = cheias.filter((p) => !PAREM.has(p)).map(semPlural);
+  const palavras = (uteis.length ? uteis : cheias.map(semPlural)).map(alternativas);
+  // A pergunta sem as palavras de pergunta também vale como frase: quem
+  // escreve "qual o motivo de perda" procura "motivo de perda".
+  if (uteis.length && uteis.length < cheias.length) {
+    for (const v of variantes(uteis.join(" "))) if (!qs.includes(v)) qs.push(v);
+  }
+
+  // Nota do campo: o peso cheio quando a frase inteira aparece nele, e a
+  // fração das palavras achadas quando não. Menos da metade das palavras é
+  // coincidência, não resposta.
+  const casa = (alvo: string, peso: number, minimo = 0.5) => {
     const alvos = [limpar(alvo), semPlural(limpar(alvo))];
     for (const v of qs) {
       for (const a of alvos) {
         for (const t of [v, semPlural(v)]) {
-          if (a === t) return nota.igual;
-          if (a.startsWith(t)) return nota.comeca;
-          if (a.includes(t)) return nota.dentro;
+          if (a === t) return peso;
+          if (a.startsWith(t)) return peso - 5;
+          if (a.includes(t)) return peso - 10;
         }
       }
     }
-    return 0;
+    // Palavra de uma ou duas letras casa com tudo: "a" acharia o painel
+    // inteiro. Nesse caso vale só a comparação de frase acima.
+    if (palavras.length === 1 && palavras[0].every((x) => x.length < 3)) return 0;
+    const achadas = palavras.filter((alts) => alts.some((x) => alvos.some((a) => a.includes(x)))).length;
+    const fracao = achadas / palavras.length;
+    if (fracao < minimo) return 0;
+    return Math.round((peso - 20) * fracao);
   };
 
   const nota = ({ area, tela, bloco }: Achado) => {
     const codigo = String(bloco ? bloco.codigo : tela.codigo);
     if (qs.some((v) => codigo === v || codigo.startsWith(v))) return 100;
-    if (bloco) {
-      // O bloco ganha da aba quando o nome bate: é mais específico, e é o que
-      // a pessoa está procurando quando escreve o nome de um quadro.
-      const n = casa(bloco.nome, { igual: 95, comeca: 85, dentro: 75 });
-      if (n) return n;
-      return 0;
+    // O quadro é mais específico que a aba, então também cobra mais: uma
+    // palavra de duas acha a aba, não o quadro.
+    if (bloco) return casa(bloco.nome, 95, 0.6);
+    const campos: [string, number][] = [
+      [tela.nome, 90],
+      [(tela.termos ?? []).join(" "), 65],
+      [tela.oque, 45],
+      [area.nome, 30],
+    ];
+    let melhor = 0;
+    for (const [texto, peso] of campos) {
+      if (!texto) continue;
+      melhor = Math.max(melhor, casa(texto, peso));
     }
-    const n = casa(tela.nome, { igual: 90, comeca: 80, dentro: 70 });
-    if (n) return n;
-    for (const t of tela.termos ?? []) {
-      const m = casa(t, { igual: 60, comeca: 60, dentro: 50 });
-      if (m) return m;
-    }
-    if (casa(tela.oque, { igual: 40, comeca: 40, dentro: 40 })) return 40;
-    if (casa(area.nome, { igual: 30, comeca: 30, dentro: 30 })) return 30;
-    return 0;
+    return melhor;
   };
 
   return [...telas, ...blocos]
