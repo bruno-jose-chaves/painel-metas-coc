@@ -40,6 +40,15 @@ export default function Acompanhando({ volta }: { volta: number }) {
   const [cartoes, setCartoes] = useState<Cartao[] | null>(null);
   const [turmas, setTurmas] = useState<Turma[] | null>(null);
   const [abrindo, setAbrindo] = useState(false);
+
+  // Esc fecha, como nas outras gavetas do painel. Faltava só aqui, e quem
+  // aprendeu o atalho em uma tela esperava que valesse em todas.
+  useEffect(() => {
+    if (!abrindo) return;
+    const aoTeclar = (e: KeyboardEvent) => { if (e.key === "Escape") setAbrindo(false); };
+    window.addEventListener("keydown", aoTeclar);
+    return () => window.removeEventListener("keydown", aoTeclar);
+  }, [abrindo]);
   const [detalhe, setDetalhe] = useState<{ titulo: string; recorte: Recorte } | null>(null);
   const [montado, setMontado] = useState(false);
 

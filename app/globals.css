@@ -1074,6 +1074,12 @@ select:disabled, input:disabled { color: var(--cinza-claro); background: var(--s
   font-weight: 700;
 }
 
+/* Quando a célula tem mais de uma linha, o ">" colado na célula caía sozinho
+   embaixo da letra miúda, como se fosse outro dado. Nessas, ele anda junto do
+   número, que é o que a pessoa clica. */
+.tabela td.abre:has(> b)::after { content: none; }
+.tabela td.abre > b::after { content: " ›"; color: var(--cinza); }
+
 .faixa > div.abre { transition: background .12s; border-radius: var(--raio-p); }
 .faixa > div.abre:hover { background: var(--lima-suave); }
 .faixa > div.abre .valor { border-bottom: 1px dashed var(--cinza); display: inline-block; }
@@ -1539,3 +1545,14 @@ select:disabled, input:disabled { color: var(--cinza-claro); background: var(--s
 /* Link com cara de botão: sem sublinhado e sem quebrar no meio do rótulo.
    "Abrir no Pigeon" vinha quebrando em duas linhas dentro da célula. */
 a.btn { text-decoration: none; white-space: nowrap; display: inline-flex; align-items: center; }
+
+/* A barra de seções é fixa no topo e tapava o que estivesse exatamente embaixo
+   dela quando a página rolava até lá: filtro, cartão e tabela ficavam sem
+   clique, e a busca por quadro caía atrás da barra. Os títulos já reservavam
+   esse espaço; agora os blocos inteiros reservam também. */
+.secao-topo,
+.filtros,
+.faixa,
+.bloco,
+.cards,
+main .rolar { scroll-margin-top: 112px; }

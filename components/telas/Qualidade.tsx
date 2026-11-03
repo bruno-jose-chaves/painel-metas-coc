@@ -176,21 +176,27 @@ export default function Qualidade() {
         <>
           <h2><span className="idx" /> Procurou contra foi procurado</h2>
           <div className="faixa">
-            <div>
+            <div className="abre" title="Ver quem procurou a gente"
+                 onClick={() => setGaveta({ titulo: "Quem procurou a gente", rotulo: "Cliente procurou",
+                                            situacao: null, canal: "", quem: "Cliente procurou" })}>
               <div className="rotulo">O cliente procurou</div>
               <div className="valor num">{num(soma(entrou, "conversas"))}</div>
               <div className="mudo num">
                 {taxaEntrou != null ? pct(taxaEntrou) + " viraram matrícula" : "sem base para conversão"}
               </div>
             </div>
-            <div>
+            <div className="abre" title="Ver quem a gente procurou"
+                 onClick={() => setGaveta({ titulo: "Quem a gente procurou", rotulo: "Nós procuramos",
+                                            situacao: null, canal: "", quem: "Nós procuramos" })}>
               <div className="rotulo">Nós procuramos</div>
               <div className="valor num">{num(soma(saiu, "conversas"))}</div>
               <div className="mudo num">
                 {taxaSaiu != null ? pct(taxaSaiu) + " viraram matrícula" : "sem base para conversão"}
               </div>
             </div>
-            <div>
+            <div className="abre" title="Ver quem nunca respondeu"
+                 onClick={() => setGaveta({ titulo: "Quem nunca respondeu", rotulo: "Nunca responderam",
+                                            situacao: "nunca", canal: "", quem: "" })}>
               <div className="rotulo">Nunca responderam</div>
               <div className="valor num">{num(soma(linhas, "nunca_responderam"))}</div>
               <div className="mudo num">
@@ -376,7 +382,7 @@ export default function Qualidade() {
           rpc="painel_qualidade_pessoas"
           params={{
             p_de: periodo.de, p_ate: periodo.ate,
-            p_canal: gaveta.canal, p_quem_comecou: gaveta.quem, p_situacao: gaveta.situacao,
+            p_canal: gaveta.canal || null, p_quem_comecou: gaveta.quem || null, p_situacao: gaveta.situacao,
             p_atendente: atendente || null, p_turma: turma || null,
             p_so_dia_util: soDiaUtil, p_so_horario_comercial: soComercial,
           }}
