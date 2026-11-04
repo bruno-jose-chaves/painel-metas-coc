@@ -20,6 +20,10 @@ export type Tela = {
   // aba Time inteira. A conferência das telas compara esta lista com os
   // títulos que a página desenha, então ela não envelhece em silêncio.
   blocos?: string[];
+  // Aba que só o admin enxerga. A área inteira pode ser soAdmin (Ajustes), mas
+  // às vezes é uma aba só: Operação do dia é leitura de diretoria e fica fora
+  // da navegação de quem vende.
+  soAdmin?: boolean;
   // Tela de dois modos: o segundo tem os seus próprios quadros, e eles
   // continuam a numeração do primeiro. O modo vai no endereço (&m=), então a
   // busca leva direto ao quadro certo e o link mandado para alguém abre no
@@ -47,7 +51,12 @@ export const AREAS: Area[] = [
         termos: ["meta", "faturamento", "matrículas", "ritmo", "projeção", "fatia de mercado",
                  "ticket", "ticket médio", "mês", "período", "semana"],
         blocos: ["Campanhas", "Acompanhando", "Metas de captação", "Ritmo diário de matrículas"] },
-      { id: "operacao", codigo: 120, nome: "Operação do dia",
+      { id: "meu", codigo: 130, nome: "Meu painel",
+        oque: "O que é seu: matrículas do dia, como você está contra a média do time e o que está parado na sua mão.",
+        termos: ["meu painel", "minha visão", "meus números", "minhas matrículas", "minha fila",
+                 "meu ticket", "minha conversão", "quanto eu vendi", "o que está comigo"],
+        blocos: ["O seu dia", "Você contra a média do time", "O que está na sua mão agora"] },
+      { id: "operacao", codigo: 120, nome: "Operação do dia", soAdmin: true,
         oque: "Lead novo, lead requentado e conversa do dia, pessoa por pessoa. Leitura de diretoria.",
         termos: ["lead novo", "requentado", "conversa do dia", "sem resposta", "hoje"],
         blocos: ["Quem chegou no período", "Conversas no período", "Dia a dia"] },
@@ -164,7 +173,8 @@ export const AREAS: Area[] = [
   },
 ];
 
-export const telasDe = (areaId: string) => AREAS.find((a) => a.id === areaId)?.telas ?? [];
+export const telasDe = (areaId: string, admin = true) =>
+  (AREAS.find((a) => a.id === areaId)?.telas ?? []).filter((t) => admin || !t.soAdmin);
 
 export const linkDa = (area: Area, tela: Tela) =>
   tela.id === area.telas[0].id ? area.href : `${area.href}?v=${tela.id}`;
@@ -249,11 +259,12 @@ export function procurar(texto: string, admin: boolean): Achado[] {
   const q = limpar(texto);
   const telas: Achado[] = AREAS
     .filter((a) => admin || !a.soAdmin)
-    .flatMap((area) => area.telas.map((tela) => ({ area, tela, link: linkDa(area, tela) })));
+    .flatMap((area) => area.telas.filter((t) => admin || !t.soAdmin)
+      .map((tela) => ({ area, tela, link: linkDa(area, tela) })));
 
   const blocos: Achado[] = AREAS
     .filter((a) => admin || !a.soAdmin)
-    .flatMap((area) => area.telas.flatMap((tela) => {
+    .flatMap((area) => area.telas.filter((t) => admin || !t.soAdmin).flatMap((tela) => {
       const base = linkDa(area, tela);
       const primeiros = (tela.blocos ?? []).map((nome, i) => ({
         area, tela,

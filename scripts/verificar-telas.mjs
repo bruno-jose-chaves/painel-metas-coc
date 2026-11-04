@@ -402,6 +402,22 @@ const rotas0 = {
       onde: "Sem retorno", atendente: "Marcia Laurett", virou_matricula: false,
       link: "https://pigeon.runus.com.br/redirect?type=SESSION&id=ghi" },
   ],
+  "rpc/painel_meu_resumo": [
+    { vendedor: "Márcia Laurett", hoje: 4, semana: 9, mes: 9, faturamento_mes: 6254.1, ticket_mes: 695, carteira: 456, parados: 186, sem_resposta: 41, atendidos_hoje: 22, posicao: 1, no_time: 2 },
+  ],
+  "rpc/painel_meu_contra_time": [
+    { indicador: "matriculas", rotulo: "Matrículas", unidade: "n", meu: 79, media_time: 64.5, melhor_do_time: 79, maior_e_melhor: true, oque: "Quantas matrículas saíram no período." },
+    { indicador: "pessoas", rotulo: "Pessoas atendidas", unidade: "n", meu: 695, media_time: 581.5, melhor_do_time: 695, maior_e_melhor: true, oque: "Gente diferente com quem você falou no WhatsApp." },
+    { indicador: "dias", rotulo: "Dias com atendimento", unidade: "n", meu: 28, media_time: 27.5, melhor_do_time: 28, maior_e_melhor: true, oque: "Em quantos dias do período você abriu conversa com alguém." },
+    { indicador: "conversao", rotulo: "Conversão", unidade: "pct", meu: 0.104, media_time: 0.1038, melhor_do_time: 0.104, maior_e_melhor: true, oque: "Das pessoas que você atendeu, quantas viraram matrícula." },
+    { indicador: "ticket", rotulo: "Ticket médio", unidade: "brl", meu: 656, media_time: 871, melhor_do_time: 1086, maior_e_melhor: true, oque: "Valor médio da matrícula. Depende do curso que você vende." },
+    { indicador: "resposta", rotulo: "Tempo até responder", unidade: "min", meu: 5, media_time: 3.5, melhor_do_time: 2, maior_e_melhor: false, oque: "Mediana no relógio comercial, só conversa que o cliente começou." },
+    { indicador: "mudos", rotulo: "Que nunca responderam", unidade: "pct", meu: 0.172, media_time: 0.17, melhor_do_time: 0.169, maior_e_melhor: false, oque: "Fatia de quem te procurou e não teve resposta nenhuma." },
+  ],
+  "rpc/painel_minha_fila": [
+    { tipo: "Pagamento pendente", prioridade: 1, pessoa: "Marina Alves", telefone: "47999990001", onde: "Aguardando Pagamento", dias: 23, desde: "2026-10-12", ja_e_aluno: false, o_que_fazer: "Link enviado e não pago. Confirmar se houve problema no pagamento." },
+    { tipo: "Negociação parada", prioridade: 2, pessoa: "Pedro Henrique", telefone: "47999990002", onde: "Qualificação", dias: 41, desde: "2026-09-24", ja_e_aluno: false, o_que_fazer: "Sem mexida há mais de um mês. Retomar ou encerrar." },
+  ],
   "rpc/painel_performance_periodo": [
     { vendedor: "Márcia Laurett", pessoas: 1159, conversas: 1258, dias_com_atendimento: 76, responderam: 744, taxa_resposta: 0.5914, vendas: 182, vendas_atendidas: 121, faturamento: 180462.42, ticket_medio: 991, conversao: 0.1044, dias_no_periodo: 91 },
     { vendedor: "João Pedro Beraldo", pessoas: 1083, conversas: 1113, dias_com_atendimento: 72, responderam: 611, taxa_resposta: 0.549, vendas: 209, vendas_atendidas: 112, faturamento: 221212.88, ticket_medio: 1058, conversao: 0.1034, dias_no_periodo: 91 },
@@ -525,6 +541,7 @@ const telas = [
   ["/marketing/?v=anuncios", "Quem chega pelo anúncio"],
   ["/marketing/?v=passagem", "Do marketing para o comercial"],
   ["/?v=operacao", "Quem chegou no período"],
+  ["/?v=meu", "O seu dia"],
   ["/", "Metas de captação"],
   ["/campanha/", "Da origem à matrícula"],
   ["/campanha/?v=historico", "O mesmo curso, ano a ano"],
