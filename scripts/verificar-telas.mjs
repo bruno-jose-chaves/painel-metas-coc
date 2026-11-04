@@ -403,8 +403,8 @@ const rotas0 = {
       link: "https://pigeon.runus.com.br/redirect?type=SESSION&id=ghi" },
   ],
   "rpc/painel_performance_resposta": [
-    { vendedor: "João Pedro Beraldo", procuraram: 452, mediana_min: 24, p90_min: 310, ate_15min: 170, ate_1h: 128, mais_de_1h: 154, sem_resposta: 79 },
-    { vendedor: "Márcia Laurett", procuraram: 465, mediana_min: 33, p90_min: 402, ate_15min: 151, ate_1h: 156, mais_de_1h: 158, sem_resposta: 92 },
+    { vendedor: "João Pedro Beraldo", procuraram: 443, mediana_min: 2, p90_min: 87, mediana_corrida: 26, ate_15min: 290, ate_1h: 38, mais_de_1h: 40, sem_resposta: 75, fora_do_horario: 154 },
+    { vendedor: "Márcia Laurett", procuraram: 465, mediana_min: 5, p90_min: 129, mediana_corrida: 32, ate_15min: 270, ate_1h: 55, mais_de_1h: 60, sem_resposta: 80, fora_do_horario: 136 },
   ],
   "rpc/painel_performance_mix": [
     { vendedor: "João Pedro Beraldo", produto_id: "metodo-acafe", produto: "Método de Aprovação ACAFE", vendas: 127, faturamento: 82296, ticket: 648, fatia: 0.602 },

@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import Detalhe, { type Recorte } from "@/components/Detalhe";
 import Pessoas from "@/components/Pessoas";
 import Ajuda from "@/components/Ajuda";
+import Chave from "@/components/Chave";
 import SeletorPeriodo from "@/components/Periodo";
 import Curva from "@/components/Curva";
 import MapaCalor, { type Celula } from "@/components/MapaCalor";
@@ -48,7 +49,8 @@ type MEDIDA = "pessoas" | "vendas" | "conv" | "ticket";
 type CALOR = "enviadas" | "recebidas" | "chamadas" | "procuraram" | "ganhas" | "espera";
 type Resposta = {
   vendedor: string; procuraram: number; mediana_min: number | null; p90_min: number | null;
-  ate_15min: number; ate_1h: number; mais_de_1h: number; sem_resposta: number;
+  mediana_corrida: number | null; ate_15min: number; ate_1h: number; mais_de_1h: number;
+  sem_resposta: number; fora_do_horario: number;
 };
 type Mix = {
   vendedor: string; produto_id: string | null; produto: string; vendas: number;
@@ -107,6 +109,9 @@ export default function Performance() {
   const [mix, setMix] = useState<Mix[] | null>(null);
   const [carteira, setCarteira] = useState<Carteira[] | null>(null);
   const [perdas, setPerdas] = useState<Perda[] | null>(null);
+  const [soDiaUtil, setSoDiaUtil] = useState(false);
+  const [soComercial, setSoComercial] = useState(false);
+  const [relogio, setRelogio] = useState<"util" | "corrido">("util");
 
   // Em período curto a semana some: sobra um ponto ou dois, e dois pontos não
   // formam leitura. Abaixo de três semanas a tela passa a falar em dia.
@@ -130,8 +135,10 @@ export default function Performance() {
       { p_de: periodo.de, p_ate: periodo.ate, p_passo: passo }),
       ({ data }) => setSemanas((data as Semana[]) ?? []));
     setResposta(null); setMix(null); setPerdas(null);
-    ultima("resposta", supabase.rpc("painel_performance_resposta", { p_de: periodo.de, p_ate: periodo.ate }),
-      ({ data }) => setResposta((data as Resposta[]) ?? []));
+    ultima("resposta", supabase.rpc("painel_performance_resposta", {
+      p_de: periodo.de, p_ate: periodo.ate, p_relogio: relogio,
+      p_so_dia_util: soDiaUtil, p_so_horario_comercial: soComercial,
+    }), ({ data }) => setResposta((data as Resposta[]) ?? []));
     ultima("mix", supabase.rpc("painel_performance_mix", { p_de: periodo.de, p_ate: periodo.ate }),
       ({ data }) => setMix((data as Mix[]) ?? []));
     ultima("perdas", supabase.rpc("painel_performance_perdas", { p_de: periodo.de, p_ate: periodo.ate }),
@@ -154,12 +161,12 @@ export default function Performance() {
 
   // O total do período sai da soma das semanas, e não de uma segunda consulta:
   // duas contas para o mesmo número é como tela passa a mentir devagar.
-  const porPessoa = useMemo(() => {
+  const somar = (linhas: Semana[]) => {
     const m = new Map<string, {
       vendedor: string; pessoas: number; conversas: number; dias: number; responderam: number;
       vendas: number; faturamento: number; coorte: number;
     }>();
-    for (const s of lista) {
+    for (const s of linhas) {
       const a = m.get(s.vendedor) ?? {
         vendedor: s.vendedor, pessoas: 0, conversas: 0, dias: 0, responderam: 0,
         vendas: 0, faturamento: 0, coorte: 0,
@@ -171,7 +178,9 @@ export default function Performance() {
       m.set(s.vendedor, a);
     }
     return [...m.values()].sort((a, b) => b.vendas - a.vendas || b.pessoas - a.pessoas);
-  }, [lista]);
+  };
+  const porPessoa = useMemo(() => somar(lista), [lista]);
+  const porTodos = useMemo(() => somar(semanas ?? []), [semanas]);
 
   const agoraFiltrado = useMemo(
     () => (agora ?? []).filter((a) => !quem || a.vendedor === quem), [agora, quem]);
@@ -211,16 +220,25 @@ export default function Performance() {
 
       <div className="filtros" style={{ flexWrap: "wrap" }}>
         <label>
-          <span className="rotulo">Comercial</span>
+          <span className="rotulo">Quem atendeu</span>
           <select value={quem} onChange={(e) => setQuem(e.target.value)}>
             <option value="">Todo mundo</option>
-            {nomes.map((n) => <option key={n} value={n}>{n}</option>)}
+            {nomes.map((n) => {
+              const p = porTodos.find((x) => x.vendedor === n);
+              return <option key={n} value={n}>{n}{p ? ` (${num(p.pessoas)})` : ""}</option>;
+            })}
           </select>
         </label>
-        <span className="mudo" style={{ marginLeft: "auto", alignSelf: "center" }}>
-          {quem ? quem + ", " + dataCurta(periodo.de) + " a " + dataCurta(periodo.ate)
-                : nomes.length + " comerciais no período"}
-        </span>
+        <div className="chaves-filtro">
+          <Chave ligada={soDiaUtil} aoMudar={setSoDiaUtil}
+                 ajuda="Ligado, tira do tempo de resposta a conversa que chegou no sábado ou domingo.">
+            Tirar sábado e domingo
+          </Chave>
+          <Chave ligada={soComercial} aoMudar={setSoComercial}
+                 ajuda="Ligado, conta só a conversa que chegou entre 8h e 18h, para madrugada não estragar a média.">
+            Só das 8h às 18h
+          </Chave>
+        </div>
       </div>
 
       <h2><span className="idx" /> Lado a lado no período</h2>
@@ -501,53 +519,91 @@ export default function Performance() {
       <p className="nota">
         Só conversa que o cliente começou, porque quando somos nós que abrimos a primeira
         resposta é a nossa própria mensagem e a conta mediria o disparo, não o atendimento.
-        <Ajuda titulo="Por que mediana e não média">
-          Uma conversa respondida três dias depois puxa a média do mês inteiro para cima e faz
-          parecer que todo mundo espera horas. A mediana diz o que acontece no caso do meio: se
-          está em 24 minutos, metade das pessoas foi atendida em menos que isso.
+        <Ajuda titulo="Os dois relógios, e por que o número muda tanto">
+          <b>Relógio comercial</b> conta só os minutos que caíram em dia útil entre 8h e 18h.
+          Mensagem que chega sábado às 22h e é respondida segunda às 8h05 conta como 5 minutos,
+          porque não tinha ninguém para atender no meio. É o que mede o time.
           <br /><br />
-          A coluna <b>90% esperaram até</b> é o outro lado: é o atraso que quase ninguém passa.
-          Entre as duas você vê a rotina e o pior caso, que é onde o cliente desiste.
+          <b>Relógio corrido</b> conta tudo, do minuto em que a mensagem chegou ao minuto da
+          resposta. Nesse mesmo caso dá 34 horas. É o que o cliente sentiu.
+          <br /><br />
+          Os dois estão certos e respondem perguntas diferentes: um diz se o time demora, o
+          outro diz se a pessoa esperou. A diferença entre eles é o tamanho do que acontece
+          fora do expediente, e a coluna "Chegou fora do horário" mostra isso direto.
         </Ajuda>
+        <br />
+        <b>Mediana</b> é o caso do meio: metade foi atendida em menos que isso. Média aqui
+        enganaria, porque uma conversa respondida três dias depois puxa o mês inteiro.
       </p>
-      {!resposta ? <p className="rotulo">Carregando</p> : resposta.length === 0 ? (
-        <p className="mudo">Ninguém procurou a gente no período.</p>
-      ) : (
-        <div className="rolar">
-          <table className="tabela">
-            <thead>
-              <tr>
-                <th>Comercial</th><th className="n">Procuraram</th>
-                <th className="n">Mediana</th><th className="n">90% esperaram até</th>
-                <th className="n">Até 15 min</th><th className="n">15 min a 1 h</th>
-                <th className="n">Mais de 1 h</th><th className="n">Sem resposta</th>
-              </tr>
-            </thead>
-            <tbody>
-              {resposta.filter((r) => !quem || r.vendedor === quem).map((r) => (
-                <tr key={r.vendedor}>
-                  <td><b>{r.vendedor}</b></td>
-                  <td className="n">{num(r.procuraram)}</td>
-                  <td className="n num">{duracao(r.mediana_min)}</td>
-                  <td className="n num">{duracao(r.p90_min)}</td>
-                  <td className="n">
-                    {num(r.ate_15min)}
-                    <div className="rotulo num">{pct(r.procuraram ? r.ate_15min / r.procuraram : null)}</div>
-                  </td>
-                  <td className="n">{num(r.ate_1h)}</td>
-                  <td className="n alerta">
-                    {num(r.mais_de_1h)}
-                    <div className="rotulo num">{pct(r.procuraram ? r.mais_de_1h / r.procuraram : null)}</div>
-                  </td>
-                  <td className="n alerta">
-                    {num(r.sem_resposta)}
-                    <div className="rotulo num">{pct(r.procuraram ? r.sem_resposta / r.procuraram : null)}</div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div className="filtros">
+        <div className="atalhos">
+          <button className={relogio === "util" ? "ativo" : ""} onClick={() => setRelogio("util")}>
+            Relógio comercial
+          </button>
+          <button className={relogio === "corrido" ? "ativo" : ""} onClick={() => setRelogio("corrido")}>
+            Relógio corrido
+          </button>
         </div>
+        <span className="mudo" style={{ marginLeft: "auto", alignSelf: "center" }}>
+          {relogio === "util" ? "Conta só dia útil, das 8h às 18h" : "Conta do minuto que chegou ao minuto da resposta"}
+        </span>
+      </div>
+      {!resposta ? <p className="rotulo">Carregando</p> : resposta.length === 0 ? (
+        <p className="mudo">Ninguém procurou a gente no período, com estes filtros.</p>
+      ) : (
+        <>
+          <div className="rolar">
+            <table className="tabela">
+              <thead>
+                <tr>
+                  <th>Comercial</th><th className="n">Procuraram</th>
+                  <th className="n">Mediana</th><th className="n">90% esperaram até</th>
+                  <th className="n">Até 15 min</th><th className="n">15 min a 1 h</th>
+                  <th className="n">Mais de 1 h</th><th className="n">Sem resposta</th>
+                  <th className="n">Chegou fora do horário</th>
+                </tr>
+              </thead>
+              <tbody>
+                {resposta.filter((r) => !quem || r.vendedor === quem).map((r) => (
+                  <tr key={r.vendedor}>
+                    <td><b>{r.vendedor}</b></td>
+                    <td className="n">{num(r.procuraram)}</td>
+                    <td className="n num">
+                      <b>{duracao(r.mediana_min)}</b>
+                      {relogio === "util" && r.mediana_corrida != null && (
+                        <div className="rotulo num">corrido: {duracao(r.mediana_corrida)}</div>
+                      )}
+                    </td>
+                    <td className="n num">{duracao(r.p90_min)}</td>
+                    <td className="n">
+                      {num(r.ate_15min)}
+                      <div className="rotulo num">{pct(r.procuraram ? r.ate_15min / r.procuraram : null)}</div>
+                    </td>
+                    <td className="n">{num(r.ate_1h)}</td>
+                    <td className={"n" + (r.mais_de_1h > 0 ? " alerta" : "")}>
+                      {num(r.mais_de_1h)}
+                      <div className="rotulo num">{pct(r.procuraram ? r.mais_de_1h / r.procuraram : null)}</div>
+                    </td>
+                    <td className={"n" + (r.sem_resposta > 0 ? " alerta" : "")}>
+                      {num(r.sem_resposta)}
+                      <div className="rotulo num">{pct(r.procuraram ? r.sem_resposta / r.procuraram : null)}</div>
+                    </td>
+                    <td className="n num mudo">
+                      {num(r.fora_do_horario)}
+                      <div className="rotulo num">{pct(r.procuraram ? r.fora_do_horario / r.procuraram : null)}</div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="nota" style={{ marginTop: 10 }}>
+            <b>Sem resposta</b> é conversa sem nenhuma mensagem nossa registrada, nem carimbo de
+            primeira resposta. O Pigeon não carimba todas: quando falta o carimbo mas existe
+            mensagem nossa, o tempo vem da primeira mensagem que mandamos, e a conversa não
+            entra aqui.
+          </p>
+        </>
       )}
 
       <h2><span className="idx" /> O que cada um vende</h2>
