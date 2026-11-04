@@ -402,6 +402,14 @@ const rotas0 = {
       onde: "Sem retorno", atendente: "Marcia Laurett", virou_matricula: false,
       link: "https://pigeon.runus.com.br/redirect?type=SESSION&id=ghi" },
   ],
+  "rpc/painel_performance_periodo": [
+    { vendedor: "Márcia Laurett", pessoas: 1159, conversas: 1258, dias_com_atendimento: 76, responderam: 744, taxa_resposta: 0.5914, vendas: 182, vendas_atendidas: 121, faturamento: 180462.42, ticket_medio: 991, conversao: 0.1044, dias_no_periodo: 91 },
+    { vendedor: "João Pedro Beraldo", pessoas: 1083, conversas: 1113, dias_com_atendimento: 72, responderam: 611, taxa_resposta: 0.549, vendas: 209, vendas_atendidas: 112, faturamento: 221212.88, ticket_medio: 1058, conversao: 0.1034, dias_no_periodo: 91 },
+  ],
+  "rpc/painel_performance_pessoas": [
+    { pessoa: "Marina Alves", telefone: "47999990001", quando: "2026-10-30", onde: "WhatsApp Comercial · Cliente procurou · respondeu", atendente: "Márcia Laurett", conversas: 3, virou_matricula: true, link: null },
+    { pessoa: "Pedro Henrique", telefone: "47999990002", quando: "2026-10-29", onde: "WhatsApp Comercial · Nós procuramos · nunca respondeu", atendente: "Márcia Laurett", conversas: 1, virou_matricula: false, link: null },
+  ],
   "rpc/painel_performance_resposta": [
     { vendedor: "João Pedro Beraldo", procuraram: 443, mediana_min: 2, p90_min: 87, mediana_corrida: 26, ate_15min: 290, ate_1h: 38, mais_de_1h: 40, sem_resposta: 75, fora_do_horario: 154 },
     { vendedor: "Márcia Laurett", procuraram: 465, mediana_min: 5, p90_min: 129, mediana_corrida: 32, ate_15min: 270, ate_1h: 55, mais_de_1h: 60, sem_resposta: 80, fora_do_horario: 136 },
@@ -440,10 +448,10 @@ const rotas0 = {
     { vendedor: "Kathleen", carteira: 1377, parada_mais_antiga: 130, atendidos_hoje: 0, vendas_hoje: 0, vendas_mes: 0, faturamento_mes: 0, ticket_mes: null, cobertura_whats: 0.709 },
   ],
   "rpc/painel_performance_semana": [
-    { semana: "2026-10-26", vendedor: "Márcia Laurett", pessoas: 76, conversas: 78, dias_trabalhados: 6, responderam: 58, taxa_resposta: 0.7436, vendas: 14, faturamento: 6188, ticket_medio: 442, conv_semana: 0.1842, coorte_compraram: 5, conv_coorte: 0.0658, coorte_fechada: false },
-    { semana: "2026-10-26", vendedor: "João Pedro Beraldo", pessoas: 33, conversas: 33, dias_trabalhados: 5, responderam: 17, taxa_resposta: 0.5152, vendas: 3, faturamento: 1986, ticket_medio: 662, conv_semana: 0.0909, coorte_compraram: 0, conv_coorte: 0, coorte_fechada: false },
-    { semana: "2026-10-19", vendedor: "Márcia Laurett", pessoas: 211, conversas: 215, dias_trabalhados: 7, responderam: 127, taxa_resposta: 0.5907, vendas: 38, faturamento: 25118, ticket_medio: 661, conv_semana: 0.1801, coorte_compraram: 15, conv_coorte: 0.0711, coorte_fechada: true },
-    { semana: "2026-10-19", vendedor: "João Pedro Beraldo", pessoas: 157, conversas: 157, dias_trabalhados: 7, responderam: 90, taxa_resposta: 0.5732, vendas: 30, faturamento: 20850, ticket_medio: 695, conv_semana: 0.1911, coorte_compraram: 12, conv_coorte: 0.0764, coorte_fechada: true },
+    { semana: "2026-10-26", vendedor: "Márcia Laurett", pessoas: 76, conversas: 78, dias_trabalhados: 6, responderam: 58, taxa_resposta: 0.7436, vendas: 14, vendas_atendidas: 12, faturamento: 6188, ticket_medio: 442, conv_semana: 0.1842, coorte_compraram: 5, conv_coorte: 0.0658, coorte_fechada: false },
+    { semana: "2026-10-26", vendedor: "João Pedro Beraldo", pessoas: 33, conversas: 33, dias_trabalhados: 5, responderam: 17, taxa_resposta: 0.5152, vendas: 3, vendas_atendidas: 1, faturamento: 1986, ticket_medio: 662, conv_semana: 0.0909, coorte_compraram: 0, conv_coorte: 0, coorte_fechada: false },
+    { semana: "2026-10-19", vendedor: "Márcia Laurett", pessoas: 211, conversas: 215, dias_trabalhados: 7, responderam: 127, taxa_resposta: 0.5907, vendas: 38, vendas_atendidas: 36, faturamento: 25118, ticket_medio: 661, conv_semana: 0.1801, coorte_compraram: 15, conv_coorte: 0.0711, coorte_fechada: true },
+    { semana: "2026-10-19", vendedor: "João Pedro Beraldo", pessoas: 157, conversas: 157, dias_trabalhados: 7, responderam: 90, taxa_resposta: 0.5732, vendas: 30, vendas_atendidas: 28, faturamento: 20850, ticket_medio: 695, conv_semana: 0.1911, coorte_compraram: 12, conv_coorte: 0.0764, coorte_fechada: true },
   ],
   "rpc/painel_parados_pessoas": [
     { pessoa: "Caio Ferreira", telefone: "48997654321", email: null, quando: "2026-09-02",

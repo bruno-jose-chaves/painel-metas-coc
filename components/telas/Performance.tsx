@@ -36,7 +36,7 @@ import { ultimosDias, type Periodo } from "@/lib/periodo";
 type Semana = {
   semana: string; vendedor: string; pessoas: number; conversas: number;
   dias_trabalhados: number; responderam: number; taxa_resposta: number | null;
-  vendas: number; faturamento: number; ticket_medio: number | null;
+  vendas: number; vendas_atendidas: number; faturamento: number; ticket_medio: number | null;
   conv_semana: number | null; coorte_compraram: number; conv_coorte: number | null;
   coorte_fechada: boolean;
 };
@@ -61,6 +61,11 @@ type Carteira = {
   d31_60: number; mais_60: number; dias_mediana: number | null;
 };
 type Perda = { vendedor: string; motivo: string; grupo: string; perdidas: number; fatia_no_grupo: number };
+type Periodo361 = {
+  vendedor: string; pessoas: number; conversas: number; dias_com_atendimento: number;
+  responderam: number; taxa_resposta: number | null; vendas: number; vendas_atendidas: number;
+  faturamento: number; ticket_medio: number | null; conversao: number | null; dias_no_periodo: number;
+};
 
 const MEDIDAS: { id: MEDIDA; nome: string }[] = [
   { id: "pessoas", nome: "Pessoas atendidas" },
@@ -82,7 +87,7 @@ const CALORES: { id: CALOR; nome: string; oque: string; unidade: string }[] = [
   { id: "procuraram", nome: "Pessoas que nos procuraram", unidade: "conversas",
     oque: "Conversa aberta pelo cliente. É a demanda espontânea, hora a hora." },
   { id: "ganhas", nome: "Negociações ganhas", unidade: "ganhas",
-    oque: "Hora em que o CRM marcou a venda. A planilha guarda só a data, então a hora vem daqui." },
+    oque: "Hora em que o CRM marcou a venda. A planilha guarda só a data, então a hora vem daqui, e por isso o total aqui não bate com o de matrículas: o CRM marcou 449 ganhas onde a planilha tem 391 matrículas em 90 dias." },
   { id: "espera", nome: "Quanto o cliente espera", unidade: "min de espera",
     oque: "Média de minutos até a primeira resposta, só em conversa que o cliente começou." },
 ];
@@ -109,6 +114,7 @@ export default function Performance() {
   const [mix, setMix] = useState<Mix[] | null>(null);
   const [carteira, setCarteira] = useState<Carteira[] | null>(null);
   const [perdas, setPerdas] = useState<Perda[] | null>(null);
+  const [total, setTotal] = useState<Periodo361[] | null>(null);
   const [soDiaUtil, setSoDiaUtil] = useState(false);
   const [soComercial, setSoComercial] = useState(false);
   const [relogio, setRelogio] = useState<"util" | "corrido">("util");
@@ -134,7 +140,9 @@ export default function Performance() {
     ultima("semanas", supabase.rpc("painel_performance_semana",
       { p_de: periodo.de, p_ate: periodo.ate, p_passo: passo }),
       ({ data }) => setSemanas((data as Semana[]) ?? []));
-    setResposta(null); setMix(null); setPerdas(null);
+    setResposta(null); setMix(null); setPerdas(null); setTotal(null);
+    ultima("periodo", supabase.rpc("painel_performance_periodo", { p_de: periodo.de, p_ate: periodo.ate }),
+      ({ data }) => setTotal((data as Periodo361[]) ?? []));
     ultima("resposta", supabase.rpc("painel_performance_resposta", {
       p_de: periodo.de, p_ate: periodo.ate, p_relogio: relogio,
       p_so_dia_util: soDiaUtil, p_so_horario_comercial: soComercial,
@@ -155,38 +163,19 @@ export default function Performance() {
   }, [periodo.de, periodo.ate, calor, quem, volta]);
 
   const nomes = useMemo(
-    () => [...new Set((semanas ?? []).map((s) => s.vendedor))].sort(), [semanas]);
+    () => [...new Set((total ?? []).map((t) => t.vendedor))].sort(), [total]);
   const lista = useMemo(
     () => (semanas ?? []).filter((s) => !quem || s.vendedor === quem), [semanas, quem]);
 
   // O total do período sai da soma das semanas, e não de uma segunda consulta:
   // duas contas para o mesmo número é como tela passa a mentir devagar.
-  const somar = (linhas: Semana[]) => {
-    const m = new Map<string, {
-      vendedor: string; pessoas: number; conversas: number; dias: number; responderam: number;
-      vendas: number; faturamento: number; coorte: number;
-    }>();
-    for (const s of linhas) {
-      const a = m.get(s.vendedor) ?? {
-        vendedor: s.vendedor, pessoas: 0, conversas: 0, dias: 0, responderam: 0,
-        vendas: 0, faturamento: 0, coorte: 0,
-      };
-      a.pessoas += Number(s.pessoas); a.conversas += Number(s.conversas);
-      a.dias += Number(s.dias_trabalhados); a.responderam += Number(s.responderam);
-      a.vendas += Number(s.vendas); a.faturamento += Number(s.faturamento);
-      a.coorte += Number(s.coorte_compraram);
-      m.set(s.vendedor, a);
-    }
-    return [...m.values()].sort((a, b) => b.vendas - a.vendas || b.pessoas - a.pessoas);
-  };
-  const porPessoa = useMemo(() => somar(lista), [lista]);
-  const porTodos = useMemo(() => somar(semanas ?? []), [semanas]);
+  const porPessoa = useMemo(
+    () => (total ?? []).filter((t) => !quem || t.vendedor === quem), [total, quem]);
 
   const agoraFiltrado = useMemo(
     () => (agora ?? []).filter((a) => !quem || a.vendedor === quem), [agora, quem]);
   const cobertura = agora?.[0]?.cobertura_whats ?? null;
-  const maior = (f: (p: (typeof porPessoa)[number]) => number) =>
-    Math.max(1, ...porPessoa.map(f));
+  const maior = (f: (p: Periodo361) => number) => Math.max(1, ...porPessoa.map(f));
 
   const curva = useMemo(() => {
     const ordem = [...new Set((semanas ?? []).map((s) => s.semana))].sort();
@@ -224,7 +213,7 @@ export default function Performance() {
           <select value={quem} onChange={(e) => setQuem(e.target.value)}>
             <option value="">Todo mundo</option>
             {nomes.map((n) => {
-              const p = porTodos.find((x) => x.vendedor === n);
+              const p = (total ?? []).find((x) => x.vendedor === n);
               return <option key={n} value={n}>{n}{p ? ` (${num(p.pessoas)})` : ""}</option>;
             })}
           </select>
@@ -259,12 +248,18 @@ export default function Performance() {
           iguais. Também é o jeito mais rápido de ver férias, afastamento ou alguém que
           simplesmente parou de abrir conversa.
           <br /><br />
-          <b>Carteira</b> é negociação aberta na mão dele hoje, segundo o CRM, e a coluna ao
-          lado é há quantos dias está parada a mais antiga. Carteira grande com venda baixa e
-          parada velha é lead estacionado, não trabalho em andamento.
+          <b>Conversão</b> divide as matrículas <i>de gente que ele atendeu no WhatsApp</i>
+          pelas pessoas que ele atendeu. Só 60% das matrículas têm conversa com o mesmo
+          vendedor: o resto fechou por telefone, presencial ou com outra pessoa do time. Se a
+          conta usasse o total de matrículas em cima de um universo menor de pessoas, a
+          conversão sairia inflada, e por isso o número de baixo mostra as duas pontas.
+          <br /><br />
+          <b>Matrículas</b> segue a mesma regra do Ranking (312) e do resumo diário: fora
+          cancelada, fora o que não é matrícula (material avulso) e só quem tem papel
+          comercial. Os dois números batem.
         </Ajuda>
       </p>
-      {!semanas || !agora ? <p className="rotulo">Carregando</p> : porPessoa.length === 0 ? (
+      {!total || !agora ? <p className="rotulo">Carregando</p> : porPessoa.length === 0 ? (
         <p className="mudo">Sem atendimento registrado no período.</p>
       ) : (
         <div className="rolar">
@@ -286,17 +281,17 @@ export default function Performance() {
                     <td className="n abre" onClick={() => setGaveta({
                       titulo: p.vendedor + ", " + dataCurta(periodo.de) + " a " + dataCurta(periodo.ate),
                       rotulo: "pessoas atendidas no período",
-                      rpc: "painel_qualidade_pessoas",
-                      params: { p_de: periodo.de, p_ate: periodo.ate, p_atendente: primeiro(p.vendedor), p_limite: 300 },
+                      rpc: "painel_performance_pessoas",
+                      params: { p_de: periodo.de, p_ate: periodo.ate, p_vendedor: p.vendedor, p_limite: 300 },
                     })}><b>{num(p.pessoas)}</b></td>
                     <td><div className="mini"><i style={{ width: `${(p.pessoas / maior((x) => x.pessoas)) * 100}%` }} /></div></td>
                     <td className="n num">
-                      {num(p.dias)}
-                      <div className="rotulo num">de {num(dias)}</div>
+                      {num(p.dias_com_atendimento)}
+                      <div className="rotulo num">de {num(p.dias_no_periodo)}</div>
                     </td>
                     <td className="n">
                       {num(p.responderam)}
-                      <div className="rotulo num">{pct(p.conversas ? p.responderam / p.conversas : null)}</div>
+                      <div className="rotulo num">{pct(p.taxa_resposta)}</div>
                     </td>
                     <td className={"n" + (p.vendas > 0 ? " abre" : "")}
                         onClick={p.vendas > 0 ? () => setDetalhe({
@@ -307,8 +302,11 @@ export default function Performance() {
                     </td>
                     <td><div className="mini"><i style={{ width: `${(p.vendas / maior((x) => x.vendas)) * 100}%` }} /></div></td>
                     <td className="n">{brl(p.faturamento)}</td>
-                    <td className="n">{brl(p.vendas ? p.faturamento / p.vendas : null)}</td>
-                    <td className="n num">{pct(p.pessoas ? p.vendas / p.pessoas : null)}</td>
+                    <td className="n">{brl(p.ticket_medio)}</td>
+                    <td className="n num">
+                      {pct(p.conversao)}
+                      <div className="rotulo num">{num(p.vendas_atendidas)} de {num(p.pessoas)}</div>
+                    </td>
                   </tr>
               ))}
             </tbody>
@@ -389,10 +387,10 @@ export default function Performance() {
           e é esse o teto da última coluna: o que não casa por telefone não entra lá.</>
         )}
         <Ajuda titulo="A diferença entre as duas últimas colunas">
-          <b>Fechou no período</b> divide as matrículas daquela linha pelas pessoas atendidas
-          naquela linha. É a conta do caixa: o que entrou contra o que foi trabalhado. Só que
-          as duas pontas não são as mesmas pessoas, porque quem comprou segunda pode ter sido
-          abordado duas semanas antes.
+          <b>Fechou no período</b> divide as matrículas de gente que ele atendeu no WhatsApp
+          pelas pessoas atendidas naquela linha. As duas pontas são do mesmo universo, mas não
+          são exatamente as mesmas pessoas: quem comprou segunda pode ter sido abordado duas
+          semanas antes.
           <br /><br />
           <b>Converteu até hoje</b> faz a pergunta certa: das pessoas que essa pessoa abordou
           naquela semana, quantas compraram, em qualquer momento depois. Acompanha as mesmas
@@ -451,7 +449,10 @@ export default function Performance() {
                     {s.vendas > 0 ? <b>{num(s.vendas)}</b> : <span className="mudo num">0</span>}
                   </td>
                   <td className="n">{brl(s.ticket_medio)}</td>
-                  <td className="n num">{pct(s.conv_semana)}</td>
+                  <td className="n num">
+                    {pct(s.conv_semana)}
+                    <div className="rotulo num">{num(s.vendas_atendidas)} de {num(s.pessoas)}</div>
+                  </td>
                   <td className={"n num " + (s.coorte_fechada ? "" : "mudo")}>
                     {pct(s.conv_coorte)}
                     <div className="rotulo num">{num(s.coorte_compraram)} de {num(s.pessoas)}</div>
@@ -610,7 +611,8 @@ export default function Performance() {
       <p className="nota">
         Ticket médio sozinho engana. R$ 602 de um e R$ 692 do outro só quer dizer alguma coisa
         sabendo o que cada um vendeu: intensivo e extensivo têm ticket dez vezes diferente, e
-        uma venda de Semi muda o ticket do mês inteiro.
+        uma venda de Semi muda o ticket do mês inteiro. Material avulso e matrícula cancelada
+        ficam de fora, como no resto do painel.
       </p>
       {!mix ? <p className="rotulo">Carregando</p> : mix.length === 0 ? (
         <p className="mudo">Sem matrícula no período.</p>
