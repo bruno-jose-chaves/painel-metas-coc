@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { procurar, type Achado } from "@/lib/telas";
+import { supabase } from "@/lib/supabase";
+import Pessoa, { type Achado as Gente } from "@/components/Pessoa";
 
 // Dezenove telas, mais de sessenta quadros, em cinco áreas: quem não construiu
 // o painel não sabe se "desconto" mora em Comercial ou em Campanha, e ia
@@ -11,15 +13,34 @@ import { procurar, type Achado } from "@/lib/telas";
 // Entende também o vocabulário da casa: venda e matrícula são a mesma coisa
 // aqui dentro, e quem procura "vendas por dia" quer o quadro que se chama
 // "Ritmo diário de matrículas".
+//
+// E procura gente. Nome ou telefone com três letras ou mais vai ao banco e
+// devolve quem comprou, quem é lead e quem conversou, na mesma caixa. Era a
+// pergunta mais natural que existe e o painel não respondia.
 export default function Busca({ admin }: { admin: boolean }) {
   const [aberta, setAberta] = useState(false);
   const [texto, setTexto] = useState("");
   const [escolhido, setEscolhido] = useState(0);
   const campo = useRef<HTMLInputElement>(null);
 
+  const [gente, setGente] = useState<Gente[]>([]);
+  const [ficha, setFicha] = useState<Gente | null>(null);
   const achados = useMemo(() => procurar(texto, admin).slice(0, 8), [texto, admin]);
 
   useEffect(() => { setEscolhido(0); }, [texto]);
+
+  // Só vai ao banco depois que a pessoa parou de digitar, e só com três letras.
+  // Buscar a cada tecla faria uma consulta por caractere sem dar resposta
+  // melhor.
+  useEffect(() => {
+    const t = texto.trim();
+    if (t.length < 3) { setGente([]); return; }
+    const espera = setTimeout(() => {
+      supabase.rpc("painel_pessoa_buscar", { p_termo: t, p_limite: 6 })
+        .then(({ data }) => setGente((data as Gente[]) ?? []));
+    }, 250);
+    return () => clearTimeout(espera);
+  }, [texto]);
 
   useEffect(() => {
     const atalho = (e: KeyboardEvent) => {
@@ -59,10 +80,10 @@ export default function Busca({ admin }: { admin: boolean }) {
               onChange={(e) => setTexto(e.target.value)}
               onKeyDown={teclado}
             />
-            {achados.length === 0 ? (
+            {achados.length === 0 && gente.length === 0 ? (
               <p className="mudo" style={{ padding: "14px 18px", margin: 0 }}>
                 Nada com esse nome. Tente a palavra que você usaria falando, como desconto, etiqueta ou
-                motivo de perda. A busca entende venda e matrícula como a mesma coisa.
+                motivo de perda, ou o nome ou telefone de uma pessoa.
               </p>
             ) : (
               <ul className="busca-lista">
@@ -86,12 +107,36 @@ export default function Busca({ admin }: { admin: boolean }) {
                 ))}
               </ul>
             )}
+            {gente.length > 0 && (
+              <>
+                <div className="busca-secao">Pessoas</div>
+                <ul className="busca-lista">
+                  {gente.map((g) => (
+                    <li key={g.chave}>
+                      <button onClick={() => { setFicha(g); setAberta(false); }}>
+                        <span className="busca-num">{g.e_aluno ? "aluno" : "lead"}</span>
+                        <span className="busca-texto">
+                          <b>{g.nome}</b>
+                          <small>
+                            {[g.telefone, g.cursos, g.dono ? "dono: " + g.dono : null]
+                              .filter(Boolean).join(" · ") || "sem histórico registrado"}
+                          </small>
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
             <p className="busca-rodape">
               Setas para escolher, Enter para abrir, Esc para fechar. Atalho: Ctrl K (ou ⌘ K).
+              Procura tela, quadro, código de três dígitos e também pessoa, por nome ou telefone.
             </p>
           </div>
         </div>
       )}
+
+      {ficha && <Pessoa achado={ficha} aoFechar={() => setFicha(null)} />}
     </>
   );
 }

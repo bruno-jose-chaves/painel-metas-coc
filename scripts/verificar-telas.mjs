@@ -402,6 +402,13 @@ const rotas0 = {
       onde: "Sem retorno", atendente: "Marcia Laurett", virou_matricula: false,
       link: "https://pigeon.runus.com.br/redirect?type=SESSION&id=ghi" },
   ],
+  "rpc/painel_pessoa_buscar": [
+    { chave: "46999770277", nome: "Giovanna Cavalheiri Alberton", telefone: "46999770277", email: null, cidade: "Blumenau", e_aluno: true, cursos: "Extensivo Coc Med · Missão UFSC - Intensive", ultimo_contato: "2026-11-04", dono: "Márcia", conversas: 4 },
+  ],
+  "rpc/painel_pessoa_ficha": [
+    { bloco: "matricula", ordem: 1, quando: "2026-11-04", titulo: "Missão UFSC - Intensive", detalhe: "Márcia · Missão UFSC 2026", valor: 594.9, link: null, situacao: "ok" },
+    { bloco: "conversa", ordem: 3, quando: "2026-10-30", titulo: "WhatsApp comercial · Nós procuramos", detalhe: "Márcia · respondeu", valor: null, link: null, situacao: "ok" },
+  ],
   "rpc/painel_meu_resumo": [
     { vendedor: "Márcia Laurett", hoje: 4, semana: 9, mes: 9, faturamento_mes: 6254.1, ticket_mes: 695, carteira: 456, parados: 186, sem_resposta: 41, atendidos_hoje: 22, posicao: 1, no_time: 2 },
   ],

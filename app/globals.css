@@ -1588,3 +1588,11 @@ main .rolar { scroll-margin-top: 112px; }
 @media (max-width: 760px) {
   .calor td { height: 26px; min-width: 26px; font-size: 10px; }
 }
+
+/* Cabeçalho de seção dentro da busca: separa tela de pessoa sem precisar de
+   duas caixas. */
+.busca-secao {
+  padding: 10px 18px 4px; font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .06em; color: var(--cinza);
+  border-top: 1px solid var(--linha);
+}
