@@ -474,16 +474,19 @@ export default function Campanha() {
       <h2><span className="idx" /> Da origem à matrícula</h2>
       <p className="nota">
         De onde veio a gente que matriculou nesta campanha, e quanto tempo levou da origem até a venda.
-        Serve para decidir verba: campanha do CRM mostra a ação, fonte mostra o canal.
-        <Ajuda titulo="A diferença entre campanha e fonte"
+        Para decidir verba, vale a visão <b>por campanha</b>: a fonte do CRM está vazia na maior parte
+        das negociações e por isso joga quase tudo em uma linha só.
+        <Ajuda titulo="A diferença entre campanha e fonte, e por que a fonte não serve hoje"
           fontes={["Matrícula: planilha comercial",
                    "Campanha e fonte: RD Station CRM, os campos da negociação que deu origem à matrícula",
                    "Chaves da ligação, nessa ordem: e-mail, telefone e nome normalizados"]}>
           <b>Por campanha do CRM</b> é o nome da ação que o marketing registrou na negociação, do tipo
-          uma campanha de anúncio específica. <b>Por fonte</b> é mais grosso e mais confiável, do tipo
-          Facebook, Google, indicação: fonte é preenchida com mais disciplina que campanha, então quando
-          as duas discordam a fonte costuma estar mais certa. O que aparece sem par é venda que entrou
-          sem passar pelo CRM, ou com dado diferente nos dois lugares.
+          uma campanha de anúncio específica, e está preenchida em quase nove de cada dez negociações.
+          <b> Por fonte</b> seria o canal, do tipo Facebook, Google, indicação, e é a leitura que
+          naturalmente serviria para verba, mas das 10.029 negociações de 2026 <b>87,7% estão sem fonte
+          preenchida</b>: o campo fica em branco quando o lead não entra por fluxo do RD. Enquanto isso
+          não for corrigido na entrada do lead, leia por campanha. O que aparece sem par é venda que
+          entrou sem passar pelo CRM, ou com dado diferente nos dois lugares.
         </Ajuda>
       </p>
       <div className="filtros" style={{ marginBottom: 16 }}>

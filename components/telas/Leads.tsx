@@ -196,14 +196,17 @@ export default function Leads() {
       <h2><span className="idx" /> Origem dos negócios no CRM</h2>
       <p className="nota">
         A mesma pergunta pelo lado do CRM em vez do formulário: de qual fonte nasceram as negociações do
-        período. Serve de contraprova da tabela de páginas, porque as duas bases podem discordar.
-        <Ajuda titulo="Por que este bloco não bate com os de cima"
+        período. Hoje este bloco serve para medir o tamanho do buraco de preenchimento, não para decidir
+        verba: a fonte está em branco na maior parte das negociações.
+        <Ajuda titulo="Por que a fonte não sustenta decisão hoje"
           fontes={["Negociações criadas no período: RD Station CRM, pelo campo de fonte",
                    "Os blocos acima vêm do RD Station Marketing, que é outra base"]}>
-          Formulário gera conversão no Marketing; negociação nasce no CRM, às vezes dias depois e às vezes
-          sem nenhum formulário no meio, como no caso do lead que chegou por indicação ou direto no
-          WhatsApp. Fonte vazia ou genérica é lead que entrou sem rastro, e o tamanho disso é o limite de
-          confiança de qualquer leitura de origem no painel.
+          Das 10.029 negociações criadas em 2026, <b>87,7% estão sem fonte preenchida</b>, contra 11,7%
+          sem campanha. O campo fica em branco quando o lead não entra por um fluxo do RD, e é por isso
+          que a linha de sem origem come a tabela. Para ler origem com decisão em cima, use a campanha:
+          em <b>Campanha, Da origem à matrícula</b> e no bloco <b>De onde veio quem fechou</b>, em
+          Comercial, Time. Formulário gera conversão no Marketing e negociação nasce no CRM, às vezes
+          dias depois e às vezes sem formulário nenhum no meio, então as duas bases não precisam bater.
         </Ajuda>
       </p>
       {!fontes ? <p className="rotulo">Carregando</p> : fontes.length === 0 ? (
