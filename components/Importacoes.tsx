@@ -14,7 +14,7 @@ import { dataHora, num } from "@/lib/formato";
 type Importacao = {
   fonte: string; aba: string; quando: string;
   lidas: number; importadas: number; em_branco: number; rejeitadas: number;
-  status: string; motivos: string | null; linhas: string | null;
+  status: string; motivos: string | null; linhas: string | null; avisos: string | null;
 };
 
 export default function Importacoes() {
@@ -25,12 +25,16 @@ export default function Importacoes() {
   }, []);
 
   const recusadas = (lista ?? []).reduce((s, i) => s + Number(i.rejeitadas ?? 0), 0);
+  const motivos = Array.from(new Set((lista ?? []).filter((i) => Number(i.rejeitadas) > 0)
+    .flatMap((i) => (i.motivos ?? "").split(", ")).filter(Boolean)));
 
   return (
     <>
       <h2><span className="idx" /> Importação da planilha</h2>
       <p className="nota">
-        A última leitura de cada aba, com o que entrou e o que ficou de fora.
+        Serve para saber se a venda que está na planilha também está no painel. Cada linha é a
+        última vez que o painel leu aquela aba: quantas linhas vieram, quantas viraram matrícula e
+        quantas ficaram de fora, com o número da linha para corrigir na origem.
         <Ajuda titulo="O que cada coluna conta"
           fontes={["Registro de cada importação: tabela sincronizacoes",
                    "Quem envia: o Apps Script dentro da planilha, a cada 15 minutos",
@@ -39,14 +43,17 @@ export default function Importacoes() {
           linha sem nome e sem data, que é só sobra de planilha e não preocupa. <b>Recusada</b> é linha
           que tem conteúdo mas a data não dá para ler: essa é venda que existe na planilha e não existe
           no painel, e o número da linha aparece aqui para ser corrigido na origem.
+          <b>Observações da leitura</b> é o que a importação percebeu mas não impediu de entrar:
+          número repetido, linha lançada duas vezes, data corrigida à mão.
         </Ajuda>
       </p>
 
       {recusadas > 0 && (
         <p className="aviso-leve ruim">
-          {num(recusadas)} linha{recusadas > 1 ? "s" : ""} recusada{recusadas > 1 ? "s" : ""} por data
-          ilegível. São matrículas que estão na planilha e não entram em conta nenhuma do painel.
-          Corrigir a data na planilha resolve na importação seguinte.
+          {num(recusadas)} linha{recusadas > 1 ? "s" : ""} recusada{recusadas > 1 ? "s" : ""}
+          {motivos.length ? ` (${motivos.join(", ")})` : ""}. São matrículas que estão na planilha e
+          não entram em conta nenhuma do painel. Corrigir a linha na planilha resolve na importação
+          seguinte.
         </p>
       )}
 
@@ -64,6 +71,7 @@ export default function Importacoes() {
                 <th className="n">Em branco</th>
                 <th className="n">Recusadas</th>
                 <th>Linhas a corrigir</th>
+                <th>Observações da leitura</th>
               </tr>
             </thead>
             <tbody>
@@ -82,6 +90,9 @@ export default function Importacoes() {
                   <td className="mudo num" style={{ maxWidth: 260 }}>
                     {i.linhas ? `linha ${i.linhas}${i.motivos ? " · " + i.motivos : ""}` : "-"}
                   </td>
+                  <td className="mudo" style={{ maxWidth: 420 }} title={i.avisos ?? undefined}>
+                    {i.avisos ?? "-"}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -89,8 +100,10 @@ export default function Importacoes() {
         </div>
       )}
       <p className="rodape">
-        As abas de anos fechados só são relidas quando alguém roda a importação do histórico na planilha.
-        As do ano corrente em diante chegam sozinhas a cada 15 minutos.
+        As abas do ano corrente em diante chegam sozinhas a cada 15 minutos, enviadas pelo Apps Script
+        que vive dentro da planilha. As de anos fechados só são relidas quando alguém roda a importação
+        do histórico, por isso uma recusa antiga pode ficar parada ali mesmo depois de a planilha ter
+        sido corrigida.
       </p>
     </>
   );

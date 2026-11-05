@@ -138,6 +138,11 @@ export default function Visao() {
       ({ data }) => setPeriodo(((data as Resumo7[]) ?? [])[0] ?? null));
   }, [janela, volta]);
 
+  // O recorte de campanha do topo vale para o ritmo tambem, senao o mesmo
+  // filtro deixava uma campanha encerrada fora dos cartoes e dentro da tabela.
+  const ritmoFiltrado = (ritmo ?? []).filter((r) =>
+    (dados ?? []).some((c) => c.id === r.campanha_id && naFaixa(c, faixa)));
+
   if (!dados) return <p className="rotulo">Carregando</p>;
 
   return (
@@ -145,11 +150,26 @@ export default function Visao() {
       <div className="rotulo">Visão geral</div>
       <h1>Como estamos</h1>
 
-      <div className="filtros" style={{ marginBottom: 8 }}>
+      {/* Os dois filtros desta tela moram aqui, acima de tudo, porque os dois
+          valem para a tela inteira: a janela manda na faixa de números e o
+          recorte de campanha manda nos cartões, nas metas de captação e no
+          ritmo. Enquanto o recorte morava na linha do título de Campanhas,
+          parecia filtrar só aquele bloco. */}
+      <div className="filtros" style={{ marginBottom: 8, flexWrap: "wrap" }}>
         <div className="atalhos">
           {JANELAS.map((j) => (
             <button key={j.id} className={janela.id === j.id ? "ativo" : ""} onClick={() => setJanela(j)}>{j.nome}</button>
           ))}
+        </div>
+        <div className="atalhos">
+          {FAIXAS.map((f) => {
+            const quantas = dados.filter((c) => naFaixa(c, f.id)).length;
+            return (
+              <button key={f.id} className={faixa === f.id ? "ativo" : ""} onClick={() => setFaixa(f.id)} disabled={quantas === 0}>
+                {f.nome} ({quantas})
+              </button>
+            );
+          })}
         </div>
         <span className="mudo num" style={{ marginLeft: "auto" }}>
           {(() => { const { de, ate } = intervalo(janela); return de === ate ? dataCurta(ate) : `${dataCurta(de)} a ${dataCurta(ate)}`; })()}
@@ -196,22 +216,7 @@ export default function Visao() {
         </div>
       </div>
 
-      {/* O filtro mora na linha do título. Virar um cartão inteiro para quatro
-          botões custava uma tela de altura em notebook, e empurrava o primeiro
-          cartão de campanha para fora. */}
-      <div className="secao-topo">
-        <h2><span className="idx" /> Campanhas</h2>
-        <div className="atalhos">
-          {FAIXAS.map((f) => {
-            const quantas = dados.filter((c) => naFaixa(c, f.id)).length;
-            return (
-              <button key={f.id} className={faixa === f.id ? "ativo" : ""} onClick={() => setFaixa(f.id)} disabled={quantas === 0}>
-                {f.nome} ({quantas})
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <h2><span className="idx" /> Campanhas</h2>
       <div className="cards">
         {dados.filter((c) => naFaixa(c, faixa)).map((c) => {
           const ating = c.meta_alunos ? c.alunos / c.meta_alunos : 0;
@@ -300,12 +305,16 @@ export default function Visao() {
       <h2><span className="idx" /> Metas de captação</h2>
       {!metasProntas ? (
         <p className="rotulo">Carregando</p>
-      ) : Object.keys(metasLeads).length === 0 ? (
-        <p className="mudo">Nenhuma meta de captação cadastrada.</p>
+      ) : dados.filter((c) => naFaixa(c, faixa) && metasLeads[c.id]?.length).length === 0 ? (
+        <p className="mudo">
+          {Object.keys(metasLeads).length === 0
+            ? "Nenhuma meta de captação cadastrada."
+            : "Nenhuma campanha com meta de captação no recorte escolhido acima."}
+        </p>
       ) : (
         <>
           <div className="cards">
-            {dados.filter((c) => metasLeads[c.id]?.length).map((c) => (
+            {dados.filter((c) => naFaixa(c, faixa) && metasLeads[c.id]?.length).map((c) => (
               <article className="card" key={c.id}>
                 <div className="card-top">
                   <div>
@@ -389,8 +398,12 @@ export default function Visao() {
       )}
 
       <h2><span className="idx" /> Ritmo diário de matrículas</h2>
-      {!ritmo ? <p className="rotulo">Carregando</p> : ritmo.length === 0 ? (
-        <p className="mudo">Nenhuma campanha ativa.</p>
+      {!ritmo ? <p className="rotulo">Carregando</p> : ritmoFiltrado.length === 0 ? (
+        <p className="mudo">
+          {ritmo.length === 0
+            ? "Nenhuma campanha ativa."
+            : "Nenhuma campanha com ritmo no recorte escolhido acima."}
+        </p>
       ) : (
         <>
           <div className="rolar">
@@ -409,7 +422,7 @@ export default function Visao() {
                 </tr>
               </thead>
               <tbody>
-                {ritmo.map((r) => {
+                {ritmoFiltrado.map((r) => {
                   const cob = r.cobertura == null ? null : Number(r.cobertura);
                   const entrega = Number(r.projecao_restante);
                   const cobre = entrega >= r.falta;
