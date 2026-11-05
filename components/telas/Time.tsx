@@ -5,6 +5,7 @@ import Curva from "@/components/Curva";
 import Detalhe, { type Recorte } from "@/components/Detalhe";
 import Pessoas from "@/components/Pessoas";
 import Ajuda from "@/components/Ajuda";
+import Fechamento from "@/components/Fechamento";
 import { supabase } from "@/lib/supabase";
 import { useUltima } from "@/lib/consulta";
 import { COR } from "@/lib/cores";
@@ -442,6 +443,8 @@ export default function Time() {
           </p>
         </>
       )}
+
+      <Fechamento de={periodo.de} ate={periodo.ate} produto={produto} campanha={campanha} />
 
       {/* O bloco do APV saiu daqui e foi para Comercial > Agente de Pré-vendas,
           junto com a medição pelo lado da conversa. Eram duas telas contando a

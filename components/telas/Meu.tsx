@@ -57,8 +57,8 @@ const CALORES: { id: CALOR; nome: string; oque: string; unidade: string }[] = [
     oque: "Conversa aberta pelo cliente, hora a hora." },
   { id: "ganhas", nome: "Vendas fechadas", unidade: "ganhas",
     oque: "A hora em que o CRM marcou a venda." },
-  { id: "espera", nome: "Quanto esperaram por você", unidade: "min de espera",
-    oque: "Média de minutos até a sua primeira resposta, só em conversa que o cliente começou." },
+  { id: "espera", nome: "Espera média, hora a hora", unidade: "min de espera",
+    oque: "Em cada faixa de hora, quantos minutos em média o cliente esperou pela sua primeira resposta. Aqui o quadrado escuro é ruim, não bom: é a hora em que você demora mais." },
 ];
 type Fila = {
   tipo: string; prioridade: number; pessoa: string; telefone: string | null; onde: string;
@@ -120,14 +120,10 @@ export default function Meu({ admin }: { admin?: boolean }) {
   }, [quem, volta]);
 
   useEffect(() => {
-    setLinhas(null); setMix(null);
+    setLinhas(null);
     ultima("contra", supabase.rpc("painel_meu_contra_time", {
       p_de: periodo.de, p_ate: periodo.ate, ...(quem ? { p_vendedor: quem } : {}),
     }), ({ data }) => setLinhas((data as Linha[]) ?? []));
-    ultima("mix", supabase.rpc("painel_performance_mix", { p_de: periodo.de, p_ate: periodo.ate }),
-      ({ data }) => setMix((data as Mix[]) ?? []));
-    ultima("comissao", supabase.rpc("painel_comissao", { p_de: periodo.de, p_ate: periodo.ate }),
-      ({ data }) => setComissao((data as Comissao[]) ?? []));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [periodo.de, periodo.ate, quem, volta]);
 
@@ -136,13 +132,28 @@ export default function Meu({ admin }: { admin?: boolean }) {
   // pode mudar amanhã.
   const euMesmo = resumoNome(resumo, quem);
 
+  // Mix e comissao pedem o nome no parametro, nao filtram depois de receber o
+  // time todo: valor de comissao e informacao de folha, e o banco agora so
+  // devolve a propria linha para quem nao e diretoria.
+  useEffect(() => {
+    if (!euMesmo) return;
+    setMix(null); setComissao(null);
+    ultima("mix", supabase.rpc("painel_performance_mix", {
+      p_de: periodo.de, p_ate: periodo.ate, p_vendedor: euMesmo,
+    }), ({ data }) => setMix((data as Mix[]) ?? []));
+    ultima("comissao", supabase.rpc("painel_comissao", {
+      p_de: periodo.de, p_ate: periodo.ate, p_vendedor: euMesmo,
+    }), ({ data }) => setComissao((data as Comissao[]) ?? []));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [periodo.de, periodo.ate, euMesmo, volta]);
+
   useEffect(() => {
     if (!euMesmo) return;
     setResposta(null);
     ultima("resp", supabase.rpc("painel_performance_resposta", {
       p_de: periodo.de, p_ate: periodo.ate, p_relogio: relogio,
-      p_so_dia_util: soDiaUtil, p_so_horario_comercial: soComercial,
-    }), ({ data }) => setResposta(((data as Resposta[]) ?? []).find((r) => r.vendedor === euMesmo) ?? null));
+      p_so_dia_util: soDiaUtil, p_so_horario_comercial: soComercial, p_vendedor: euMesmo,
+    }), ({ data }) => setResposta(((data as Resposta[]) ?? [])[0] ?? null));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [periodo.de, periodo.ate, relogio, soDiaUtil, soComercial, euMesmo, volta]);
 
@@ -283,7 +294,12 @@ export default function Meu({ admin }: { admin?: boolean }) {
       </p>
       {!comissao ? <p className="rotulo">Carregando</p> : (() => {
         const meu = comissao.filter((c) => c.vendedor === euMesmo);
-        if (meu.length === 0) return <p className="mudo">Sem venda com comissão no período.</p>;
+        if (meu.length === 0) return (
+          <p className="mudo">
+            Nenhuma venda com comissão no período {euMesmo ? "para " + euMesmo : ""}. Entram aqui só
+            matrícula não cancelada, com valor lançado na planilha e com o nome do vendedor preenchido.
+          </p>
+        );
         const total = meu.reduce((s, c) => s + Number(c.comissao), 0);
         const porMes = new Map<string, number>();
         for (const c of meu) porMes.set(c.mes, (porMes.get(c.mes) ?? 0) + Number(c.comissao));

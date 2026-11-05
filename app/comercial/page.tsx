@@ -11,9 +11,10 @@ import Performance from "@/components/telas/Performance";
 
 // Time e Lançamentos respondem à mesma pergunta por ângulos diferentes: quem
 // está entregando, e o que exatamente foi vendido.
-const ABAS: Aba[] = telasDe("comercial");
-
-function Tela() {
+// Performance individual e leitura de diretoria: mostra nome, carteira e
+// comissao de todo mundo. Quem vende ve a propria versao disso em Meu painel.
+function Tela({ admin }: { admin: boolean }) {
+  const ABAS: Aba[] = telasDe("comercial", admin);
   const { aba, escolher } = useAba(ABAS);
   return (
     <>
@@ -23,11 +24,11 @@ function Tela() {
       {aba === "agente" && <Agente />}
       {aba === "qualidade" && <Qualidade />}
       {aba === "atendimento" && <Atendimento />}
-      {aba === "performance" && <Performance />}
+      {aba === "performance" && admin && <Performance />}
     </>
   );
 }
 
 export default function Page() {
-  return <Shell>{() => <Tela />}</Shell>;
+  return <Shell>{({ admin }) => <Tela admin={admin} />}</Shell>;
 }

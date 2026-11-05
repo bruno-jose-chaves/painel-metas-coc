@@ -96,8 +96,12 @@ export const AREAS: Area[] = [
         // calcula nenhum dos dois, e apelido que leva a uma tela que não tem a
         // resposta é pior do que não achar nada.
         termos: ["vendedor", "quem vendeu", "ranking", "leads recebidos", "conversão", "perdidas",
-                 "motivo de perda", "funil", "taxa de conversão", "objeção"],
-        blocos: ["Vendas dia a dia", "Ranking de vendas", "Negócios em aberto e tempo parado", "Motivos de perda"] },
+                 "motivo de perda", "funil", "taxa de conversão", "objeção",
+                 "de onde veio quem fechou", "origem da matrícula", "quanto tempo para fechar",
+                 "tempo de fechamento", "há quanto tempo é lead", "tempo na base", "namoro",
+                 "campanha que fechou", "fonte da venda", "ciclo de venda"],
+        blocos: ["Vendas dia a dia", "Ranking de vendas", "Negócios em aberto e tempo parado",
+                 "Motivos de perda", "De onde veio quem fechou"] },
       { id: "lancamentos", codigo: 320, nome: "Lançamentos",
         oque: "A matrícula como ela foi lançada (aluno, curso, valor de tabela, desconto e vendedor), e o que saiu estranho e vale conferir.",
         termos: ["desconto", "desconto médio", "valor de tabela", "aluno", "matrícula", "cancelado",
@@ -118,7 +122,7 @@ export const AREAS: Area[] = [
         blocos: ["O tamanho de cada buraco", "A fila"],
         modo2: { id: "diagnostico", nome: "Diagnóstico",
                  blocos: ["A passagem", "Por atendente", "Quanto tempo o card fica parado"] } },
-      { id: "performance", codigo: 360, nome: "Performance individual",
+      { id: "performance", codigo: 360, nome: "Performance individual", soAdmin: true,
         oque: "Quanto cada comercial atendeu, vendeu e converteu, semana por semana, e o que está na mão de cada um agora.",
         termos: ["performance", "individual", "por vendedor", "quantas pessoas atendeu", "carteira",
                  "dias trabalhados", "coorte", "ticket por vendedor", "gestão de performance",
