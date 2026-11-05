@@ -116,6 +116,20 @@ export default function Agente() {
       {!dias ? <p className="rotulo">Carregando</p> : (
         <>
           <h2><span className="idx" /> A qualidade do agente</h2>
+          <p className="nota">
+            O funil do agente em quatro taxas, de quem respondeu até quem virou matrícula. Serve para
+            decidir se o problema do agente é volume de disparo, qualidade da conversa ou passagem para o
+            comercial, porque as três pedem conserto em lugares diferentes.
+            <Ajuda titulo="O que cada taxa significa"
+              fontes={["Atendidos, respostas e aquecimento: Pigeon Post, no número do Agente de Pré-vendas",
+                       "Entregue no CRM: RD Station CRM, negociação que saiu do funil de pré-vendas",
+                       "Virou matrícula: planilha comercial, cruzada pelo telefone do atendimento"]}>
+              Cada taxa é medida sobre os <b>atendidos</b>, não sobre a etapa anterior, para dar para
+              comparar período com período sem conta de cabeça. <b>Respondeu</b> mede se a abordagem
+              funciona, <b>aqueceu</b> mede se a conversa sustenta, e <b>entregue</b> mede se o que
+              aqueceu chega ao comercial. Clicar em cada número abre quem está por trás dele.
+            </Ajuda>
+          </p>
           <div className="faixa">
             <div className="abre" title="Ver quem respondeu ao agente"
                  onClick={() => setGaveta({ titulo: "Quem o agente abriu e respondeu",
@@ -154,8 +168,11 @@ export default function Agente() {
 
           <h2><span className="idx" /> Dia a dia</h2>
           <p className="nota">
-            A linha cheia é o que o agente abriu. A tracejada é o que respondeu.
-            <Ajuda titulo="Por que as duas juntas">
+            O esforço e o retorno do agente no mesmo eixo, dia a dia: linha cheia é o que ele abriu,
+            tracejada é o que respondeu. Serve para separar dia ruim de disparo ruim.
+            <Ajuda titulo="Por que as duas juntas"
+              fontes={["Atendidos e responderam: Pigeon Post, no número do Agente de Pré-vendas",
+                       "A medição de resposta começa em 05/10/2026; antes disso o traço é ausência de medida"]}>
               Separadas, uma esconde a outra: num dia de disparo em massa o volume sobe e a resposta não,
               e isso só aparece quando as duas estão no mesmo eixo. Distância grande entre as linhas é
               disparo sem retorno.
@@ -171,6 +188,18 @@ export default function Agente() {
           />
 
           <h2><span className="idx" /> Cada dia por inteiro</h2>
+          <p className="nota">
+            O mesmo dia a dia em número, com as colunas de entrega e matrícula que não caberiam na curva.
+            É aqui que se confere um dia específico antes de cobrar alguém por ele.
+            <Ajuda titulo="Por que existe traço em algumas colunas"
+              fontes={["Atendidos, responderam e aqueceu: Pigeon Post, no número do agente",
+                       "Entregue no CRM: a partir de 30/09/2026; responderam e aqueceu: a partir de 05/10/2026",
+                       "Virou matrícula: planilha comercial, cruzada pelo telefone"]}>
+              Traço quer dizer que naquele dia a medição ainda não existia, não que o número foi zero: o
+              agente é novo e cada medida entrou em uma data diferente. Por isso comparar mês com mês só
+              vale a partir de outubro de 2026.
+            </Ajuda>
+          </p>
           <div className="rolar">
             <table className="tabela">
               <thead>
@@ -202,13 +231,11 @@ export default function Agente() {
               </tbody>
             </table>
           </div>
-          <p className="rodape">
-            Traço quer dizer que naquele dia a medição ainda não existia, não que o número foi zero.
-          </p>
-
           <h2><span className="idx" /> O mesmo agente, pelo funil do CRM</h2>
           <p className="nota">
-            A conversa mostra o esforço. O funil mostra o que sobrou dele dentro do CRM.
+            O mesmo agente contado pelo CRM em vez da conversa: a conversa mostra o esforço, o funil
+            mostra o que sobrou dele dentro do sistema. Diferença grande entre os dois blocos é passagem
+            perdida, e é justamente o que vale investigar.
             <Ajuda titulo="Por que as duas leituras convivem"
               fontes={["RD Station CRM: o funil de pré-vendas, que é por onde o agente entrega o lead",
                        "Entrega: existe negociação do mesmo contato fora do funil de pré-vendas, criada depois",

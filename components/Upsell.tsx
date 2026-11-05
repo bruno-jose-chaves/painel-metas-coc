@@ -155,6 +155,21 @@ export default function Upsell() {
       ) : (
         <>
           <h2><span className="idx" /> Resultado</h2>
+          <p className="nota">
+            Quantos alunos da base escolhida também compraram o curso de destino, quanto isso faturou e
+            quanto tempo passou entre as duas compras. O número de dias é o mais acionável: é ele que diz
+            quando disparar a oferta para a próxima turma.
+            <Ajuda titulo="O que cada número conta"
+              fontes={["Matrículas das duas pontas: planilha comercial, pela turma de cada venda",
+                       "Cruzamento por e-mail, telefone e nome normalizados",
+                       "Conta pessoa, não matrícula: quem comprou o destino duas vezes conta uma"]}>
+              <b>Alunos na base</b> é gente, não matrícula. <b>Taxa</b> é a fatia da base que comprou o
+              destino, e é o número que vale comparar entre recortes. <b>Faturamento</b> é só o do curso
+              de destino, porque é ele o upsell. <b>Dias, em média</b> é quanto tempo passou entre a
+              compra da base e a do destino: média baixa quer dizer compra junto, média alta quer dizer
+              que a oferta só funciona meses depois.
+            </Ajuda>
+          </p>
           <div className="faixa">
             <div>
               <div className="rotulo">Alunos na base</div>
@@ -192,6 +207,17 @@ export default function Upsell() {
           </div>
 
           <h2><span className="idx" /> Contra o ano anterior</h2>
+          <p className="nota">
+            O mesmo cruzamento feito com as turmas equivalentes de um ano atrás, para saber se o upsell
+            melhorou ou piorou e não só se ele existe. Compare a coluna de taxa, não a de volume.
+            <Ajuda titulo="Por que a comparação é conservadora"
+              fontes={["Turma equivalente: mesmo produto e mesmo semestre, um ano atrás",
+                       "Matrículas: planilha comercial, pela turma de cada venda"]}>
+              Se a turma anterior ainda estava vendendo quando o recorte foi feito, o número dela ainda vai
+              crescer, então a comparação fica por baixo: upsell que aparece empatado com o ano passado
+              provavelmente está um pouco atrás. A linha em destaque é o recorte de agora.
+            </Ajuda>
+          </p>
           <div className="rolar">
             <table className="tabela">
               <thead>
@@ -217,13 +243,6 @@ export default function Upsell() {
               </tbody>
             </table>
           </div>
-          <p className="rodape">
-        A turma equivalente do ano anterior é a mesma do mesmo produto e semestre, um ano atrás.
-        <Ajuda titulo="Por que a comparação é conservadora">
-          Se a turma anterior ainda estava vendendo quando o recorte foi feito, o número dela ainda vai crescer,
-          então a comparação fica por baixo.
-        </Ajuda>
-      </p>
         </>
       )}
     </>

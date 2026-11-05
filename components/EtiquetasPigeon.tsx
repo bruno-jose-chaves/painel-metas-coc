@@ -65,9 +65,13 @@ export default function EtiquetasPigeon({ admin }: { admin?: boolean }) {
     <>
       <h2><span className="idx" /> Etiquetas do Pigeon</h2>
       <p className="nota">
-        Etiqueta aqui não é enfeite: é ela que diz ao painel de quem é o contato e que curso a
-        pessoa quer.
-        <Ajuda titulo="O que o painel faz com cada tipo">
+        As etiquetas que o time usa no Pigeon e o que o painel entende de cada uma. Etiqueta aqui não é
+        enfeite: é ela que diz ao painel de quem é o contato e que curso a pessoa quer, nos casos em que
+        o CRM não diz.
+        <Ajuda titulo="O que o painel faz com cada tipo"
+          fontes={["Etiquetas em uso: Pigeon Post, pelas conversas do período",
+                   "O que cada etiqueta significa: apontado nesta tela e guardado no painel",
+                   "Dono vindo de etiqueta só é usado quando o CRM não tem responsável"]}>
           <b>Dono do contato</b> alimenta a fila do que está escapando quando o CRM não tem dono
           registrado. <b>Curso de interesse</b> classifica o lead quando nenhuma outra regra
           pegou. <b>Etapa do funil</b> serve de conferência contra o CRM.

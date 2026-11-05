@@ -206,6 +206,18 @@ export default function Meu({ admin }: { admin?: boolean }) {
       )}
 
       <h2><span className="idx" /> O seu dia</h2>
+      <p className="nota">
+        O que é seu hoje, para abrir a tela e já saber onde está: matrícula fechada, conversa tocada e
+        negociação na sua mão. É contagem do dia, não acumulado do mês.
+        <Ajuda titulo="De onde sai cada número"
+          fontes={["Matrículas: planilha comercial, pelo vendedor da linha e pela data da compra",
+                   "Conversas: Pigeon Post, pelo atendente da conversa",
+                   "Negociações em aberto: RD Station CRM, pelo responsável do negócio"]}>
+          O vendedor da matrícula é o nome que está na coluna Vendedor da planilha, então venda lançada
+          sem vendedor não aparece para ninguém. <b>Conversas</b> conta conversa tocada, não mensagem: dez
+          mensagens na mesma conversa são uma. Clicando nas matrículas abre a lista nome por nome.
+        </Ajuda>
+      </p>
       {!resumo ? <p className="rotulo">Carregando</p> : (
         <>
           <div className="faixa">
@@ -252,8 +264,12 @@ export default function Meu({ admin }: { admin?: boolean }) {
 
       <h2><span className="idx" /> Quanto você ganhou</h2>
       <p className="nota">
-        Comissão fixa por venda, pela regra em vigor: 3% em Semi e Extensivo, 5% nos demais.
-        <Ajuda titulo="Por que este número é o teto, e não o contracheque">
+        Quanto a comissão fixa das suas vendas do período soma, pela regra em vigor: 3% em Semi e
+        Extensivo, 5% nos demais. Serve para acompanhar, não para fechar folha.
+        <Ajuda titulo="Por que este número é o teto, e não o contracheque"
+          fontes={["Vendas e valor: planilha comercial, pelo vendedor da linha",
+                   "Percentual de cada produto: tabela de regras de comissão, em Ajustes",
+                   "Regra da casa: Premiações 2026 v3"]}>
           A regra da casa paga sobre a <b>parcela paga</b>, não sobre o valor da matrícula. O
           painel recebe a venda fechada, não o pagamento de cada parcela, então o que aparece
           aqui é quanto você recebe <b>se o aluno pagar tudo</b>. Se ele parar de pagar, a
@@ -317,9 +333,13 @@ export default function Meu({ admin }: { admin?: boolean }) {
 
       <h2><span className="idx" /> Você contra a média do time</h2>
       <p className="nota">
-        Sem nome de ninguém, de propósito: a média serve de referência, e o melhor do time serve
-        de teto. Quem é não muda o que você faz amanhã.
-        <Ajuda titulo="Como ler esta tabela">
+        Onde você está em relação ao time nos indicadores que você controla. Sem nome de ninguém, de
+        propósito: a média serve de referência e o melhor do time serve de teto, e saber quem é não muda
+        o que você faz amanhã.
+        <Ajuda titulo="Como ler esta tabela"
+          fontes={["Matrículas, ticket e faturamento: planilha comercial, pelo vendedor da linha",
+                   "Pessoas atendidas e tempo de resposta: Pigeon Post, pelo atendente da conversa",
+                   "Média e melhor do time: só quem tem papel comercial, no mesmo período"]}>
           A barra mostra onde você está entre a média e o melhor do time. Nos dois últimos
           indicadores, menor é melhor: tempo até responder e fatia de gente que nunca recebeu
           resposta.
@@ -371,9 +391,13 @@ export default function Meu({ admin }: { admin?: boolean }) {
 
       <h2><span className="idx" /> Quanto esperam por você</h2>
       <p className="nota">
-        Só conversa que o cliente começou, porque quando é você que abre, a primeira resposta é
-        a sua própria mensagem e a conta mediria o disparo, não o atendimento.
-        <Ajuda titulo="Os dois relógios">
+        Quanto tempo o cliente espera pela sua primeira resposta. Conta só conversa que o cliente
+        começou, porque quando é você que abre, a primeira mensagem é a sua e a conta mediria o disparo
+        e não o atendimento.
+        <Ajuda titulo="Os dois relógios"
+          fontes={["Mensagens recebidas e enviadas: Pigeon Post, com data e hora de cada uma",
+                   "Relógio comercial: só minutos de dia útil entre 8h e 18h",
+                   "Conversa sem resposta: nenhuma mensagem nossa depois da primeira do cliente"]}>
           <b>Relógio comercial</b> conta só os minutos de dia útil entre 8h e 18h. Mensagem que
           chega sábado às 22h e você responde segunda às 8h05 conta como 5 minutos, porque não
           tinha ninguém para atender no meio. É o que mede você.
@@ -443,11 +467,19 @@ export default function Meu({ admin }: { admin?: boolean }) {
 
       <h2><span className="idx" /> O seu quadro de horário</h2>
       <p className="nota">
-        {CALORES.find((c) => c.id === calor)?.oque}
-        <Ajuda titulo="Para que serve">
-          Compare duas medidas. Se as suas mensagens saem às 9h e as respostas chegam às 19h,
-          o esforço está no horário errado. Se a espera cresce justo quando mais gente te
-          procura, falta tempo naquela faixa, não falta vontade.
+        A sua semana em hora e dia: cada quadradinho é uma faixa de uma hora, e quanto mais escuro,
+        maior o número naquela faixa. Serve para descobrir se o seu esforço está no horário em que o
+        cliente aparece. {CALORES.find((c) => c.id === calor)?.oque}
+        <Ajuda titulo="Como ler o quadro"
+          fontes={["Mensagens, conversas e tempo de espera: Pigeon Post, pela hora de cada mensagem",
+                   "Matrículas: planilha comercial, pela data da compra",
+                   "Fuso: tudo convertido para o horário de São Paulo"]}>
+          A escala é relativa a você e ao período escolhido, não ao time: o quadrado mais escuro é o seu
+          pico, qualquer que seja o número. Troque a medida nos botões e compare duas: se as suas
+          mensagens saem às 9h e as do cliente chegam às 19h, o esforço está no horário errado. Se a
+          espera cresce justo na faixa em que mais gente te procura, falta tempo ali, não falta vontade.
+          A medida de matrícula usa a data da compra, que é quando a venda foi lançada e não
+          necessariamente a hora da conversa que fechou.
         </Ajuda>
       </p>
       <div className="filtros">
@@ -471,9 +503,18 @@ export default function Meu({ admin }: { admin?: boolean }) {
 
       <h2><span className="idx" /> O que você vende</h2>
       <p className="nota">
-        Ticket médio sozinho não diz nada. R$ 656 e R$ 1.086 só fazem sentido sabendo o mix:
-        intensivo e extensivo têm ticket dez vezes diferente, e uma venda de Semi muda o seu
+        O seu mix: quanto de cada produto você vendeu no período e quanto cada um pesa no seu
+        faturamento. Serve para ler o seu ticket médio sem se enganar, porque ticket sozinho não diz
+        nada: intensivo e extensivo têm ticket dez vezes diferente, e uma venda de Semi muda o seu
         ticket do mês inteiro.
+        <Ajuda titulo="O que cada coluna significa"
+          fontes={["Matrículas, valor e desconto: planilha comercial, pelo vendedor da linha",
+                   "Produto de cada venda: o curso da planilha, apontado para produto em Ajustes, Cursos"]}>
+          <b>Matrículas</b> é linha de venda, não pessoa. <b>Fatia</b> é quanto aquele produto representa
+          das suas matrículas no período. <b>Ticket</b> é o faturamento daquele produto dividido pelas
+          matrículas dele, então ele se mexe com desconto dado e com fase de preço, não só com o produto.
+          <b> Faturamento</b> é o valor cheio da matrícula no dia em que foi lançada, não a parcela paga.
+        </Ajuda>
       </p>
       {!mix ? <p className="rotulo">Carregando</p> : (() => {
         const meu = mix.filter((m) => m.vendedor === euMesmo);
@@ -509,8 +550,17 @@ export default function Meu({ admin }: { admin?: boolean }) {
 
       <h2><span className="idx" /> O que está na sua mão agora</h2>
       <p className="nota">
-        A mesma fila da tela O que está escapando, filtrada em você. Em ordem do que mais
-        aperta, não do mais antigo.
+        A sua fila do momento: negociação parada, conversa sem resposta e lead sem primeiro contato,
+        em ordem do que mais aperta e não do mais antigo. É a única parte desta tela que pede ação hoje.
+        <Ajuda titulo="Como a ordem é decidida"
+          fontes={["Negociações em aberto e tempo parado: RD Station CRM, pelo responsável do negócio",
+                   "Conversa sem resposta: Pigeon Post, pelo atendente da conversa",
+                   "É a mesma fila da tela Marketing, O que está escapando, filtrada em você"]}>
+          <b>Parada há</b> conta desde a última mexida registrada, não desde a criação. A ordem pesa o
+          tipo de buraco e o tempo junto: cliente que mandou mensagem e não foi respondido vem antes de
+          negociação antiga esquecida, porque no primeiro caso a pessoa está esperando agora.
+          <b> O que fazer</b> é a ação sugerida para aquele tipo de buraco, não tarefa atribuída.
+        </Ajuda>
       </p>
       {!fila ? <p className="rotulo">Carregando</p> : fila.length === 0 ? (
         <p className="mudo">Nada parado na sua mão. É uma boa notícia.</p>

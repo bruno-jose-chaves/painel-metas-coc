@@ -90,6 +90,20 @@ export default function Leads() {
         </p>
       )}
       <h2><span className="idx" /> Conversões por dia</h2>
+      <p className="nota">
+        Quanta gente converteu em formulário por dia, com a visita em landing page ao lado. Serve para
+        ligar pico de captação a anúncio e a envio de e-mail, e para achar o dia em que a captação parou.
+        <Ajuda titulo="Conversão e visita não medem a mesma coisa"
+          fontes={["Conversões e visitas: RD Station Marketing",
+                   "Período e curso: os filtros no topo da tela",
+                   "Quais páginas pertencem a cada curso: as regras apontadas em Marketing, A classificar"]}>
+          <b>Conversão</b> conta envio de formulário, não pessoa: quem baixa dois materiais aparece duas
+          vezes. <b>Visita em landing page</b> é a linha tracejada e só existe para página hospedada no
+          próprio RD, então página feita no site de vocês com formulário embutido do RD aparece com
+          conversão e sem visita. Por isso a distância entre as duas linhas não é taxa de conversão
+          confiável, e a tabela abaixo é o lugar certo para olhar isso.
+        </Ajuda>
+      </p>
       {!dias ? <p className="rotulo">Carregando</p> : dias.length === 0 ? (
         <p className="mudo">Sem conversões registradas no período.</p>
       ) : (
@@ -103,6 +117,18 @@ export default function Leads() {
       )}
 
       <h2><span className="idx" /> Páginas e formulários</h2>
+      <p className="nota">
+        Qual página e qual formulário trouxeram gente no período. É a tabela que diz onde investir
+        tráfego e qual material rico ainda funciona.
+        <Ajuda titulo="Como ler a taxa de conversão desta tabela"
+          fontes={["Páginas, formulários, visitas e conversões: RD Station Marketing",
+                   "Quais páginas contam em cada curso: as regras apontadas em Marketing, A classificar"]}>
+          A taxa só é confiável nas páginas hospedadas pelo RD, porque é só nelas que ele conta visita.
+          Página com taxa acima de 100% ou com visita zerada é página do site de vocês com formulário
+          embutido: a conversão dela está certa, a visita não existe. Página sem curso apontado cai em
+          <b> A classificar</b>, e enquanto não for apontada ela não entra em meta de captação nenhuma.
+        </Ajuda>
+      </p>
       {!origens ? <p className="rotulo">Carregando</p> : origens.length === 0 ? (
         <p className="mudo">Sem conversões por página no período.</p>
       ) : (
@@ -131,6 +157,18 @@ export default function Leads() {
       )}
 
       <h2><span className="idx" /> Tags dos leads</h2>
+      <p className="nota">
+        Quais etiquetas a pessoa já tinha no RD no momento em que converteu. Serve para descobrir
+        interesse declarado sem perguntar, e é daqui que vai sair o de para de etiqueta para curso.
+        <Ajuda titulo="Por que a contagem começa em outubro"
+          fontes={["Tags: RD Station Marketing, pelo webhook de conversão",
+                   "A tag guardada é a que a pessoa tinha no momento da conversão, não a de hoje",
+                   "O webhook foi ligado em 02/10/2026"]}>
+          <b>Pessoas</b> é gente diferente e <b>conversões</b> é envio de formulário, então a mesma pessoa
+          com três downloads conta uma vez na primeira coluna e três na segunda. Antes de 02/10/2026 não
+          existe tag guardada, então comparar com período anterior a isso não faz sentido.
+        </Ajuda>
+      </p>
       {!tags ? <p className="rotulo">Carregando</p> : tags.length === 0 ? (
         <p className="mudo">
           Ainda sem tags no período. O webhook de conversão foi ligado em 02/10/2026, então só há tag a partir dessa data.
@@ -152,13 +190,22 @@ export default function Leads() {
               </tbody>
             </table>
           </div>
-          <p className="rodape">
-            Cada conversão traz as tags que a pessoa tinha naquele momento. É daqui que sai, na próxima versão, o de para de tag para curso de destino.
-          </p>
         </>
       )}
 
       <h2><span className="idx" /> Origem dos negócios no CRM</h2>
+      <p className="nota">
+        A mesma pergunta pelo lado do CRM em vez do formulário: de qual fonte nasceram as negociações do
+        período. Serve de contraprova da tabela de páginas, porque as duas bases podem discordar.
+        <Ajuda titulo="Por que este bloco não bate com os de cima"
+          fontes={["Negociações criadas no período: RD Station CRM, pelo campo de fonte",
+                   "Os blocos acima vêm do RD Station Marketing, que é outra base"]}>
+          Formulário gera conversão no Marketing; negociação nasce no CRM, às vezes dias depois e às vezes
+          sem nenhum formulário no meio, como no caso do lead que chegou por indicação ou direto no
+          WhatsApp. Fonte vazia ou genérica é lead que entrou sem rastro, e o tamanho disso é o limite de
+          confiança de qualquer leitura de origem no painel.
+        </Ajuda>
+      </p>
       {!fontes ? <p className="rotulo">Carregando</p> : fontes.length === 0 ? (
         <p className="mudo">Nenhum negócio criado no período.</p>
       ) : (

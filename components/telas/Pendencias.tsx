@@ -127,7 +127,9 @@ export default function Pendencias({ admin, embutido }: { admin: boolean; embuti
 
       <h2><span className="idx" /> Esperando a sua decisão</h2>
       <p className="nota">
-        Campanhas do CRM e formulários que o painel não conseguiu ligar a um curso sozinho.
+        Campanhas do CRM e formulários que o painel não conseguiu ligar a um curso sozinho. Cada um
+        apontado aqui vira regra e passa a classificar todo lead que chegar por ali, então é o trabalho
+        que mais melhora os filtros por curso em todo o painel.
         <Ajuda titulo="Por que resolver, e em que ordem"
           fontes={["Campanhas: RD Station CRM",
                    "Formulários: RD Station Marketing",
@@ -228,8 +230,13 @@ export default function Pendencias({ admin, embutido }: { admin: boolean; embuti
 
       <h2><span className="idx" /> Regras já apontadas</h2>
       <p className="nota">
-        Regra apontada para <b>curso</b> vale para qualquer ano: a data do lead decide a turma e a campanha.
-        <Ajuda titulo="Curso, turma ou campanha">
+        As regras de classificação que já existem, para conferir e corrigir. Se um curso aparecer com
+        lead estranho, é aqui que se descobre qual regra está jogando gente para lá. Regra apontada para
+        <b> curso</b> vale para qualquer ano: a data do lead decide a turma e a campanha.
+        <Ajuda titulo="Curso, turma ou campanha"
+          fontes={["Regras: guardadas no painel, apontadas nesta tela e em Etiquetas",
+                   "Indicadores: campanhas do RD Station CRM e formulários do RD Station Marketing",
+                   "A regra manual sempre ganha da regra automática pelo nome do curso"]}>
           Apontar para turma ou campanha só faz sentido quando a regra é mesmo daquele ano, como um formulário
           feito para uma campanha específica. Apontada para curso, a regra é escrita uma vez e não precisa ser
           repontada em janeiro.

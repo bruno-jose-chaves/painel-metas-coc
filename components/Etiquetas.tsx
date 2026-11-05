@@ -80,7 +80,9 @@ export default function Etiquetas({ admin, embutido }: { admin: boolean; embutid
 
       <h2><span className="idx" /> Esperando a sua decisão</h2>
       <p className="nota">
-        Etiquetas que chegam do RD e ainda não têm curso apontado.
+        Etiquetas que chegam do RD e ainda não têm curso apontado. Cada uma que você aponta aqui
+        classifica de uma vez todo lead que a carrega, hoje e no futuro, então é o trabalho de
+        classificação com o melhor retorno por minuto do painel.
         <Ajuda titulo="Por que a etiqueta importa"
           fontes={["Etiquetas: RD Station Marketing",
                    "A regra apontada aqui fica guardada no painel"]}>
@@ -147,6 +149,21 @@ export default function Etiquetas({ admin, embutido }: { admin: boolean; embutid
       {aviso && <div className="aviso ok" style={{ marginTop: 12 }}>{aviso}</div>}
 
       <h2><span className="idx" /> Regras já apontadas</h2>
+      <p className="nota">
+        As etiquetas que já têm curso apontado, para conferir e corrigir. Serve de histórico da decisão:
+        se um curso aparecer com lead estranho, é aqui que se descobre qual etiqueta está jogando gente
+        para lá.
+        <Ajuda titulo="A ordem da conferência, degrau por degrau"
+          fontes={["Regras apontadas: guardadas no painel, nesta tela e em A classificar",
+                   "Etiquetas: RD Station Marketing",
+                   "A etiqueta é o quarto degrau da classificação de curso"]}>
+          O painel tenta nesta ordem e para no primeiro que responde, então o que foi classificado por um
+          degrau acima não é reclassificado por um de baixo: primeiro a regra apontada à mão, depois a
+          regra do formulário que a pessoa preencheu, depois o nome da campanha no CRM, e só então a
+          etiqueta. Tirar uma regra não desclassifica o lead que já foi classificado por ela em um
+          relatório fechado, mas muda a leitura daqui para frente.
+        </Ajuda>
+      </p>
       {!regras ? <p className="rotulo">Carregando</p> : regras.length === 0 ? (
         <p className="mudo">Nenhuma regra de etiqueta cadastrada.</p>
       ) : (

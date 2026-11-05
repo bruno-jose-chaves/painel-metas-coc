@@ -111,6 +111,20 @@ export default function Cursos({ admin }: { admin: boolean }) {
       {!cursos ? <p className="rotulo">Carregando</p> : (
         <>
           <h2><span className="idx" /> O tamanho de cada produto</h2>
+          <p className="nota">
+            Quanto cada produto representa em matrícula e faturamento, com quantos nomes de curso da
+            planilha caem nele. Serve para conferir a classificação: produto com muitos nomes e pouca
+            venda costuma ter nome apontado errado.
+            <Ajuda titulo="O que cada coluna conta"
+              fontes={["Matrículas e faturamento: planilha comercial, pelo produto resolvido de cada venda",
+                       "Nomes de curso: a coluna Curso da planilha, agrupada pelo destino",
+                       "Conta aluno: marcado no cadastro do produto; material avulso fica fora"]}>
+              <b>Nomes de curso</b> é quantas grafias diferentes da planilha apontam para aquele produto:
+              é normal ter várias, porque o nome muda de ano para ano. Produto marcado para <b>não contar
+              aluno</b>, como material avulso, aparece aqui com faturamento e fica fora de toda contagem
+              de aluno do painel. Cursos extras contam aluno, porque foram alunos de verdade.
+            </Ajuda>
+          </p>
           <div className="rolar">
             <table className="tabela">
               <thead>
@@ -142,9 +156,21 @@ export default function Cursos({ admin }: { admin: boolean }) {
 
           <h2><span className="idx" /> Cada nome, um a um</h2>
           <p className="nota">
+            Todo nome de curso que já apareceu na planilha, com o produto de destino e por qual caminho
+            ele foi resolvido. É aqui que se conserta matrícula caindo no produto errado.{" "}
             {admin
               ? "Trocar o produto reclassifica na hora todas as matrículas daquele nome."
               : "Só a diretoria pode apontar destino. Aqui a lista é de leitura."}
+            <Ajuda titulo="Os caminhos pelos quais um nome é resolvido"
+              fontes={["Nomes: a coluna Curso da planilha comercial",
+                       "Apontado: o de para manual desta tela, guardado no painel",
+                       "Regra: as expressões de nome cadastradas em cada produto"]}>
+              <b>Apontado</b> quer dizer que alguém resolveu à mão aqui, e isso sempre ganha da regra
+              automática. <b>Regra</b> quer dizer que o nome casou com uma expressão do produto.
+              <b> Sem destino</b> é nome que não casou com nada: a matrícula existe, entra no faturamento
+              e fica fora de qualquer leitura por produto, então é o que vale resolver primeiro. Maiúscula,
+              acento e espaço repetido são ignorados na comparação.
+            </Ajuda>
           </p>
           <div className="filtros">
             <label>

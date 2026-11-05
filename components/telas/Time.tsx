@@ -108,17 +108,6 @@ export default function Time() {
         Período em análise: {dataCurta(periodo.de)} a {dataCurta(periodo.ate)}
         {campanha ? ", só " + (campanhas.find((c) => c.id === campanha)?.nome ?? "") : ", todos os cursos"}.
       </p>
-      <p className="nota">
-        Para cobrança de meta vale a coluna <b>Alunos</b>, não a de ganhas no CRM.
-        <Ajuda titulo="Por que duas contagens"
-          fontes={["Alunos: planilha comercial",
-                   "Ganhas no CRM: negociação marcada como ganha no RD Station CRM",
-                   "As duas se ligam por e-mail, telefone ou nome"]}>
-          Alunos é a planilha comercial, que é a fonte firme: a venda entra no dia em que aconteceu.
-          Ganhas no CRM é outra contagem, do RD, e costuma ficar atrás porque o negócio às vezes é fechado no
-          dia seguinte, e porque nem toda venda tem negócio correspondente.
-        </Ajuda>
-      </p>
 
       <div className="secao-topo">
         <h2><span className="idx" /> Vendas dia a dia</h2>
@@ -134,6 +123,20 @@ export default function Time() {
           </select>
         </div>
       </div>
+      <p className="nota">
+        A curva de venda do período, para enxergar onde o movimento aconteceu em vez do total fechado.
+        Por dia mostra o pico e o buraco; acumulado mostra se a soma está ganhando ou perdendo da
+        referência escolhida ao lado.
+        <Ajuda titulo="O que é comparado"
+          fontes={["Matrículas: planilha comercial, pela data da compra",
+                   "Referência do ano anterior: o mesmo curso, alinhado pelo dia de venda da turma",
+                   "Período e curso: os filtros no topo da tela"]}>
+          A comparação com o ano anterior alinha pelo <b>dia de venda da turma</b>, não pela data do
+          calendário: dia 12 contra dia 12. É assim porque campanha que abriu uma semana mais tarde
+          apareceria atrasada sem ter atrasado nada. Fim de semana aparece na curva, mas as médias do
+          painel contam só dia útil, então uma segunda alta logo depois de um sábado morto é normal.
+        </Ajuda>
+      </p>
       <p className="nota">
         Matrícula por dia no período e no curso escolhidos acima, com uma linha de comparação ao lado.
         <Ajuda titulo="Como ler"
@@ -223,7 +226,25 @@ export default function Time() {
       )}
 
       <h2><span className="idx" /> Ranking de vendas</h2>
-      <p className="nota">Clique na linha de um vendedor para ver as matrículas dele no período.</p>
+      <p className="nota">
+        Quem vendeu o quê no período, com o funil de cada um ao lado da venda. Para cobrança de meta vale
+        a coluna <b>Alunos</b>, não a de ganhas no CRM. Clique na linha de um vendedor para ver as
+        matrículas dele nome por nome.
+        <Ajuda titulo="Por que duas contagens, e o que cada coluna significa"
+          fontes={["Alunos, faturamento e ticket: planilha comercial, pelo vendedor da linha",
+                   "Leads recebidos, ganhas, perdidas e em aberto: RD Station CRM, pelo responsável do negócio",
+                   "As duas bases se ligam por e-mail, telefone ou nome"]}>
+          <b>Alunos</b> vem da planilha comercial, que é a fonte firme: a venda entra no dia em que
+          aconteceu. <b>Ganhas no CRM</b> é outra contagem, do RD, e costuma ficar atrás porque o negócio
+          às vezes é fechado no dia seguinte e porque nem toda venda tem negócio correspondente.
+          <b> Conversão</b> é ganhas sobre o funil inteiro do período, ganhas mais perdidas mais o que
+          ainda está em aberto: contar só o que já foi decidido inflava o número, porque a maior parte do
+          funil ainda não decidiu. <b>Venda automática</b> é a matrícula sem vendedor na planilha, a compra
+          que o aluno fez sozinho pelo site: entra no faturamento e fica fora do ranking. O ranking conta
+          só a venda lançada dentro do período, então campanha com reserva vendida antes do início aparece
+          menor aqui do que no cartão dela.
+        </Ajuda>
+      </p>
       {!time ? <p className="rotulo">Carregando</p> : time.length === 0 ? (
         <p className="mudo">Nenhuma atividade comercial no período.</p>
       ) : (
@@ -278,20 +299,20 @@ export default function Time() {
           </table>
         </div>
       )}
-      <p className="rodape">
-        <b>Conversão</b> é ganhas sobre o funil inteiro do período, não só sobre o que já foi decidido.
-        <Ajuda titulo="Por que contar o funil inteiro"
-          fontes={["Negociações: RD Station CRM",
-                   "Alunos e faturamento: planilha comercial"]}>
-          Ganhas mais perdidas mais o que ainda está em aberto. Contar só o que já foi decidido inflava o
-          número, porque a maior parte do funil ainda não decidiu. Venda automática é a matrícula fechada sem
-          vendedor na planilha, ou seja a compra que o aluno fez sozinho pelo site: ela entra no faturamento mas
-          fica fora do ranking. O ranking conta só a venda lançada dentro do período acima, então campanha com
-          reserva vendida antes do início aparece menor aqui do que no cartão da campanha.
+      <h2><span className="idx" /> Negócios em aberto e tempo parado</h2>
+      <p className="nota">
+        Onde o funil está travado: quantas negociações estão paradas em cada etapa e há quanto tempo.
+        Serve para achar a etapa que acumula, que é onde falta ação e não onde falta lead.
+        <Ajuda titulo="Como o tempo parado é contado"
+          fontes={["Negociações em aberto e etapa: RD Station CRM",
+                   "Tempo parado: desde a última mexida registrada no negócio, não desde a criação"]}>
+          <b>Em aberto</b> é negociação que não foi ganha nem perdida. As faixas dividem essas negociações
+          pelo tempo desde a última mexida: a barra de distribuição é a mesma informação em desenho, para
+          comparar etapas de tamanhos diferentes. Etapa com muita coisa em <b>mais de 30 dias</b> não é
+          fila de trabalho, é cemitério: ou volta a ser trabalhada ou é perda que ninguém marcou. A
+          <b> média</b> é puxada por esses casos extremos, então olhe a distribuição antes dela.
         </Ajuda>
       </p>
-
-      <h2><span className="idx" /> Negócios em aberto e tempo parado</h2>
       {!parados ? <p className="rotulo">Carregando</p> : parados.length === 0 ? (
         <p className="mudo">Nenhum negócio em aberto no período.</p>
       ) : (
@@ -341,7 +362,9 @@ export default function Time() {
 
       <h2><span className="idx" /> Motivos de perda</h2>
       <p className="nota">
-        Separado em dois, porque são duas conversas diferentes.
+        Por que as negociações foram perdidas no período, separado em dois porque são duas conversas
+        diferentes: o que a pessoa falou é assunto de oferta e preço, e sumiço é assunto de ritmo de
+        follow-up e qualidade do lead.
         <Ajuda titulo="Por que sumiço fica separado"
           fontes={["RD Station CRM, negociação marcada como perdida no período, pelo motivo escrito lá",
                    "Veio da pré-venda: o mesmo contato tem negociação no funil de pré-vendas",

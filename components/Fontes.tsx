@@ -121,7 +121,9 @@ export default function Fontes() {
     <>
       <h2><span className="idx" /> Saúde das fontes</h2>
       <p className="nota">
-        De quanto em quanto tempo cada carga deveria rodar, e quando ela rodou pela última vez.
+        Se o número que está na tela é o de agora. Cada linha é uma carga de dado, com de quanto em
+        quanto tempo ela deveria rodar e quando rodou pela última vez. É o primeiro lugar a olhar quando
+        um número do painel parecer errado.
         <Ajuda titulo="Como a situação é decidida"
           fontes={["Marca de tempo de cada carga: tabela sync_estado",
                    "Planilha comercial: tabela vendas, campo atualizado_em",

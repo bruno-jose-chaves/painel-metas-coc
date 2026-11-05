@@ -190,6 +190,21 @@ export default function Configuracao({ admin }: { admin: boolean }) {
       {retorno && <div className={"aviso " + retorno.tipo}>{retorno.msg}</div>}
 
       <h2><span className="idx" /> Planilha de vendas</h2>
+      <p className="nota">
+        O histórico de envios da planilha comercial, que é a fonte firme de toda venda do painel. Serve
+        para saber se o último envio chegou e se alguma linha ficou de fora. O detalhe linha por linha
+        está no bloco <b>Importação da planilha</b>, mais abaixo.
+        <Ajuda titulo="O que cada coluna conta"
+          fontes={["Registro de cada envio: tabela sincronizacoes",
+                   "Quem envia: o Apps Script instalado dentro da própria planilha",
+                   "Abas enviadas: toda aba chamada Vendas <ano>, do ano corrente em diante"]}>
+          <b>Linhas</b> é tudo que veio da aba, inclusive linha de formatação vazia. <b>Importadas</b> é o
+          que virou matrícula. <b>Rejeitadas</b> é linha com conteúdo que o painel não conseguiu ler, quase
+          sempre data: essa é venda que existe na planilha e não existe no painel. Aba de ano fechado só é
+          relida quando alguém roda a importação do histórico, então uma rejeição antiga pode ficar parada
+          aqui mesmo depois de a planilha ter sido corrigida.
+        </Ajuda>
+      </p>
       <div className="bloco">
         <p style={{ marginTop: 0 }}>Envio automático a cada 15 minutos pelo script instalado na própria planilha.</p>
         <div className="rolar"><table className="tabela">
@@ -205,6 +220,19 @@ export default function Configuracao({ admin }: { admin: boolean }) {
       </div>
 
       <h2><span className="idx" /> RD Station</h2>
+      <p className="nota">
+        A conexão com o CRM e com o Marketing do RD Station, que é de onde vem lead, negociação, origem e
+        conversão de formulário. Se um destes dois cair, as telas de Comercial e de Marketing param de
+        receber dado novo e passam a mostrar a última foto.
+        <Ajuda titulo="O que cada aplicativo alimenta"
+          fontes={["RD Station CRM: negociações, etapas, responsáveis, motivos de perda e origem",
+                   "RD Station Marketing: conversões de formulário, páginas, visitas e etiquetas",
+                   "A autorização é por aplicativo e vence: renovar aqui não mexe em dado nenhum"]}>
+          Os dois são aplicativos separados no RD e autorizam separado, então um pode estar conectado e o
+          outro não. O token é renovado sozinho enquanto a conexão está de pé; quando ela cai de vez, o
+          selo fica pendente e é preciso autorizar de novo aqui. Nenhum dado já importado se perde nisso.
+        </Ajuda>
+      </p>
       {admin ? (
         <>
           <AppRD servico="rd_crm" status={st("rd_crm")} recarregar={carregar} />
@@ -213,6 +241,18 @@ export default function Configuracao({ admin }: { admin: boolean }) {
       ) : <p className="mudo">Somente administradores configuram integrações.</p>}
 
       <h2><span className="idx" /> n8n</h2>
+      <p className="nota">
+        O automatizador que dispara as mensagens do painel para o time no WhatsApp. É por ele que a fila
+        do painel chega em quem precisa trabalhar ela.
+        <Ajuda titulo="O que passa pelo n8n"
+          fontes={["Mensagem da fila de manhã e consolidado das 20h: montados pelo painel",
+                   "Entrega no WhatsApp: n8n, usando o número da casa",
+                   "A fila é a mesma de Comercial, O que está escapando"]}>
+          O painel monta o texto e o n8n entrega. Se o n8n estiver fora, o painel continua certo e as
+          mensagens simplesmente não saem, sem erro visível para o time. Por isso vale conferir aqui
+          quando alguém disser que parou de receber a fila.
+        </Ajuda>
+      </p>
       <div className="bloco">
         <div className="card-top">
           <div><h3 style={{ margin: "4px 0" }}>Automações do n8n</h3></div>
@@ -241,6 +281,20 @@ export default function Configuracao({ admin }: { admin: boolean }) {
       <FilaManha admin={admin} />
 
       <h2><span className="idx" /> Pigeon Post</h2>
+      <p className="nota">
+        A conexão com o Pigeon, que é de onde vem toda conversa de WhatsApp: atendimento, tempo de
+        resposta, quadro de horário e quem falou com quem. É a fonte mais frágil do painel, porque chega
+        por webhook e não por busca.
+        <Ajuda titulo="Por que o webhook pode cair calado"
+          fontes={["Conversas, mensagens, atendente e etiquetas: Pigeon Post",
+                   "Entrega: webhook do Pigeon chamando o painel a cada evento",
+                   "Histórico importado a partir de 01/08/2026"]}>
+          Como é o Pigeon que chama o painel, e não o contrário, quando a conexão cai não aparece erro:
+          simplesmente param de chegar conversas, e a tela fica com a última foto como se o time tivesse
+          parado de atender. Já aconteceu de ficar dez dias fora sem ninguém notar, e é por isso que a
+          <b> Saúde das fontes</b>, acima, vigia o tempo desde o último evento recebido.
+        </Ajuda>
+      </p>
       <div className="bloco">
         <div className="card-top">
           <div><h3 style={{ margin: "4px 0" }}>Conversas com clientes</h3></div>
@@ -294,7 +348,8 @@ export default function Configuracao({ admin }: { admin: boolean }) {
 
       <h2><span className="idx" /> Cobertura do RD Marketing</h2>
       <p className="nota">
-        As conversões do RD Marketing vêm dia a dia, e dia que não foi buscado não aparece em lugar nenhum.
+        Quais dias de conversão do RD Marketing já foram buscados. Serve para não ler buraco de busca
+        como queda de captação: dia que não foi buscado aparece como zero em toda tela de marketing.
         <Ajuda titulo="Por que isso importa"
           fontes={["Dias já buscados do RD Marketing",
                    "Conversões de formulário do RD Marketing"]}>
@@ -329,6 +384,17 @@ export default function Configuracao({ admin }: { admin: boolean }) {
       )}
 
       <h2><span className="idx" /> Pedidos de acesso</h2>
+      <p className="nota">
+        Quem pediu acesso ao painel e está esperando resposta. Enquanto o pedido não é aprovado, a pessoa
+        consegue entrar e não vê dado nenhum.
+        <Ajuda titulo="O que acontece ao aprovar"
+          fontes={["Pedidos: a própria tela de login do painel",
+                   "A liberação de dado é feita pelo banco, pela regra de autorização de cada tela"]}>
+          Aprovar cria o acesso com papel de leitura. Papel e permissão de diretoria são definidos depois,
+          no bloco <b>Quem acessa</b>. Negar um pedido não bloqueia a pessoa para sempre: ela pode pedir
+          de novo.
+        </Ajuda>
+      </p>
       {!pedidos ? <p className="rotulo">Carregando</p> : pedidos.length === 0 ? (
         <p className="mudo">Nenhum pedido esperando resposta.</p>
       ) : (
@@ -356,6 +422,20 @@ export default function Configuracao({ admin }: { admin: boolean }) {
       )}
 
       <h2><span className="idx" /> Quem acessa</h2>
+      <p className="nota">
+        Quem tem acesso ao painel e com qual papel. É o papel que decide o que a pessoa vê: comercial vê
+        o painel dela e o resumo, diretoria vê tudo e pode mexer em cadastro.
+        <Ajuda titulo="O que cada papel permite"
+          fontes={["Usuários e papéis: cadastro do painel",
+                   "A restrição é aplicada no banco, não só na tela",
+                   "O papel comercial também é o que amarra a pessoa às vendas dela na planilha"]}>
+          <b>Comercial</b> entra direto no painel dele e no resumo, e não enxerga as telas de gestão nem
+          valor de comissão de outra pessoa. <b>Diretoria</b> vê tudo e é o único papel que aponta curso,
+          cadastra campanha e mexe em meta. O nome cadastrado aqui precisa ser igual ao que está na coluna
+          Vendedor da planilha, senão a pessoa entra e não vê venda própria nenhuma. <b>Senha nova</b>
+          gera uma senha temporária para entregar à pessoa.
+        </Ajuda>
+      </p>
       <div className="bloco">
         <div className="rolar"><table className="tabela">
           <thead>

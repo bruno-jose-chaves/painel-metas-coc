@@ -93,12 +93,17 @@ export default function Gestao() {
 
       <h2><span className="idx" /> Quem chegou no período</h2>
       <p className="nota">
-        <b>Lead novo</b> é negociação criada sem nenhuma conversa nos 20 dias anteriores.
+        Separa a entrada de gente em rosto novo e rosto que já conhecia a gente. Serve para saber se o
+        volume do período veio de captação nova ou de base antiga voltando, porque as duas coisas pedem
+        reação diferente de marketing e de comercial.
         <Ajuda titulo="Novo, conhecido e requentado"
-          fontes={["Negociações: RD Station CRM",
-                   "Conversas: Pigeon Post, ligadas pelo telefone"]}>
-          Gente que entrou agora. Quem já falou com a gente antes disso entra como conhecido, e requentado é
-          quem voltou a falar depois de um tempo parado.
+          fontes={["Negociações criadas: RD Station CRM, pela data de criação",
+                   "Conversa anterior: Pigeon Post, ligada à negociação pelo telefone"]}>
+          <b>Lead novo</b> é negociação criada sem nenhuma conversa com a gente nos 20 dias anteriores:
+          rosto novo. <b>Lead conhecido</b> é o contrário, já tinha conversa recente quando a negociação
+          nasceu. <b>Requentado</b> é quem voltou a falar depois de 15 dias parado, e por isso não entra no
+          total de negociações criadas: ele não é entrada nova, é base reagindo. A soma de novo mais
+          conhecido fecha o total de negociações criadas no período.
         </Ajuda>
       </p>
       {!linhas ? <p className="rotulo">Carregando</p> : (
@@ -132,6 +137,19 @@ export default function Gestao() {
       )}
 
       <h2><span className="idx" /> Conversas no período</h2>
+      <p className="nota">
+        O mesmo período visto pelo WhatsApp em vez do CRM: quantas conversas o time tocou e quanto disso
+        era gente falando com a gente pela primeira vez. É a medida de carga de atendimento, não de venda.
+        <Ajuda titulo="O que conta como conversa"
+          fontes={["Conversas e mensagens: Pigeon Post",
+                   "Primeira conversa: nenhuma mensagem anterior daquele telefone na base"]}>
+          <b>Conversa aberta</b> é conversa que começou no período. <b>Em andamento</b> é conversa que já
+          existia e recebeu mensagem dentro do período. Somadas, dão as <b>conversas tocadas</b>, que é o
+          volume real de trabalho do dia, maior que o número de leads novos. <b>Rosto novo</b> é a fatia das
+          conversas abertas que é primeiro contato de verdade: quanto mais baixo, mais o time está gastando
+          o dia em retorno de quem já conhecia a gente.
+        </Ajuda>
+      </p>
       {!linhas ? <p className="rotulo">Carregando</p> : (
         <div className="rolar">
           <table className="tabela">
@@ -160,6 +178,18 @@ export default function Gestao() {
       )}
 
       <h2><span className="idx" /> Dia a dia</h2>
+      <p className="nota">
+        As três entradas dia a dia, uma linha cada, para enxergar buraco e pico no período em vez do total
+        fechado. Queda nas três no mesmo dia costuma ser feriado ou anúncio parado, e não time parado.
+        <Ajuda titulo="As três linhas"
+          fontes={["Conversas abertas: Pigeon Post",
+                   "Leads novos e requentados: RD Station CRM cruzado com Pigeon Post"]}>
+          <b>Conversas abertas</b> é o WhatsApp, <b>leads novos</b> é o CRM, e os dois não batem de
+          propósito: há conversa que nunca virou negociação e negociação que nasceu sem conversa.
+          <b> Requentados</b> é a linha tracejada e anda sozinha: ela sobe quando alguém trabalha a base
+          antiga, independente de captação.
+        </Ajuda>
+      </p>
       {!dias ? <p className="rotulo">Carregando</p> : dias.length === 0 ? (
         <p className="mudo">Sem movimento no período.</p>
       ) : (

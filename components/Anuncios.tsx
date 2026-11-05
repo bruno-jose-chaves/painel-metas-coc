@@ -93,7 +93,10 @@ export default function Anuncios() {
 
       <h2><span className="idx" /> Peça por peça</h2>
       <p className="nota">
-        Quem chegou por peça de clique para WhatsApp, ligado à matrícula pelo telefone.
+        Quais peças de clique para WhatsApp trouxeram gente e quantas delas viraram matrícula. É a única
+        leitura de retorno que existe para esse tipo de anúncio, porque ele não passa por formulário e o
+        RD não o vê. <b>Pessoas por matrícula</b> não é custo: é quantas conversas a peça precisa gerar
+        para sair um aluno, o que já separa peça que traz volume de peça que traz aluno.
         <Ajuda titulo="Como a peça vira matrícula"
           fontes={["Conversa e peça de origem: Pigeon Post",
                    "Matrícula: planilha comercial",
@@ -154,11 +157,9 @@ export default function Anuncios() {
         </div>
       )}
       <p className="rodape">
-        Pessoas por matrícula não é custo.
-        <Ajuda titulo="Por que não é custo">
-          Para custo falta a verba de cada peça, que o painel não recebe. O que esta coluna diz é quantas
-          conversas a peça precisa gerar para sair uma matrícula, o que já separa peça que traz volume de peça
-          que traz aluno.
+        <Ajuda titulo="Por que não dá para calcular custo aqui">
+          Para custo falta a verba de cada peça, que o painel ainda não recebe. Quando a planilha de
+          investimento entrar, o custo por matrícula aparece nesta mesma tabela.
         </Ajuda>
       </p>
 

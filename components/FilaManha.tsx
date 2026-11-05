@@ -85,6 +85,19 @@ export default function FilaManha({ admin }: { admin: boolean }) {
   return (
     <>
       <h2><span className="idx" /> Fila de manhã</h2>
+      <p className="nota">
+        O disparo da fila de trabalho para o time, de manhã: cada pessoa recebe o que está parado na mão
+        dela e a diretoria recebe o consolidado. Serve para a fila do painel virar ação sem ninguém
+        precisar abrir o painel.
+        <Ajuda titulo="O que a mensagem leva"
+          fontes={["A fila é a mesma de Comercial, O que está escapando",
+                   "Telefone de cada pessoa: cadastro de pessoas em Ajustes",
+                   "O envio usa o mesmo caminho da mensagem das 20h"]}>
+          De cada tipo de problema, a mensagem traz os três mais antigos, com nome, telefone, há quantos
+          dias está parado e o que fazer, e diz quantos ficaram de fora. Quem está com a fila limpa não
+          recebe nada, de propósito: mensagem vazia todo dia ensina o time a ignorar as que importam.
+        </Ajuda>
+      </p>
       <div className="bloco">
         <p style={{ marginTop: 0 }}>
           <b>O envio automático está desligado.</b> O texto da mensagem ainda não está bom o bastante

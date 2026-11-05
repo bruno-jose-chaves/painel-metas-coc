@@ -97,7 +97,9 @@ export default function Passagem({ admin }: { admin: boolean }) {
 
       <h2><span className="idx" /> Formulário por formulário</h2>
       <p className="nota">
-        Ter formulário não faz o lead chegar no comercial: é preciso um fluxo no RD Marketing criando a negociação.
+        Se o lead que se inscreveu num formulário chegou de fato ao comercial, formulário por formulário.
+        Serve para achar captação que está sendo paga e não vira negociação para ninguém trabalhar: ter
+        formulário não faz o lead chegar, é preciso um fluxo no RD Marketing criando a negociação.
         <Ajuda titulo="O que é apontar, e o que esta conta compara"
           fontes={["Conversões do formulário: RD Station Marketing",
                    "Pessoas no CRM: RD Station CRM, pela campanha ligada ao formulário",
@@ -191,7 +193,8 @@ export default function Passagem({ admin }: { admin: boolean }) {
 
       <h2><span className="idx" /> Captação e entrada no CRM, dia a dia</h2>
       <p className="nota">
-        Esta leitura não depende de fluxo apontado nenhum.
+        A mesma pergunta no total e dia a dia, sem depender de fluxo apontado nenhum. Serve de alarme:
+        o que importa é a distância entre as duas linhas mudar de repente, que é o sinal de fluxo quebrado.
         <Ajuda titulo="Como ler as duas linhas"
           fontes={["Conversões: RD Station Marketing",
                    "Negociações criadas: RD Station CRM, fora do funil de pré-vendas"]}>

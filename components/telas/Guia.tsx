@@ -103,6 +103,10 @@ export default function Guia() {
       </p>
 
       <h2><span className="idx" /> O que você faz</h2>
+      <p className="nota">
+        Escolha o seu papel. Ele só muda a ordem em que as telas são sugeridas aqui embaixo, porque a
+        mesma pergunta se responde em telas diferentes dependendo de quem pergunta.
+      </p>
       <div className="cards" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
         {PAPEIS.map((p) => (
           <button
@@ -117,6 +121,10 @@ export default function Guia() {
       </div>
 
       <h2><span className="idx" /> O que você quer saber agora</h2>
+      <p className="nota">
+        A pergunta que você tem na mão agora. É ela que escolhe as telas: o painel tem mais de setenta
+        blocos, e quase nenhuma pergunta precisa de mais de três.
+      </p>
       <div className="cards" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
         {PERGUNTAS.map((p) => (
           <button
@@ -130,6 +138,10 @@ export default function Guia() {
       </div>
 
       <h2><span className="idx" /> Onde olhar</h2>
+      <p className="nota">
+        As telas que respondem a sua pergunta, na ordem de abrir, com o motivo de cada uma. Clique no
+        nome para ir direto.
+      </p>
       {!pergunta ? (
         <p className="mudo">Escolha o que você quer saber e a lista aparece aqui.</p>
       ) : (
@@ -147,6 +159,10 @@ export default function Guia() {
       )}
 
       <h2><span className="idx" /> Três coisas que valem para o painel inteiro</h2>
+      <p className="nota">
+        Três hábitos que servem em qualquer tela. Vale ler uma vez: eles economizam a maior parte das
+        perguntas sobre de onde vem um número.
+      </p>
       <div className="marcos">
         <div>
           <span className="quando">Ⓘ</span>

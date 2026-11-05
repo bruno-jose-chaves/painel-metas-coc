@@ -194,6 +194,21 @@ export default function Campanha() {
 
 
       <h2><span className="idx" /> Projeção de fechamento</h2>
+      <p className="nota">
+        Onde esta campanha fecha se mantiver o comportamento da edição anterior. Serve para decidir agora,
+        no meio da campanha, se dá para esperar ou se precisa mexer na oferta.
+        <Ajuda titulo="Como a projeção é feita, e o que ela não é"
+          fontes={["Realizado: planilha comercial, pela turma de cada venda",
+                   "Curva de referência: o mesmo curso na edição anterior, alinhado pelo dia de venda",
+                   "Meta: a meta ativa da campanha, cadastrada em Ajustes"]}>
+          A conta é simples de propósito: a campanha está no dia N de venda e já vendeu X; na edição
+          anterior, o dia N representava uma fatia conhecida do total; a projeção aplica essa mesma fatia.
+          Por isso ela <b>não</b> é previsão de mercado nem leva em conta campanha de mídia nova, mudança
+          de preço ou concorrente. Campanha sem edição anterior comparável não tem projeção, e é por isso
+          que às vezes este bloco aparece vazio. No começo da janela de venda a projeção balança muito,
+          porque poucos dias de dado viram muita diferença no total.
+        </Ajuda>
+      </p>
       {!proj ? <p className="rotulo">Carregando</p> : proj.projecao_alunos == null ? (
         <p className="mudo">Sem histórico do ano anterior para projetar esta campanha.</p>
       ) : (
@@ -292,6 +307,21 @@ export default function Campanha() {
       )}
 
       <h2><span className="idx" /> Ritmo da campanha</h2>
+      <p className="nota">
+        As três leituras da campanha no mesmo eixo: o que vendeu, o que a meta pedia e onde a edição
+        anterior estava. A distância entre as linhas é a leitura, não o número de nenhuma delas sozinho.
+        <Ajuda titulo="O que cada linha é"
+          fontes={["Alunos acumulados: planilha comercial, pela turma de cada venda",
+                   "Ritmo da meta: a escada de fases da campanha, cadastrada em Ajustes",
+                   "Mesmo dia no ano anterior: a edição anterior do mesmo curso, pelo dia de venda"]}>
+          <b>Alunos acumulados</b> é a linha cheia e é o realizado. <b>Ritmo da meta</b> é tracejada e
+          sobe em degraus, porque a meta é distribuída por fase e não por dia: campanha que concentra
+          venda no fim aparece adiantada no começo. <b>Mesmo dia no ano anterior</b> é pontilhada e é a
+          referência mais honesta das três, porque é comportamento que já aconteceu em vez de expectativa.
+          Linha cheia acima da pontilhada e abaixo da tracejada quer dizer campanha melhor que o ano
+          passado e com meta mais agressiva que ele.
+        </Ajuda>
+      </p>
       {curva ? (
         <Curva
           rotulos={curva.rotulos}
@@ -305,7 +335,9 @@ export default function Campanha() {
 
       <h2><span className="idx" /> Escada de preço por fase</h2>
       <p className="nota">
-        A <b>meta ajustada</b> é a meta da fase corrigida pelo que as anteriores deixaram de trazer.
+        Quanto cada fase de preço vendeu contra o que ela devia vender, para saber se a campanha pode
+        subir de fase tranquila ou se vai entrar na próxima devendo. A <b>meta ajustada</b> é a meta da
+        fase corrigida pelo que as anteriores deixaram de trazer.
         <Ajuda titulo="Como a meta ajustada é calculada"
           fontes={["Metas por fase: cadastro da campanha",
                    "Alunos: planilha comercial, pela data dentro da fase",
@@ -390,6 +422,20 @@ export default function Campanha() {
 
 
       <h2><span className="idx" /> Cenários das metas</h2>
+      <p className="nota">
+        As quatro metas da campanha lado a lado, com o que falta para cada uma. Serve para escolher qual
+        meta ainda está em jogo e qual já foi, antes de prometer número para alguém.
+        <Ajuda titulo="O que as quatro metas são"
+          fontes={["Metas 0 a 3: cadastro da campanha em Ajustes, Campanhas e metas",
+                   "Alunos e faturamento realizados: planilha comercial",
+                   "Regra da casa: Meta 0 é repetir o ano anterior e Meta 3 é crescer 40%"]}>
+          <b>Meta 0</b> é o mínimo aceitável, repetir a edição anterior, e as outras sobem de dez em dez
+          por cento até a Meta 3. O bônus por meta da casa é pago em cima da meta atingida, por isso a
+          tabela mostra as quatro e não só a ativa: é ela que diz quanto chão falta para o próximo degrau
+          valer a pena. A meta ativa, que é a que as barras do resto do painel usam, é a que está valendo
+          agora, não a mais alta.
+        </Ajuda>
+      </p>
       {!cenarios ? <p className="rotulo">Carregando</p> : (
         <div className="rolar">
           <table className="tabela">
@@ -426,6 +472,20 @@ export default function Campanha() {
 
 
       <h2><span className="idx" /> Da origem à matrícula</h2>
+      <p className="nota">
+        De onde veio a gente que matriculou nesta campanha, e quanto tempo levou da origem até a venda.
+        Serve para decidir verba: campanha do CRM mostra a ação, fonte mostra o canal.
+        <Ajuda titulo="A diferença entre campanha e fonte"
+          fontes={["Matrícula: planilha comercial",
+                   "Campanha e fonte: RD Station CRM, os campos da negociação que deu origem à matrícula",
+                   "Chaves da ligação, nessa ordem: e-mail, telefone e nome normalizados"]}>
+          <b>Por campanha do CRM</b> é o nome da ação que o marketing registrou na negociação, do tipo
+          uma campanha de anúncio específica. <b>Por fonte</b> é mais grosso e mais confiável, do tipo
+          Facebook, Google, indicação: fonte é preenchida com mais disciplina que campanha, então quando
+          as duas discordam a fonte costuma estar mais certa. O que aparece sem par é venda que entrou
+          sem passar pelo CRM, ou com dado diferente nos dois lugares.
+        </Ajuda>
+      </p>
       <div className="filtros" style={{ marginBottom: 16 }}>
         <div className="atalhos">
           <button className={porOrigem === "campanha" ? "ativo" : ""} onClick={() => setPorOrigem("campanha")}>
@@ -508,6 +568,19 @@ export default function Campanha() {
       )}
 
       <h2><span className="idx" /> Quem já era da casa</h2>
+      <p className="nota">
+        Quanto desta campanha é gente que já tinha comprado da COC antes. É a leitura que separa
+        crescimento de base nova de crescimento de recompra, que custam dinheiro bem diferente.
+        <Ajuda titulo="O que cada linha conta"
+          fontes={["Matrículas atuais e anteriores: planilha comercial",
+                   "Cruzamento por e-mail, telefone e nome normalizados",
+                   "Conta pessoa, não matrícula: quem compra dois cursos conta uma vez"]}>
+          <b>Rematrícula</b> é quem fez o mesmo curso na edição anterior e voltou, e a base dela é o
+          tamanho da turma anterior, por isso a taxa é comparável de ano para ano. As outras linhas olham
+          se a pessoa também tem compra de outro curso, antes ou depois, que é o upsell. Taxa alta de
+          recompra com matrícula total parada é sinal de captação fraca, não de produto bom.
+        </Ajuda>
+      </p>
       {!recompra ? <p className="rotulo">Carregando</p> : recompra.length === 0 ? (
         <p className="mudo">Sem matrícula nesta campanha ainda.</p>
       ) : (
@@ -570,6 +643,17 @@ export default function Campanha() {
       )}
 
       <h2><span className="idx" /> Marcos</h2>
+      <p className="nota">
+        As datas que mandam no calendário desta campanha: virada de fase, prova, aulão, início de aula.
+        Serve para ler qualquer queda ou pico da curva acima sabendo o que aconteceu naquele dia.
+        <Ajuda titulo="De onde vêm os marcos"
+          fontes={["Marcos: cadastro da campanha em Ajustes, Campanhas e metas",
+                   "Datas oficiais dos vestibulares: Calendário do ano, mantido fora do painel"]}>
+          Marco é cadastro manual, então campanha com pouco marco não quer dizer campanha sem evento:
+          quer dizer que ninguém cadastrou. O selo <b>Agora</b> marca o marco que está acontecendo hoje,
+          e os que já passaram ficam apagados.
+        </Ajuda>
+      </p>
       {c.marcos?.length ? (
         <div className="marcos">
           {c.marcos.map((m) => {
@@ -588,6 +672,19 @@ export default function Campanha() {
       {ref && (
         <>
           <h2><span className="idx" /> Contra {ref.ano}</h2>
+          <p className="nota">
+            Esta campanha contra a edição de {ref.ano} fechada, não contra onde ela estava neste dia. É
+            comparação de chegada, para saber quanto chão ainda falta até igualar o ano passado.
+            <Ajuda titulo="Por que o número de lá é o total fechado"
+              fontes={["Edição anterior: planilha comercial, a turma equivalente do ano anterior inteira",
+                       "Esta campanha: o realizado até hoje",
+                       "A comparação por dia de venda fica na curva do Ritmo da campanha, acima"]}>
+              Aqui o de {ref.ano} é o total em que aquela turma fechou. Então no começo da janela de venda
+              a diferença parece terrível, e isso é esperado: não é atraso, é campanha que ainda nem
+              rodou. Para comparar no mesmo ponto da vida da campanha, use a linha pontilhada da curva de
+              ritmo ou a tela Comparar turmas.
+            </Ajuda>
+          </p>
           <div className="faixa">
             <div>
               <div className="rotulo">Alunos {ref.ano}</div>

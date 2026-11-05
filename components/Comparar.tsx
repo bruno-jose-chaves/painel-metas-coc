@@ -137,7 +137,8 @@ export default function Comparar() {
       </p>
 
       <p className="nota">
-        As duas curvas são alinhadas pelo dia da turma, não pela data do calendário.
+        Duas turmas lado a lado no mesmo ponto da vida de cada uma, para comparar ritmo de venda sem o
+        calendário atrapalhar. As curvas são alinhadas pelo dia da turma, não pela data.
         <Ajuda titulo="Por que o eixo é o dia da turma"
           fontes={["Planilha comercial, pela turma de cada venda",
                    "Turma = produto + ano + semestre, com janela de venda própria",
@@ -248,6 +249,18 @@ export default function Comparar() {
           </div>
 
           <h2><span className="idx" /> As duas curvas</h2>
+          <p className="nota">
+            O acumulado das duas turmas dia a dia de venda. Distância que abre no começo e se mantém é
+            diferença de captação; distância que abre só no fim é diferença de fechamento na reta final.
+            <Ajuda titulo="Como ler as curvas"
+              fontes={["Acumulado de cada turma no mesmo dia de vida: planilha comercial, pela turma da venda",
+                       "Janela de venda de cada turma: tabela turmas",
+                       "Matrícula cancelada não entra"]}>
+              A turma que ainda está em curso para no dia de hoje em vez de cair para zero no resto do
+              eixo, para a comparação não parecer uma queda que não existe. Clicar em um ponto do gráfico
+              abre as matrículas daquele dia da primeira turma escolhida.
+            </Ajuda>
+          </p>
           <Curva
             rotulos={curva.map((p) => "dia " + p.d)}
             series={series}
@@ -263,6 +276,20 @@ export default function Comparar() {
           />
 
           <h2><span className="idx" /> As duas por inteiro</h2>
+          <p className="nota">
+            As duas turmas em número fechado, com ticket e desconto ao lado da matrícula. É aqui que se vê
+            se a turma que vendeu mais também faturou mais, porque nem sempre: volume com desconto maior
+            pode render menos. Clique em qualquer linha para ver as matrículas.
+            <Ajuda titulo="O que cada coluna conta"
+              fontes={["Alunos, faturamento, ticket e desconto: planilha comercial, pela turma de cada venda",
+                       "Janela de venda: tabela turmas, cadastrada em Ajustes",
+                       "Faturamento é o valor cheio da matrícula no dia em que foi lançada"]}>
+              Para turma em curso os números são parciais, até hoje, e para turma fechada são o total.
+              Comparar o total de uma fechada com o parcial de uma em curso não diz nada: para isso existe
+              o bloco <b>No mesmo ponto da turma</b>, acima. <b>Desconto</b> é a média do desconto
+              concedido, e é ela que explica ticket menor em turma que vendeu bem.
+            </Ajuda>
+          </p>
           <div className="rolar">
             <table className="tabela">
               <thead>

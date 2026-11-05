@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta } from "@/lib/formato";
+import Ajuda from "@/components/Ajuda";
 
 type Venda = {
   chave: string; numero: string | null; data: string; vendedor: string | null; status: string | null;
@@ -145,6 +146,21 @@ export default function Vendas({ embutido }: { embutido?: boolean } = {}) {
       </div>
 
       <h2><span className="idx" /> Lançamentos</h2>
+      <p className="nota">
+        A planilha comercial como o painel a leu, linha por linha. Serve para conferir uma venda
+        específica: se o número da tela parecer errado, é aqui que se vê o que entrou de fato.
+        <Ajuda titulo="O que cada coluna é"
+          fontes={["Tudo nesta tabela vem da planilha comercial, aba Vendas do ano",
+                   "Produto: o curso da planilha, apontado para produto em Ajustes, Cursos",
+                   "Turma e campanha: resolvidas pela data da venda contra a janela de cada uma"]}>
+          <b>#</b> é o número da linha na própria planilha, que é por onde se acha a venda lá.
+          <b> Vendedor</b> é o nome que está na planilha, e linha vazia aqui é a venda automática pelo
+          site. <b>Valor</b> é o valor cheio da matrícula no dia em que foi lançada, não a parcela paga.
+          Matrícula com condição cancelada aparece na lista e fica fora de toda contagem do painel.
+          E-mail, telefone e responsável financeiro ficam fora desta tela de propósito: quem precisa desse
+          dado usa a planilha ou o CRM.
+        </Ajuda>
+      </p>
       {!linhas ? <p className="rotulo">Carregando</p> : linhas.length === 0 ? (
         <p className="mudo">Nenhuma venda com esses filtros.</p>
       ) : (
@@ -189,9 +205,6 @@ export default function Vendas({ embutido }: { embutido?: boolean } = {}) {
           <button disabled={pagina + 1 >= paginas} onClick={() => setPagina((p) => p + 1)}>Próxima</button>
         </div>
       )}
-      <p className="rodape">
-        E-mail, telefone e responsável financeiro do aluno ficam fora do painel de propósito. Quem precisa desse dado usa a planilha ou o CRM.
-      </p>
     </>
   );
 }

@@ -69,7 +69,8 @@ export default function Escapando({ embutido }: { embutido?: boolean } = {}) {
       )}
 
       <p className="nota">
-        Lead some por caminhos diferentes, e cada caminho morava em uma tela diferente. Aqui é uma fila só.
+        Lead some por caminhos diferentes, e cada caminho morava em uma tela diferente. Aqui é uma fila
+        só, na foto de agora e sem filtro de período de propósito.
         <Ajuda titulo="Como a fila é montada"
           fontes={["Pagamento pendente e negociação parada: RD Station CRM, pela data em que o card entrou na etapa",
                    "Conversa sem card: conversas do Pigeon cruzadas com negociações do CRM pelo telefone",
@@ -85,15 +86,27 @@ export default function Escapando({ embutido }: { embutido?: boolean } = {}) {
         </Ajuda>
       </p>
 
-      <p className="nota" style={{ marginTop: 0 }}>
-        A fila não tem filtro de período de propósito: ela é a foto de agora. Card parado está parado
-        hoje, e conversa sem card olha sempre os últimos 14 dias. O dono vem do CRM e, quando o card não
-        existe, da etiqueta de dono no Pigeon.
-      </p>
 
       {!resumo ? <p className="rotulo">Carregando</p> : (
         <>
           <h2><span className="idx" /> O tamanho de cada buraco</h2>
+          <p className="nota">
+            Quantos itens existem de cada tipo de vazamento e há quanto tempo estão parados. Serve para
+            escolher onde atacar primeiro: tipo com muitos itens e mediana alta é problema de processo,
+            tipo com poucos itens e mediana alta é caso a caso.
+            <Ajuda titulo="O que cada coluna responde"
+              fontes={["Pagamento pendente e negociação parada: RD Station CRM, pela data em que o card entrou na etapa",
+                       "Conversa sem card: conversas do Pigeon cruzadas com o CRM pelo telefone, últimos 14 dias",
+                       "Já é aluno: planilha comercial",
+                       "Dono: o responsável no CRM e, quando não existe card, a etiqueta de dono no Pigeon"]}>
+              <b>Metade parada há</b> é a mediana, o caso do meio, e não a média: um card esquecido há
+              oito meses puxaria a média e faria o tipo parecer pior do que é. <b>Mais parado</b> é o
+              pior caso daquele tipo, que é o que diz se existe cemitério ali. <b>Por dono</b> mostra se
+              o buraco é do processo ou de uma pessoa. A linha marcada como <b>fora da fila</b> é o que
+              passou de 90 dias parado: continua contado para o tamanho do problema não sumir, e sai da
+              fila de trabalho porque acima disso não é follow-up, é faxina de base.
+            </Ajuda>
+          </p>
           <div className="faixa">
             {naFila.map((r) => (
               <div key={r.tipo}>
@@ -160,6 +173,21 @@ export default function Escapando({ embutido }: { embutido?: boolean } = {}) {
             </div>
           </div>
 
+          <p className="nota">
+            A lista nome por nome, com dono e o que fazer, em ordem de quanto custa deixar parado e não
+            de quando apareceu. É a única parte da tela que pede ação hoje.
+            <Ajuda titulo="Por que esta ordem"
+              fontes={["Negociações, etapa e dono: RD Station CRM",
+                       "Conversas e telefone: Pigeon Post",
+                       "Já é aluno: planilha comercial, cruzada por telefone, e-mail ou nome"]}>
+              <b>Pagamento pendente</b> vem primeiro porque é a venda mais perto de acontecer. O valor da
+              negociação ficou de fora da ordenação de propósito: está preenchido em 1 de 1.991
+              negociações abertas, e ordenar por informação que o time não preenche é inventar
+              prioridade. <b>Parado há</b> conta desde a última mexida registrada, não desde a criação.
+              A fila tem janela: negociação entra a partir de 15 dias parada, que é quando vale avisar, e
+              sai aos 90.
+            </Ajuda>
+          </p>
           {!fila ? <p className="rotulo">Carregando</p> : lista.length === 0 ? (
             <p className="mudo">Nada escapando neste recorte.</p>
           ) : (

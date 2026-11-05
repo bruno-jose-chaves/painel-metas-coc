@@ -157,7 +157,8 @@ export default function Historico() {
 
       <h2><span className="idx" /> Curva acumulada, sobreposta</h2>
       <p className="nota">
-        Alinhada pela semana do ano, não pelo dia da campanha.
+        Todos os anos deste curso na mesma curva, para ver se ele está à frente ou atrás do mesmo momento
+        dos anos anteriores. Alinhada pela semana do ano, não pelo dia da campanha.
         <Ajuda titulo="Por que pela semana"
           fontes={["Planilha comercial, pela data da venda",
                    "Semestre resolvido pela janela de venda da turma"]}>
@@ -173,7 +174,22 @@ export default function Historico() {
       )}
 
       <h2><span className="idx" /> Ano por ano</h2>
-      <p className="nota">Clique na linha de um ano para ver as matrículas daquele ano.</p>
+      <p className="nota">
+        A mesma história em número: cada ano deste curso, com o fechamento cheio e a venda até o mesmo dia
+        do calendário. Serve para responder se o crescimento veio de mais aluno ou de preço maior. Clique
+        na linha de um ano para ver as matrículas daquele ano.
+        <Ajuda titulo="O que cada coluna conta"
+          fontes={["Matrículas, faturamento, ticket e desconto: planilha comercial",
+                   "Turma e semestre: tabela turmas, pela janela de venda de cada uma",
+                   "Matrícula cancelada fica fora de todas as colunas"]}>
+          <b>Até esta data</b> compara maçã com maçã: conta só a venda feita até o mesmo dia do ano, e
+          vale para os anos anteriores também. Dentro do mesmo semestre, quando o curso tem duas turmas,
+          elas aparecem separadas: o Método ACAFE do 1º semestre vende de janeiro a junho e o do 2º de
+          julho a dezembro, então somar os dois esconde o que cada turma está fazendo. <b>Alunos no ano</b>
+          é o fechamento cheio, que para o ano corrente ainda está em aberto. <b>Ticket</b> e
+          <b> desconto</b> juntos explicam faturamento que cresce mais ou menos que a matrícula.
+        </Ajuda>
+      </p>
       {!anos ? <p className="rotulo">Carregando</p> : anos.length === 0 ? (
         <p className="mudo">Sem histórico para este curso.</p>
       ) : (

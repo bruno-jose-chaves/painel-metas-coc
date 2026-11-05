@@ -240,9 +240,15 @@ export default function Performance() {
 
       <h2><span className="idx" /> Lado a lado no período</h2>
       <p className="nota">
-        Tudo aqui respeita o período e o comercial escolhidos acima. Clique num número para
-        ver quem está por trás dele.
-        <Ajuda titulo="O que é cada coluna">
+        A linha de cada comercial no período, para gestão individual de performance: volume, carteira,
+        atendimento e conversão na mesma leitura. Tudo aqui respeita o período e o comercial escolhidos
+        acima, e clicar num número abre quem está por trás dele.
+        <Ajuda titulo="O que é cada coluna"
+          fontes={["Matrículas, faturamento e ticket: planilha comercial, pelo vendedor da linha",
+                   "Pessoas, dias com atendimento e tempo de resposta: Pigeon Post, pelo atendente da conversa",
+                   "Leads, carteira e perdas: RD Station CRM, pelo responsável do negócio",
+                   "Quem é comercial: cadastro de pessoas em Ajustes, papel comercial",
+                   "A regra de matrícula é a mesma do Ranking: venda não cancelada, material avulso fora"]}>
           <b>Pessoas</b> é gente diferente que aquele comercial atendeu no WhatsApp no período.
           A mesma pessoa em três conversas conta uma vez.
           <br /><br />
@@ -327,7 +333,10 @@ export default function Performance() {
         A foto de agora, que não depende do período escolhido acima. Carteira é negociação
         aberta na mão da pessoa hoje, segundo o CRM, quebrada por quanto tempo cada uma está
         sem receber nenhuma mexida.
-        <Ajuda titulo="Por que quebrar a carteira por tempo">
+        <Ajuda titulo="Por que quebrar a carteira por tempo"
+          fontes={["Carteira, etapa e tempo parado: RD Station CRM, pelo responsável do negócio",
+                   "Matrículas e conversas de hoje: planilha comercial e Pigeon Post",
+                   "Tempo parado: desde a última mexida registrada no negócio"]}>
           Carteira grande não é sinal de trabalho: pode ser lead estacionado. Quem tem 400
           negociações com metade parada há menos de uma semana está trabalhando; quem tem 1.300
           com quase tudo parado há mais de dois meses está só segurando nome que já esfriou.
@@ -394,7 +403,10 @@ export default function Performance() {
           <> Hoje {pct(cobertura)} das matrículas dão para amarrar numa conversa de WhatsApp,
           e é esse o teto da última coluna: o que não casa por telefone não entra lá.</>
         )}
-        <Ajuda titulo="A diferença entre as duas últimas colunas">
+        <Ajuda titulo="A diferença entre as duas últimas colunas"
+          fontes={["Pessoas atendidas: Pigeon Post, gente diferente por semana ou por dia",
+                   "Matrículas: planilha comercial, pelo vendedor e pela data da compra",
+                   "Cobertura: fatia das matrículas que dá para amarrar a uma conversa pelo telefone"]}>
           <b>Fechou no período</b> divide as matrículas de gente que ele atendeu no WhatsApp
           pelas pessoas atendidas naquela linha. As duas pontas são do mesmo universo, mas não
           são exatamente as mesmas pessoas: quem comprou segunda pode ter sido abordado duas
@@ -474,9 +486,19 @@ export default function Performance() {
 
       <h2><span className="idx" /> A curva de cada um</h2>
       <p className="nota">
-        Um ponto por {passo === "dia" ? "dia" : "semana"}, seguindo o período escolhido: até
-        três semanas a curva vai por dia, acima disso por semana. Uma medida por vez, porque
-        duas escalas no mesmo eixo mentem sobre a proporção.
+        A mesma informação do bloco acima em desenho, uma linha por comercial, para enxergar constância
+        e cruzamento em vez de total. Um ponto por {passo === "dia" ? "dia" : "semana"}, seguindo o
+        período escolhido: até três semanas a curva vai por dia, acima disso por semana. Uma medida por
+        vez, porque duas escalas no mesmo eixo mentem sobre a proporção.
+        <Ajuda titulo="Como escolher a medida"
+          fontes={["Matrículas e faturamento: planilha comercial, pelo vendedor da linha",
+                   "Pessoas atendidas e tempo de resposta: Pigeon Post, pelo atendente da conversa",
+                   "O passo da curva segue o tamanho do período, não uma escolha manual"]}>
+          Linha subindo junto em todos quer dizer campanha ou sazonalidade; linha de um só descolando quer
+          dizer pessoa. Nas medidas de tempo de resposta, para baixo é melhor, ao contrário das outras.
+          Curva com buraco no meio não é dado faltando: é semana sem atendimento daquela pessoa, e o bloco
+          <b> Lado a lado</b> mostra isso na coluna de dias com atendimento.
+        </Ajuda>
       </p>
       <div className="filtros">
         <div className="atalhos">
@@ -493,9 +515,14 @@ export default function Performance() {
 
       <h2><span className="idx" /> O quadro de horário</h2>
       <p className="nota">
-        {CALORES.find((c) => c.id === calor)?.oque} Respeita o período e o comercial escolhidos
-        lá em cima.
-        <Ajuda titulo="Para que serve o quadro">
+        A semana do time em hora e dia: cada quadradinho é uma faixa de uma hora, e quanto mais escuro,
+        maior o número ali. Serve para casar escala de equipe com a hora em que o cliente aparece.
+        {" "}{CALORES.find((c) => c.id === calor)?.oque} Respeita o período e o comercial escolhidos lá
+        em cima.
+        <Ajuda titulo="Para que serve o quadro"
+          fontes={["Mensagens, conversas e espera: Pigeon Post, pela hora de cada mensagem",
+                   "Matrículas: planilha comercial, pela data da compra",
+                   "Fuso: tudo convertido para o horário de São Paulo"]}>
           Comparar duas medidas aqui é o ponto. Se as mensagens enviadas estão concentradas às
           9h e as recebidas às 19h, o time está falando quando o aluno não está ouvindo. Se a
           espera cresce justo na hora em que o cliente mais procura, falta gente naquele
@@ -526,9 +553,13 @@ export default function Performance() {
 
       <h2><span className="idx" /> Quanto o cliente espera por cada um</h2>
       <p className="nota">
-        Só conversa que o cliente começou, porque quando somos nós que abrimos a primeira
-        resposta é a nossa própria mensagem e a conta mediria o disparo, não o atendimento.
-        <Ajuda titulo="Os dois relógios, e por que o número muda tanto">
+        Quanto o cliente espera pela primeira resposta de cada comercial, nos dois relógios. Conta só
+        conversa que o cliente começou, porque quando somos nós que abrimos, a primeira mensagem é a
+        nossa e a conta mediria o disparo e não o atendimento.
+        <Ajuda titulo="Os dois relógios, e por que o número muda tanto"
+          fontes={["Mensagens recebidas e enviadas: Pigeon Post, com data e hora de cada uma",
+                   "Relógio comercial: só minutos de dia útil entre 8h e 18h",
+                   "Sem resposta: nenhuma mensagem nossa depois da primeira do cliente"]}>
           <b>Relógio comercial</b> conta só os minutos que caíram em dia útil entre 8h e 18h.
           Mensagem que chega sábado às 22h e é respondida segunda às 8h05 conta como 5 minutos,
           porque não tinha ninguém para atender no meio. É o que mede o time.
@@ -617,10 +648,18 @@ export default function Performance() {
 
       <h2><span className="idx" /> O que cada um vende</h2>
       <p className="nota">
-        Ticket médio sozinho engana. R$ 602 de um e R$ 692 do outro só quer dizer alguma coisa
-        sabendo o que cada um vendeu: intensivo e extensivo têm ticket dez vezes diferente, e
-        uma venda de Semi muda o ticket do mês inteiro. Material avulso e matrícula cancelada
-        ficam de fora, como no resto do painel.
+        O mix de cada comercial: quanto de cada produto ele vendeu e quanto aquilo pesa no faturamento
+        dele. Serve para ler o ticket médio sem se enganar, porque ticket sozinho engana: intensivo e
+        extensivo têm ticket dez vezes diferente, e uma venda de Semi muda o ticket do mês inteiro.
+        <Ajuda titulo="O que cada coluna significa"
+          fontes={["Matrículas, valor e desconto: planilha comercial, pelo vendedor da linha",
+                   "Produto de cada venda: o curso da planilha, apontado para produto em Ajustes, Cursos",
+                   "Material avulso e matrícula cancelada ficam fora, como no resto do painel"]}>
+          <b>Matrículas</b> é linha de venda, não pessoa. <b>Fatia</b> é quanto aquele produto representa
+          das matrículas daquela pessoa, e é ela que explica diferença de ticket entre dois comerciais
+          melhor que qualquer outra coluna. <b>Ticket</b> se mexe com desconto dado e com fase de preço,
+          não só com o produto. <b>Faturamento</b> é o valor cheio da matrícula no dia em que foi lançada.
+        </Ajuda>
       </p>
       {!mix ? <p className="rotulo">Carregando</p> : mix.length === 0 ? (
         <p className="mudo">Sem matrícula no período.</p>
@@ -657,7 +696,10 @@ export default function Performance() {
       <p className="nota">
         Comissão fixa por venda, pela regra em vigor: 3% em Semi e Extensivo, 5% nos demais.
         Fica aqui e na tela de cada comercial, não no ranking do time.
-        <Ajuda titulo="Por que este número é o teto">
+        <Ajuda titulo="Por que este número é o teto"
+          fontes={["Vendas e valor: planilha comercial, pelo vendedor da linha",
+                   "Percentual de cada produto: tabela comissao_regras, em Ajustes",
+                   "Regra da casa: Premiações 2026 v3"]}>
           A regra paga sobre a <b>parcela paga</b>, não sobre o valor da matrícula. O painel
           recebe a venda fechada, não o pagamento de cada parcela, então isto é o que a pessoa
           recebe se o aluno pagar tudo. Serve para acompanhar, não para fechar folha.
@@ -712,8 +754,18 @@ export default function Performance() {
 
       <h2><span className="idx" /> Por que cada um perde</h2>
       <p className="nota">
-        Os mesmos dois grupos da tela 314: sumiço de um lado, perda comercial do outro. Quem
-        perde por preço e quem perde por público errado precisam de conversas diferentes.
+        Por que cada comercial perde, nos mesmos dois grupos do bloco 314: sumiço de um lado, perda
+        comercial do outro. Serve para a conversa individual, porque quem perde por preço e quem perde
+        por público errado precisam de orientação diferente.
+        <Ajuda titulo="Como ler a fatia dentro do grupo"
+          fontes={["Negociações perdidas no período: RD Station CRM, pelo motivo escrito lá",
+                   "Grupo: sumiço contra motivo comercial, a mesma separação do bloco 314",
+                   "Responsável: o dono do negócio no CRM no momento da perda"]}>
+          A fatia é calculada <b>dentro do grupo daquela pessoa</b>, não sobre todas as perdas dela: é
+          assim porque sumiço é a maioria esmagadora e, no total, afogaria os motivos comerciais que
+          ensinam alguma coisa. Então leia as duas listas como duas conversas: na de sumiço o que importa
+          é o tamanho comparado ao time, e na comercial o que importa é qual motivo aparece.
+        </Ajuda>
       </p>
       {!perdas ? <p className="rotulo">Carregando</p> : perdas.length === 0 ? (
         <p className="mudo">Nenhuma perda registrada no período.</p>

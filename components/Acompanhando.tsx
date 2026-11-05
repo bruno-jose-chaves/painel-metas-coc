@@ -101,19 +101,25 @@ export default function Acompanhando({ volta }: { volta: number }) {
         </div>
       </div>
 
+      <p className="nota">
+        Para ficar de olho em turma que ainda não tem campanha cadastrada, como as de 2027: sem meta para
+        comparar, a referência é a turma equivalente do ano anterior no mesmo dia de vida de venda.
+        <Ajuda titulo="Por que isto existe separado das campanhas"
+          fontes={["Turmas e janela de venda: cadastro em Ajustes, Campanhas e metas",
+                   "Matrículas e faturamento: planilha comercial, pela turma de cada venda",
+                   "No mesmo ponto: a turma equivalente do ano anterior, contada até o mesmo dia de venda"]}>
+          Campanha cadastrada tem meta, fase e projeção, e por isso ganha cartão próprio acima. Turma que
+          ainda não é campanha não tem nada disso e simplesmente não aparecia, que foi o que aconteceu com
+          2027 quando começou a vender. <b>Dia de venda</b> conta desde a abertura da janela daquela turma,
+          e é por ele que a comparação é justa: dia 12 contra dia 12. <b>No mesmo ponto</b> é quanto a turma
+          do ano anterior tinha vendido naquele mesmo dia 12, e <b>a turma anterior fechou</b> é onde ela
+          chegou no total, para você saber quanto chão ainda existe. Dá para acompanhar até duas de cada
+          vez, de propósito: esta tela serve para bater o olho, e uma lista de dez turmas vira outra planilha.
+        </Ajuda>
+      </p>
+
       {escolha.length === 0 ? (
-        <p className="nota">
-          Nada escolhido. Serve para ficar de olho em turma que ainda não virou campanha, como as de 2027.
-          <Ajuda titulo="Por que isto existe separado das campanhas"
-            fontes={["Turmas e janela de venda: cadastro em Ajustes, Campanhas e metas",
-                     "Matrículas: planilha comercial, pela turma de cada venda",
-                     "Comparação: a turma equivalente do ano anterior, no mesmo dia de vida"]}>
-            Campanha cadastrada tem meta, fase e projeção, e por isso ganha cartão próprio acima. Turma que
-            ainda não é campanha não tem nada disso e simplesmente não aparece, que foi o que aconteceu com
-            2027 quando começou a vender. Aqui você escolhe até duas para acompanhar, e a referência é a
-            turma equivalente do ano anterior no mesmo dia de vida, não uma meta que ainda não existe.
-          </Ajuda>
-        </p>
+        <p className="mudo">Nada escolhido ainda.</p>
       ) : !cartoes ? <p className="rotulo">Carregando</p> : (
         <div className="cards">
           {cartoes.map((c) => {

@@ -175,6 +175,22 @@ export default function Qualidade() {
       {!linhas ? <p className="rotulo">Carregando</p> : (
         <>
           <h2><span className="idx" /> Procurou contra foi procurado</h2>
+          <p className="nota">
+            Separa a conversa em quem veio atrás da gente e quem a gente foi atrás, porque as duas
+            convertem de forma muito diferente. Serve para decidir onde o tempo do time rende mais:
+            responder quem chegou ou disparar para quem ainda não chegou.
+            <Ajuda titulo="O que cada número conta"
+              fontes={["Conversas e mensagens: Pigeon Post, pela primeira mensagem de cada conversa",
+                       "Quem começou: se a primeira mensagem da conversa foi recebida ou enviada",
+                       "Viraram matrícula: planilha comercial, cruzada pelo telefone da conversa"]}>
+              <b>O cliente procurou</b> é conversa cuja primeira mensagem veio dele. <b>Nós procuramos</b>
+              é o contrário. <b>Nunca responderam</b> é conversa que a gente abriu e morreu sem resposta,
+              e é por isso que ela é medida sobre tudo que abriu, não só sobre o que a gente disparou.
+              <b> Atendido em até 15 min</b> conta só sobre quem procurou a gente, porque é o único caso
+              em que existe alguém esperando. A conversão cruza telefone, então conversa sem telefone
+              guardado fica fora dessa conta e dentro das outras.
+            </Ajuda>
+          </p>
           <div className="faixa">
             <div className="abre" title="Ver quem procurou a gente"
                  onClick={() => setGaveta({ titulo: "Quem procurou a gente", rotulo: "Cliente procurou",
@@ -226,6 +242,22 @@ export default function Qualidade() {
           )}
 
           <h2><span className="idx" /> Cada canal por inteiro</h2>
+          <p className="nota">
+            A mesma leitura quebrada por canal e por quem começou a conversa, para achar o canal que
+            entrega gente que responde e o canal que só gera volume. É a tabela que sustenta decisão de
+            verba por canal.
+            <Ajuda titulo="O que cada coluna significa"
+              fontes={["Conversas, canal e horários: Pigeon Post",
+                       "Canal: o campo de origem da conversa no Pigeon, não a origem do lead no CRM",
+                       "Viraram matrícula: planilha comercial, cruzada pelo telefone da conversa"]}>
+              <b>Responderam</b> e <b>nunca responderam</b> somam as conversas daquela linha.
+              <b> Até atender</b> é a mediana, o caso do meio, e não a média: uma conversa respondida três
+              dias depois puxaria a média do mês inteiro. <b>Pior 10%</b> é a espera dos 10% mais
+              azarados, e é ela que mostra o problema que a mediana esconde. A conversão conta só quem tem
+              telefone guardado, porque sem telefone não dá para cruzar com a planilha. O canal aqui é o
+              que o Pigeon registrou na conversa, que não é a mesma coisa que a origem do lead no CRM.
+            </Ajuda>
+          </p>
           <div className="rolar">
             <table className="tabela">
               <thead>
@@ -306,8 +338,13 @@ export default function Qualidade() {
 
           <h2><span className="idx" /> Quanto o cliente espera, por dia da semana</h2>
           <p className="nota">
-            Só conversa que o cliente começou, e aqui a semana aparece inteira, sem os filtros de cima.
-            <Ajuda titulo="Por que o fim de semana continua aqui">
+            Quanto o cliente espera em cada dia da semana, com a semana inteira à vista, sem os filtros
+            de cima. Serve para dimensionar plantão: é aqui que aparece o dia em que gente procurou a COC
+            e ficou esperando.
+            <Ajuda titulo="Por que o fim de semana continua aqui"
+              fontes={["Conversas abertas pelo cliente: Pigeon Post, pelo dia da semana da primeira mensagem",
+                       "Espera: minutos até a primeira resposta nossa, no relógio corrido",
+                       "Este bloco ignora de propósito as chaves de dia útil e de horário comercial"]}>
               O comercial não é cobrado por atender sábado e domingo, então esses dias ficam fora das
               médias lá de cima, senão estragariam a conta. Mas tirá-los do painel esconderia que gente
               procurou a COC e ficou esperando até segunda. Quem quiser a média limpa usa os botões de

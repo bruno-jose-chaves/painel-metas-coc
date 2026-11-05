@@ -215,8 +215,40 @@ export default function Visao() {
           <div className="mudo">fora da conta</div>
         </div>
       </div>
+      <p className="nota">
+        Os cinco números da janela escolhida acima, para bater o olho antes de descer para campanha
+        nenhuma. Matrícula é venda fechada, não proposta. Faturamento é o valor cheio da matrícula no
+        dia em que ela foi lançada, não a parcela que entrou no caixa.
+        <Ajuda titulo="De onde sai cada número"
+          fontes={["Matrículas, faturamento e ticket: planilha comercial, pela data da compra",
+                   "Leads: pessoas criadas no RD Station CRM no período",
+                   "Cancelamentos: a própria planilha, pelas matrículas com condição cancelada"]}>
+          <b>Matrículas</b> conta linha de venda, não pessoa: quem compra dois cursos aparece duas vezes.
+          <b> Ticket</b> é faturamento dividido por matrícula no período, então ele sobe e desce com o mix
+          de produto e não só com desconto. <b>Leads por matrícula</b> é quanto a captação precisou
+          entregar para sair uma venda, e serve para comparar período com período, não como meta.
+          <b> Cancelamentos</b> ficam de fora das outras quatro contas de propósito: estão aqui só para
+          você saber o tamanho da perda. Clicando em Matrículas abre a lista nome por nome.
+        </Ajuda>
+      </p>
 
       <h2><span className="idx" /> Campanhas</h2>
+      <p className="nota">
+        Um cartão por campanha cadastrada, para responder em um olhar se ela está no lugar certo do
+        calendário dela. Barra preta é o realizado, traço vermelho é onde a meta ativa espera que a
+        campanha esteja hoje.
+        <Ajuda titulo="O que cada cartão mostra"
+          fontes={["Campanhas, metas e fases: cadastro em Ajustes, Campanhas e metas",
+                   "Matrículas e faturamento: planilha comercial, pela turma de cada venda",
+                   "Fecha em: curva do mesmo curso no ano anterior, no mesmo dia de vida da campanha"]}>
+          <b>Meta ativa</b> é a meta que está valendo agora, de 0 a 3, e não a mais alta: a barra mede
+          contra ela. <b>Esperado hoje</b> sai da escada de fases, então campanha que concentra venda no
+          fim aparece adiantada no começo. <b>Fecha em</b> é projeção, não promessa: pesa a curva do mesmo
+          curso no ano anterior. O selo diz a situação (No ritmo, Atenção, Atrás) comparando realizado com
+          esperado hoje. O detalhe do ritmo, com quanto falta e quantos dias úteis sobram, está em
+          <b> Ritmo diário de matrículas</b>, no fim desta tela.
+        </Ajuda>
+      </p>
       <div className="cards">
         {dados.filter((c) => naFaixa(c, faixa)).map((c) => {
           const ating = c.meta_alunos ? c.alunos / c.meta_alunos : 0;
@@ -292,17 +324,26 @@ export default function Visao() {
       {dados.filter((c) => naFaixa(c, faixa)).length === 0 && (
         <p className="mudo">Nenhuma campanha nesta situação.</p>
       )}
-      <p className="rodape">
-        Barra preta: realizado. Traço vermelho: onde a meta ativa espera que a campanha esteja hoje.
-        O detalhe do ritmo, com quanto falta, quantos dias úteis sobram e a média dos últimos sete,
-        está em <b>Ritmo diário de matrículas</b>, no fim desta tela.
-      </p>
-
       {/* Turma que ainda não virou campanha não aparece acima e some da tela.
           Foi o que aconteceu com 2027 quando começou a vender. */}
       <Acompanhando volta={volta} />
 
       <h2><span className="idx" /> Metas de captação</h2>
+      <p className="nota">
+        A conta de marketing de cada campanha: quanto lead a captação prometeu entregar e quanto já
+        entregou. Serve para saber se uma campanha atrasada está atrasada na venda ou antes dela, na
+        entrada de gente.
+        <Ajuda titulo="Como ler as metas de captação"
+          fontes={["Metas de captação: cadastro em Ajustes, Campanhas e metas",
+                   "Pessoas no CRM: RD Station CRM",
+                   "Conversões de formulário: RD Station Marketing",
+                   "Quais páginas contam em cada indicador: as regras apontadas em Marketing, A classificar"]}>
+          Cada barra é um indicador de captação da campanha, medido contra a meta cadastrada, com o traço
+          marcando o esperado para hoje. Indicador sem meta, como material rico, aparece só com o número
+          porque é acompanhamento e não cobrança. O Ⓘ ao lado de cada indicador diz exatamente quais
+          páginas e formulários entram naquela conta.
+        </Ajuda>
+      </p>
       {!metasProntas ? (
         <p className="rotulo">Carregando</p>
       ) : dados.filter((c) => naFaixa(c, faixa) && metasLeads[c.id]?.length).length === 0 ? (
@@ -398,6 +439,21 @@ export default function Visao() {
       )}
 
       <h2><span className="idx" /> Ritmo diário de matrículas</h2>
+      <p className="nota">
+        A tabela de decisão da semana: quanto falta para a meta, quantos dias úteis sobram e quanto
+        precisa sair por dia para chegar. É aqui que se decide se o problema é esforço ou se é prazo.
+        <Ajuda titulo="O que cada coluna responde"
+          fontes={["Realizado, hoje e ontem: planilha comercial, pela turma de cada venda",
+                   "Esperado hoje e faltam: escada de fases da campanha, em Ajustes",
+                   "Média e precisa por dia: só dias úteis, sábado e domingo fora"]}>
+          <b>Realizado</b> é o total da campanha até agora. <b>Esperado hoje</b> é onde a escada de fases
+          dizia que ela estaria. <b>Média 7 dias úteis</b> é o ritmo que o time está entregando de fato, e
+          <b> precisa por dia útil</b> é o ritmo que a meta exige daqui até o fim: comparar os dois é a
+          leitura mais honesta da tela. Média e ritmo contam só dia útil porque fim de semana é pouco mais
+          de três por cento das matrículas e, contado como dia normal, puxava a média para baixo e fazia o
+          necessário parecer menor do que é.
+        </Ajuda>
+      </p>
       {!ritmo ? <p className="rotulo">Carregando</p> : ritmoFiltrado.length === 0 ? (
         <p className="mudo">
           {ritmo.length === 0
@@ -477,14 +533,6 @@ export default function Visao() {
               </tfoot>
             </table>
           </div>
-          <p className="rodape">
-        Média e ritmo contam só dia útil.
-        <Ajuda titulo="Por que só dia útil"
-          fontes={["Planilha comercial"]}>
-          Sábado e domingo somam pouco mais de três por cento das matrículas e, contados como dia normal,
-          puxavam a média para baixo e faziam o ritmo necessário parecer menor do que é.
-        </Ajuda>
-      </p>
           <p className="rodape">
             São três leituras diferentes e elas podem discordar entre si.
             <Ajuda titulo="Por que as três leituras discordam"

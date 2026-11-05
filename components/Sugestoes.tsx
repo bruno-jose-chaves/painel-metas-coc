@@ -65,8 +65,13 @@ export default function Sugestoes({ embutido }: { embutido?: boolean } = {}) {
 
       <h2><span className="idx" /> Lista de conferência</h2>
       <p className="nota">
-        Isto não é cobrança, é uma lista do que está estranho na base.
-        <Ajuda titulo="Como usar">
+        O que está estranho na base e vale conferir: matrícula sem vendedor, nome de curso sem destino,
+        campanha sem meta, lead sem origem. Serve para achar erro de preenchimento antes que ele vire
+        número errado em alguma tela. Não é cobrança de ninguém.
+        <Ajuda titulo="Como usar"
+          fontes={["Cada ponto é uma conferência feita no banco, sobre a planilha comercial, o RD e o Pigeon",
+                   "A lista é recalculada a cada carga, não é fila manual",
+                   "Nada aqui muda dado: a correção é feita onde o dado nasce"]}>
           Cada ponto diz por que importa e o que fazer, e some sozinho quando o caso é resolvido na origem.
           Nada aqui muda dado: a correção é feita onde o dado nasce.
         </Ajuda>

@@ -124,6 +124,22 @@ export default function Cadastro({ admin }: { admin: boolean }) {
       {aviso && <div className={"aviso " + aviso.tipo}>{aviso.texto}</div>}
 
       <h2><span className="idx" /> Dados da campanha</h2>
+      <p className="nota">
+        A identidade da campanha: código, nome, produto e a janela de venda. É o que o resto do painel usa
+        para saber qual matrícula pertence a ela, então errar a janela aqui tira venda de dentro da
+        campanha em todas as telas.
+        <Ajuda titulo="O que cada campo manda"
+          fontes={["Tabela campanhas, no banco do painel",
+                   "Produto: tabela produtos, mantida no bloco Cursos e nomes",
+                   "A janela de venda é o que decide a qual campanha uma matrícula pertence"]}>
+          <b>Código</b> é o identificador fixo, não muda depois de criado, e é por ele que as regras de
+          captação apontam. <b>Produto</b> amarra a campanha ao curso, e é ele que liga a campanha à
+          edição do ano anterior para projeção e comparação. <b>Venda de</b> e <b>até</b> são a janela:
+          matrícula fora dela não entra na campanha, mesmo sendo do mesmo curso. Venda que chega depois do
+          fim ganha um prazo de carência de 90 dias para ainda cair na campanha, para matrícula atrasada
+          não ficar órfã.
+        </Ajuda>
+      </p>
       <div className="bloco" style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))" }}>
         <label className="campo" style={{ margin: 0 }}><span className="rotulo">Código</span>
           <input value={c.id} disabled={!!sel} onChange={(e) => setC({ ...c, id: e.target.value })} placeholder="semi-2027-1" />
@@ -168,6 +184,20 @@ export default function Cadastro({ admin }: { admin: boolean }) {
       </p>
 
       <h2><span className="idx" /> Metas</h2>
+      <p className="nota">
+        As quatro metas da campanha, de 0 a 3, em aluno e em faturamento. São elas que desenham as barras
+        e os selos em todo o painel, e é a meta ativa que vale para cobrança.
+        <Ajuda titulo="O que é ticket implícito, e qual meta vale"
+          fontes={["Tabela metas, ligada à campanha",
+                   "Regra da casa: Meta 0 é repetir o ano anterior e Meta 3 é crescer 40%",
+                   "Ticket implícito é calculado, não digitado: faturamento dividido por alunos"]}>
+          <b>Ticket implícito</b> é o que a meta está assumindo de ticket médio sem dizer: se ele sair
+          muito acima do ticket real do curso, a meta de faturamento não fecha com a de aluno e uma das
+          duas vai estourar. É a conferência mais útil desta tela. A <b>meta ativa</b> é escolhida no
+          bloco acima e é a única que o painel usa para medir ritmo; as outras ficam para o bloco de
+          cenários e para o cálculo de bônus.
+        </Ajuda>
+      </p>
       <div className="rolar">
         <table className="tabela">
           <thead><tr><th>Nível</th><th className="n">Alunos</th><th className="n">Faturamento</th><th className="n">Ticket implícito</th></tr></thead>
@@ -191,6 +221,20 @@ export default function Cadastro({ admin }: { admin: boolean }) {
       </div>
 
       <h2><span className="idx" /> Fases e escada de preço</h2>
+      <p className="nota">
+        Como a meta da campanha é distribuída no tempo, fase por fase, com o preço de cada uma. É daqui
+        que sai o <b>esperado hoje</b> de toda barra do painel, então fase mal distribuída faz campanha
+        saudável parecer atrasada.
+        <Ajuda titulo="Como as fases viram o esperado de hoje"
+          fontes={["Tabela fases, ligada à campanha",
+                   "O esperado de hoje é a soma das metas das fases já encerradas mais a parte corrida da fase atual",
+                   "A meta ajustada de cada fase é calculada na tela da campanha, não aqui"]}>
+          A soma das metas de aluno das fases deve fechar com a meta ativa da campanha: se não fechar, o
+          esperado de hoje nunca chega na meta e a campanha aparece eternamente adiantada ou atrasada.
+          Fase sem data de fim é tratada como aberta até a fase seguinte começar. O <b>bônus</b> é o
+          brinde ou vantagem daquela fase, texto livre, e serve para o comercial saber o que oferecer.
+        </Ajuda>
+      </p>
       <div className="rolar">
         <table className="tabela">
           <thead>
@@ -229,7 +273,9 @@ export default function Cadastro({ admin }: { admin: boolean }) {
 
       <h2><span className="idx" /> Turmas por ano</h2>
       <p className="nota">
-        Turma é o produto de um ano específico: "Semi Extensivo" é produto, "Semi Extensivo 2026/2" é turma.
+        A lista de turmas que existem, ano por ano. Turma é o produto de um ano específico: Semi
+        Extensivo é produto, Semi Extensivo 2026/2 é turma. É a turma que permite comparar o mesmo curso
+        entre anos, e é a janela de venda dela que decide a qual turma uma matrícula pertence.
         <Ajuda titulo="Para que serve a turma"
           fontes={["Tabela turmas, semeada de 2021 a 2027",
                    "Janela de venda derivada da sazonalidade real das vendas de 2021 a 2025"]}>
@@ -264,6 +310,18 @@ export default function Cadastro({ admin }: { admin: boolean }) {
       )}
 
       <h2><span className="idx" /> Campanhas cadastradas</h2>
+      <p className="nota">
+        Todas as campanhas que existem no painel, para conferir se falta alguma e se as janelas não estão
+        se sobrepondo. Campanha que não está aqui não tem cartão, nem meta, nem projeção em tela nenhuma.
+        <Ajuda titulo="O que a situação quer dizer"
+          fontes={["Tabela campanhas, no banco do painel",
+                   "A situação é calculada pela data de hoje contra a janela de venda e o ritmo"]}>
+          <b>Não iniciada</b> é campanha cuja janela de venda ainda não abriu, <b>encerrada</b> é a que já
+          fechou, e as três do meio comparam realizado com esperado hoje. Duas campanhas do mesmo produto
+          com janelas que se cruzam fazem a mesma matrícula ser disputada: a primeira cuja janela contém a
+          data da venda ganha, então vale conferir aqui antes de cadastrar turma nova.
+        </Ajuda>
+      </p>
       <div className="rolar">
         <table className="tabela">
           <thead><tr><th>Nome</th><th>Produto</th><th>Venda</th><th className="n">Meta ativa</th><th>Situação</th></tr></thead>

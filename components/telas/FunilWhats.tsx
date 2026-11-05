@@ -104,6 +104,21 @@ export default function FunilWhats({ embutido }: { embutido?: boolean } = {}) {
       {!pessoas ? <p className="rotulo">Carregando</p> : (
         <>
           <h2><span className="idx" /> A passagem</h2>
+          <p className="nota">
+            Quanto da conversa do WhatsApp chega a virar negociação no CRM, no período escolhido. Serve
+            para medir o tamanho do vazamento entre falar com a pessoa e acompanhar a pessoa, que é onde
+            lead desaparece sem ninguém perceber.
+            <Ajuda titulo="Como as duas bases são ligadas"
+              fontes={["Pessoas que conversaram: Pigeon Post, uma linha por telefone no período",
+                       "Card no CRM: RD Station CRM, negociação cruzada pelo telefone da conversa",
+                       "Já são matrícula: planilha comercial, cruzada por telefone"]}>
+              <b>Conversaram</b> conta pessoa, não conversa: quem falou três vezes conta uma.
+              <b> Têm card</b> é quem tem negociação no CRM, em qualquer etapa e em qualquer situação,
+              ganha ou perdida inclusive. <b>Sem card nenhum</b> é o vazamento: conversou e não existe em
+              nenhuma conta de funil. <b>Já são matrícula</b> está aqui como contrapeso, porque parte de
+              quem não tem card simplesmente já comprou e não precisa de negociação.
+            </Ajuda>
+          </p>
           <div className="faixa">
             <div>
               <div className="rotulo">Conversaram</div>
@@ -141,6 +156,19 @@ export default function FunilWhats({ embutido }: { embutido?: boolean } = {}) {
           )}
 
           <h2><span className="idx" /> Por atendente</h2>
+          <p className="nota">
+            O mesmo vazamento quebrado por quem atendeu, para saber se é regra da casa ou hábito de uma
+            pessoa. Olhe a coluna de percentual, não a de volume: quem atende mais gente naturalmente
+            deixa mais card para trás em número absoluto.
+            <Ajuda titulo="Quem aparece aqui"
+              fontes={["Atendente: a etiqueta de dono da conversa no Pigeon Post",
+                       "Sem card: a mesma conta do bloco acima, pessoa a pessoa",
+                       "Conversa sem etiqueta de dono aparece agrupada como sem atendente"]}>
+              O atendente é quem o Pigeon registra como dono da conversa, que não é necessariamente quem
+              fechou a venda. Conversa que passou por duas pessoas fica com a última etiqueta, então a
+              leitura certa é de tendência e não de culpa.
+            </Ajuda>
+          </p>
           <div className="rolar">
             <table className="tabela">
               <thead>
@@ -166,7 +194,8 @@ export default function FunilWhats({ embutido }: { embutido?: boolean } = {}) {
 
           <h2><span className="idx" /> Quanto tempo o card fica parado</h2>
           <p className="nota">
-            Negociação aberta no CRM, por etapa, e há quantos dias ela não sai do lugar.
+            Negociação aberta no CRM, por etapa, e há quantos dias ela não sai do lugar. Serve para achar
+            a etapa que acumula lead morto e a venda que foi dada como feita e não aconteceu.
             <b> Este bloco não segue o período escolhido acima</b>: card parado está parado agora.
             <Ajuda titulo="Por que tempo, e não conversão"
               fontes={["RD Station CRM: desde quando o card está na etapa em que está",
