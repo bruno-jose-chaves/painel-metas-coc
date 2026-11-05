@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import Ajuda from "@/components/Ajuda";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, dataCurta } from "@/lib/formato";
+import { inicioDoAno } from "@/lib/periodo";
 
 type Sugestao = {
   tipo: string; titulo: string; detalhe: string;
@@ -21,14 +22,14 @@ export default function Sugestoes({ embutido }: { embutido?: boolean } = {}) {
   const [casos, setCasos] = useState<Caso[] | null>(null);
 
   useEffect(() => {
-    supabase.rpc("painel_sugestoes", { p_desde: "2026-01-01" })
+    supabase.rpc("painel_sugestoes", { p_desde: inicioDoAno() })
       .then(({ data }) => setLista((data as Sugestao[]) ?? []));
   }, [volta]);
 
   useEffect(() => {
     if (!aberto) { setCasos(null); return; }
     setCasos(null);
-    supabase.rpc("painel_sugestoes_casos", { p_tipo: aberto, p_desde: "2026-01-01" })
+    supabase.rpc("painel_sugestoes_casos", { p_tipo: aberto, p_desde: inicioDoAno() })
       .then(({ data }) => setCasos((data as Caso[]) ?? []));
   }, [aberto]);
 

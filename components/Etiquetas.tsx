@@ -5,6 +5,7 @@ import Ajuda from "@/components/Ajuda";
 import Chave from "@/components/Chave";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, dataCurta } from "@/lib/formato";
+import { inicioDoAno } from "@/lib/periodo";
 
 type Pendente = {
   etiqueta: string; pessoas: number; conversoes: number;
@@ -22,7 +23,7 @@ export default function Etiquetas({ admin, embutido }: { admin: boolean; embutid
   const [tudo, setTudo] = useState(false);
 
   function carregar() {
-    supabase.rpc("painel_etiquetas_pendentes", { p_desde: "2026-01-01", p_minimo: tudo ? 1 : 5 })
+    supabase.rpc("painel_etiquetas_pendentes", { p_desde: inicioDoAno(), p_minimo: tudo ? 1 : 5 })
       .then(({ data }) => setLista((data as Pendente[]) ?? []));
     supabase.from("etiqueta_regras").select("id,etiqueta,produto_id").order("etiqueta")
       .then(({ data }) => setRegras((data as Regra[]) ?? []));

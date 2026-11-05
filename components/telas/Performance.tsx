@@ -61,6 +61,10 @@ type Carteira = {
   d31_60: number; mais_60: number; dias_mediana: number | null;
 };
 type Perda = { vendedor: string; motivo: string; grupo: string; perdidas: number; fatia_no_grupo: number };
+type Comissao = {
+  vendedor: string; mes: string; produto: string; matriculas: number;
+  faturamento: number; percentual: number; comissao: number;
+};
 type Periodo361 = {
   vendedor: string; pessoas: number; conversas: number; dias_com_atendimento: number;
   responderam: number; taxa_resposta: number | null; vendas: number; vendas_atendidas: number;
@@ -115,6 +119,7 @@ export default function Performance() {
   const [carteira, setCarteira] = useState<Carteira[] | null>(null);
   const [perdas, setPerdas] = useState<Perda[] | null>(null);
   const [total, setTotal] = useState<Periodo361[] | null>(null);
+  const [comissao, setComissao] = useState<Comissao[] | null>(null);
   const [soDiaUtil, setSoDiaUtil] = useState(false);
   const [soComercial, setSoComercial] = useState(false);
   const [relogio, setRelogio] = useState<"util" | "corrido">("util");
@@ -143,6 +148,9 @@ export default function Performance() {
     setResposta(null); setMix(null); setPerdas(null); setTotal(null);
     ultima("periodo", supabase.rpc("painel_performance_periodo", { p_de: periodo.de, p_ate: periodo.ate }),
       ({ data }) => setTotal((data as Periodo361[]) ?? []));
+    setComissao(null);
+    ultima("comissao", supabase.rpc("painel_comissao", { p_de: periodo.de, p_ate: periodo.ate }),
+      ({ data }) => setComissao((data as Comissao[]) ?? []));
     ultima("resposta", supabase.rpc("painel_performance_resposta", {
       p_de: periodo.de, p_ate: periodo.ate, p_relogio: relogio,
       p_so_dia_util: soDiaUtil, p_so_horario_comercial: soComercial,
@@ -644,6 +652,63 @@ export default function Performance() {
           </table>
         </div>
       )}
+
+      <h2><span className="idx" /> Quanto cada um ganhou</h2>
+      <p className="nota">
+        Comissão fixa por venda, pela regra em vigor: 3% em Semi e Extensivo, 5% nos demais.
+        Fica aqui e na tela de cada comercial, não no ranking do time.
+        <Ajuda titulo="Por que este número é o teto">
+          A regra paga sobre a <b>parcela paga</b>, não sobre o valor da matrícula. O painel
+          recebe a venda fechada, não o pagamento de cada parcela, então isto é o que a pessoa
+          recebe se o aluno pagar tudo. Serve para acompanhar, não para fechar folha.
+          <br /><br />
+          O <b>bônus por meta</b> não entra: depende do quadro de colaboradores ativos no
+          período, com peso de CLT e MEI, que é informação de fora do painel.
+          <br /><br />
+          Os percentuais ficam em uma tabela no banco (comissao_regras), produto a produto, e
+          mudam sem mexer em código.
+        </Ajuda>
+      </p>
+      {!comissao ? <p className="rotulo">Carregando</p> : (() => {
+        const lista = comissao.filter((c) => !quem || c.vendedor === quem);
+        if (lista.length === 0) return <p className="mudo">Sem venda com comissão no período.</p>;
+        const porPessoa = new Map<string, { matriculas: number; faturamento: number; comissao: number }>();
+        for (const c of lista) {
+          const a = porPessoa.get(c.vendedor) ?? { matriculas: 0, faturamento: 0, comissao: 0 };
+          a.matriculas += Number(c.matriculas); a.faturamento += Number(c.faturamento);
+          a.comissao += Number(c.comissao);
+          porPessoa.set(c.vendedor, a);
+        }
+        const linhas = [...porPessoa.entries()].sort((a, b) => b[1].comissao - a[1].comissao);
+        const maiorC = Math.max(1, ...linhas.map(([, a]) => a.comissao));
+        return (
+          <div className="rolar">
+            <table className="tabela">
+              <thead>
+                <tr>
+                  <th>Comercial</th><th className="n">Matrículas</th>
+                  <th className="n">Faturamento</th><th className="n">Comissão</th>
+                  <th style={{ minWidth: 90 }} /><th className="n">Sobre o faturamento</th>
+                </tr>
+              </thead>
+              <tbody>
+                {linhas.map(([nome, a]) => (
+                  <tr key={nome}>
+                    <td><b>{nome}</b></td>
+                    <td className="n">{num(a.matriculas)}</td>
+                    <td className="n">{brl(a.faturamento)}</td>
+                    <td className="n"><b>{brl(a.comissao, 2)}</b></td>
+                    <td><div className="mini"><i style={{ width: `${(a.comissao / maiorC) * 100}%` }} /></div></td>
+                    <td className="n num mudo">
+                      {pct(a.faturamento ? a.comissao / a.faturamento : null, 2)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      })()}
 
       <h2><span className="idx" /> Por que cada um perde</h2>
       <p className="nota">

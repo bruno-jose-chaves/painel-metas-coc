@@ -8,6 +8,7 @@ import Passagem from "@/components/Passagem";
 import Classificar from "@/components/telas/Classificar";
 import Leads from "@/components/telas/Leads";
 import { supabase } from "@/lib/supabase";
+import { inicioDoAno, DESDE_CONVERSAS } from "@/lib/periodo";
 
 // Tudo que responde "de onde vem o lead" em um lugar: captação por página,
 // anúncio de clique para WhatsApp, e a fila de classificação. O marcador nas
@@ -18,9 +19,9 @@ function Tela({ admin }: { admin: boolean }) {
   const [passagem, setPassagem] = useState<number | null>(null);
 
   useEffect(() => {
-    supabase.rpc("painel_pendencias", { p_desde: "2026-08-01", p_minimo: 10 })
+    supabase.rpc("painel_pendencias", { p_desde: DESDE_CONVERSAS, p_minimo: 10 })
       .then(({ data }) => setPaginas(((data as unknown[]) ?? []).length));
-    supabase.rpc("painel_etiquetas_pendentes", { p_desde: "2026-01-01", p_minimo: 5 })
+    supabase.rpc("painel_etiquetas_pendentes", { p_desde: inicioDoAno(), p_minimo: 5 })
       .then(({ data }) => setEtiquetas(((data as unknown[]) ?? []).length));
     supabase.rpc("painel_passagem_crm", {})
       .then(({ data }) => setPassagem(((data as { situacao: string }[]) ?? [])

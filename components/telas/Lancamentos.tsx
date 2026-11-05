@@ -6,6 +6,7 @@ import Sugestoes from "@/components/Sugestoes";
 import Vendas from "@/components/telas/Vendas";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num } from "@/lib/formato";
+import { inicioDoAno } from "@/lib/periodo";
 
 // "O que conferir" nunca foi outra tela: é a mesma matrícula lançada, filtrada
 // pelo que saiu estranho. Virou o segundo modo daqui, com a contagem no botão,
@@ -21,7 +22,7 @@ export default function Lancamentos() {
   const [aConferir, setAConferir] = useState<number | null>(null);
 
   useEffect(() => {
-    supabase.rpc("painel_sugestoes", { p_desde: "2026-01-01" })
+    supabase.rpc("painel_sugestoes", { p_desde: inicioDoAno() })
       .then(({ data }) => setAConferir(((data as unknown[]) ?? []).length));
   }, [volta]);
 

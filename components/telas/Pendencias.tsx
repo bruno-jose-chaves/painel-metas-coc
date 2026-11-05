@@ -7,6 +7,7 @@ import Pessoas from "@/components/Pessoas";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, dataCurta } from "@/lib/formato";
 import { useIndicadores, useDestinos, partirDestino, type Indicador, type Destino } from "@/lib/indicadores";
+import { DESDE_CONVERSAS } from "@/lib/periodo";
 
 type Pendencia = {
   tipo: string; valor: string; volume: number; matriculas: number;
@@ -36,7 +37,7 @@ export default function Pendencias({ admin, embutido }: { admin: boolean; embuti
   const destinos = useDestinos();
 
   function carregar() {
-    supabase.rpc("painel_pendencias", { p_desde: "2026-08-01", p_minimo: tudo ? 1 : 10 })
+    supabase.rpc("painel_pendencias", { p_desde: DESDE_CONVERSAS, p_minimo: tudo ? 1 : 10 })
       .then(({ data }) => setLista((data as Pendencia[]) ?? []));
     supabase.from("captacao_regras").select("*").order("campanha_id")
       .then(({ data }) => setRegras((data as Regra[]) ?? []));
@@ -220,7 +221,7 @@ export default function Pendencias({ admin, embutido }: { admin: boolean; embuti
           titulo={aberto.valor}
           rotulo={TIPO[aberto.tipo] ?? aberto.tipo}
           rpc="painel_pendencia_pessoas"
-          params={{ p_tipo: aberto.tipo, p_valor: aberto.valor, p_desde: "2026-08-01" }}
+          params={{ p_tipo: aberto.tipo, p_valor: aberto.valor, p_desde: DESDE_CONVERSAS }}
           aoFechar={() => setAberto(null)}
         />
       )}

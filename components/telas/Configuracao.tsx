@@ -286,7 +286,7 @@ export default function Configuracao({ admin }: { admin: boolean }) {
         )}
       </div>
 
-      <EtiquetasPigeon />
+      <EtiquetasPigeon admin={admin} />
 
       <Fontes />
 

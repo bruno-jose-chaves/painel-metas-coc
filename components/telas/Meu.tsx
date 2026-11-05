@@ -41,6 +41,10 @@ type Mix = {
   vendedor: string; produto_id: string | null; produto: string; vendas: number;
   faturamento: number; ticket: number | null; fatia: number;
 };
+type Comissao = {
+  vendedor: string; mes: string; produto: string; matriculas: number;
+  faturamento: number; percentual: number; comissao: number;
+};
 type CALOR = "enviadas" | "recebidas" | "chamadas" | "procuraram" | "ganhas" | "espera";
 const CALORES: { id: CALOR; nome: string; oque: string; unidade: string }[] = [
   { id: "enviadas", nome: "Mensagens que você mandou", unidade: "mensagens",
@@ -59,6 +63,12 @@ const CALORES: { id: CALOR; nome: string; oque: string; unidade: string }[] = [
 type Fila = {
   tipo: string; prioridade: number; pessoa: string; telefone: string | null; onde: string;
   dias: number; desde: string; ja_e_aluno: boolean; o_que_fazer: string;
+};
+
+const mesCurto = (d: string) => {
+  const [a, m] = d.slice(0, 7).split("-");
+  return ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"][Number(m) - 1]
+    + "/" + a.slice(2);
 };
 
 const resumoNome = (r: Resumo | null | "nenhum", quem: string) =>
@@ -84,6 +94,7 @@ export default function Meu({ admin }: { admin?: boolean }) {
   const [detalhe, setDetalhe] = useState<{ titulo: string; recorte: Recorte } | null>(null);
   const [resposta, setResposta] = useState<Resposta | null>(null);
   const [mix, setMix] = useState<Mix[] | null>(null);
+  const [comissao, setComissao] = useState<Comissao[] | null>(null);
   const [grade, setGrade] = useState<Celula[] | null>(null);
   const [calor, setCalor] = useState<CALOR>("recebidas");
   const [relogio, setRelogio] = useState<"util" | "corrido">("util");
@@ -115,6 +126,8 @@ export default function Meu({ admin }: { admin?: boolean }) {
     }), ({ data }) => setLinhas((data as Linha[]) ?? []));
     ultima("mix", supabase.rpc("painel_performance_mix", { p_de: periodo.de, p_ate: periodo.ate }),
       ({ data }) => setMix((data as Mix[]) ?? []));
+    ultima("comissao", supabase.rpc("painel_comissao", { p_de: periodo.de, p_ate: periodo.ate }),
+      ({ data }) => setComissao((data as Comissao[]) ?? []));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [periodo.de, periodo.ate, quem, volta]);
 
@@ -236,6 +249,71 @@ export default function Meu({ admin }: { admin?: boolean }) {
           )}
         </>
       )}
+
+      <h2><span className="idx" /> Quanto você ganhou</h2>
+      <p className="nota">
+        Comissão fixa por venda, pela regra em vigor: 3% em Semi e Extensivo, 5% nos demais.
+        <Ajuda titulo="Por que este número é o teto, e não o contracheque">
+          A regra da casa paga sobre a <b>parcela paga</b>, não sobre o valor da matrícula. O
+          painel recebe a venda fechada, não o pagamento de cada parcela, então o que aparece
+          aqui é quanto você recebe <b>se o aluno pagar tudo</b>. Se ele parar de pagar, a
+          comissão para junto.
+          <br /><br />
+          O <b>bônus por meta</b> não entra nesta conta: ele depende do quadro de colaboradores
+          ativos no período, com peso de CLT e MEI, que é informação que não vive aqui.
+          <br /><br />
+          Serve para acompanhar, não para fechar folha.
+        </Ajuda>
+      </p>
+      {!comissao ? <p className="rotulo">Carregando</p> : (() => {
+        const meu = comissao.filter((c) => c.vendedor === euMesmo);
+        if (meu.length === 0) return <p className="mudo">Sem venda com comissão no período.</p>;
+        const total = meu.reduce((s, c) => s + Number(c.comissao), 0);
+        const porMes = new Map<string, number>();
+        for (const c of meu) porMes.set(c.mes, (porMes.get(c.mes) ?? 0) + Number(c.comissao));
+        const meses = [...porMes.entries()].sort((a, b) => b[0].localeCompare(a[0]));
+        return (
+          <>
+            <div className="faixa">
+              <div>
+                <div className="rotulo">No período escolhido</div>
+                <div className="valor num">{brl(total)}</div>
+                <div className="mudo num">
+                  {num(meu.reduce((s, c) => s + Number(c.matriculas), 0))} matrículas
+                </div>
+              </div>
+              {meses.slice(0, 4).map(([mes, v]) => (
+                <div key={mes}>
+                  <div className="rotulo">{mesCurto(mes)}</div>
+                  <div className="valor num">{brl(v)}</div>
+                </div>
+              ))}
+            </div>
+            <div className="rolar">
+              <table className="tabela">
+                <thead>
+                  <tr>
+                    <th>Mês</th><th>Produto</th><th className="n">Matrículas</th>
+                    <th className="n">Faturamento</th><th className="n">%</th><th className="n">Comissão</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {meu.map((c, i) => (
+                    <tr key={c.mes + c.produto}>
+                      <td>{i === 0 || meu[i - 1].mes !== c.mes ? <b>{mesCurto(c.mes)}</b> : ""}</td>
+                      <td>{c.produto}</td>
+                      <td className="n">{num(c.matriculas)}</td>
+                      <td className="n">{brl(c.faturamento)}</td>
+                      <td className="n num mudo">{pct(c.percentual, 0)}</td>
+                      <td className="n"><b>{brl(c.comissao, 2)}</b></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        );
+      })()}
 
       <h2><span className="idx" /> Você contra a média do time</h2>
       <p className="nota">

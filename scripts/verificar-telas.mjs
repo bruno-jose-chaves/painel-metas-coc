@@ -402,6 +402,23 @@ const rotas0 = {
       onde: "Sem retorno", atendente: "Marcia Laurett", virou_matricula: false,
       link: "https://pigeon.runus.com.br/redirect?type=SESSION&id=ghi" },
   ],
+  "rpc/painel_comissao": [
+    { vendedor: "Márcia Laurett", mes: "2026-11-01", produto: "Missão UFSC", matriculas: 8, faturamento: 5759, percentual: 0.05, comissao: 287.96 },
+    { vendedor: "Márcia Laurett", mes: "2026-10-01", produto: "Missão UFSC", matriculas: 48, faturamento: 29855, percentual: 0.05, comissao: 1492.76 },
+    { vendedor: "Márcia Laurett", mes: "2026-10-01", produto: "Método de Aprovação ACAFE", matriculas: 28, faturamento: 19457, percentual: 0.05, comissao: 972.86 },
+    { vendedor: "João Pedro Beraldo", mes: "2026-10-01", produto: "Missão UFSC", matriculas: 28, faturamento: 19057, percentual: 0.05, comissao: 952.86 },
+    { vendedor: "João Pedro Beraldo", mes: "2026-10-01", produto: "Extensivo", matriculas: 1, faturamento: 19274, percentual: 0.03, comissao: 578.22 },
+  ],
+  "rpc/painel_etiqueta_destinos": [
+    { tipo: "curso", valor: "missao-ufsc-2026", rotulo: "Missão UFSC 2026" },
+    { tipo: "vendedor", valor: "Márcia Laurett", rotulo: "Márcia Laurett" },
+    { tipo: "etapa", valor: "Qualificação", rotulo: "Qualificação" },
+  ],
+  "rpc/painel_etiquetas_whats": [
+    { etiqueta: "LIVE UFSC 2026", etiqueta_norm: "LIVE UFSC 2026", tipo: "curso", valor: "missao-ufsc-2026", pessoas: 312, ultima: "2026-10-16" },
+    { etiqueta: "MÁRCIA", etiqueta_norm: "MÁRCIA", tipo: "vendedor", valor: "Márcia Laurett", pessoas: 361, ultima: "2026-11-04" },
+    { etiqueta: "LEAD FRIO 2027", etiqueta_norm: "LEAD FRIO 2027", tipo: null, valor: null, pessoas: 7, ultima: "2026-10-15" },
+  ],
   "rpc/painel_pessoa_buscar": [
     { chave: "46999770277", nome: "Giovanna Cavalheiri Alberton", telefone: "46999770277", email: null, cidade: "Blumenau", e_aluno: true, cursos: "Extensivo Coc Med · Missão UFSC - Intensive", ultimo_contato: "2026-11-04", dono: "Márcia", conversas: 4 },
   ],
