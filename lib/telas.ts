@@ -168,8 +168,11 @@ export const AREAS: Area[] = [
         blocos: ["O tamanho de cada produto", "Cada nome, um a um"] },
       { id: "sistema", codigo: 530, nome: "Acesso e integrações",
         oque: "Quem entra no painel, estado das integrações, última sincronização e saúde dos dados.",
-        termos: ["acesso", "liberar pessoa", "integração", "sincronização", "pigeon", "supabase", "n8n", "fonte"],
-        blocos: ["Planilha de vendas", "RD Station", "n8n", "Fila de manhã", "Pigeon Post", "Saúde das fontes", "Importação da planilha", "Cobertura do RD Marketing", "Pedidos de acesso", "Quem acessa"] },
+        termos: ["acesso", "liberar pessoa", "integração", "sincronização", "pigeon", "supabase",
+                 "n8n", "fonte", "etiqueta do pigeon", "etiqueta do whatsapp", "tag"],
+        blocos: ["Planilha de vendas", "RD Station", "n8n", "Fila de manhã", "Pigeon Post",
+                 "Etiquetas do Pigeon", "Saúde das fontes", "Importação da planilha",
+                 "Cobertura do RD Marketing", "Pedidos de acesso", "Quem acessa"] },
     ],
   },
 ];

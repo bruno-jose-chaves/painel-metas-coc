@@ -4,6 +4,7 @@ import { supabase, SUPABASE_URL } from "@/lib/supabase";
 import Ajuda from "@/components/Ajuda";
 import FilaManha from "@/components/FilaManha";
 import Fontes from "@/components/Fontes";
+import EtiquetasPigeon from "@/components/EtiquetasPigeon";
 import Importacoes from "@/components/Importacoes";
 import { dataHora, dataCurta, num } from "@/lib/formato";
 
@@ -284,6 +285,8 @@ export default function Configuracao({ admin }: { admin: boolean }) {
           </>
         )}
       </div>
+
+      <EtiquetasPigeon />
 
       <Fontes />
 
