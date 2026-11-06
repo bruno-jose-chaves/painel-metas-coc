@@ -11,6 +11,17 @@ import { dataHora, dataCurta, num } from "@/lib/formato";
 type Status = { servico: string; app_configurado: boolean; conectado: boolean; expira_em: string | null; atualizado_em: string | null };
 type Sync = { id: number; fonte: string; terminado_em: string | null; lidas: number; importadas: number; rejeitadas: number; status: string };
 type Usuario = { email: string; nome: string | null; papel: string };
+
+// Quatro papéis. A lista mora aqui e no banco (o CHECK de usuarios_autorizados);
+// antes o banco só aceitava leitor e admin, e por isso escolher comercial no
+// seletor era rejeitado sem a tela dizer nada.
+const PAPEIS: { id: string; nome: string; oque: string }[] = [
+  { id: "comercial", nome: "Comercial", oque: "Meu painel, resumo, lançamentos e a fila do que está escapando" },
+  { id: "marketing", nome: "Marketing", oque: "Resumo, campanha, marketing e qualidade do lead" },
+  { id: "leitor", nome: "Leitor", oque: "Resumo, campanha e marketing, só para acompanhar" },
+  { id: "admin", nome: "Diretoria", oque: "Tudo, e é o único papel que mexe em cadastro" },
+];
+const nomePapel = (p: string) => PAPEIS.find((x) => x.id === p)?.nome ?? p;
 type Pedido = { email: string; nome: string | null; mensagem: string | null; criada_em: string; situacao: string };
 
 const NOMES: Record<string, string> = { rd_crm: "RD Station CRM", rd_marketing: "RD Station Marketing", planilha: "Planilha Coc Online - Comercial" };
@@ -390,9 +401,9 @@ export default function Configuracao({ admin }: { admin: boolean }) {
         <Ajuda titulo="O que acontece ao aprovar"
           fontes={["Pedidos: a própria tela de login do painel",
                    "A liberação de dado é feita pelo banco, pela regra de autorização de cada tela"]}>
-          Aprovar cria o acesso com papel de leitura. Papel e permissão de diretoria são definidos depois,
-          no bloco <b>Quem acessa</b>. Negar um pedido não bloqueia a pessoa para sempre: ela pode pedir
-          de novo.
+          Aprovar já define o papel: o botão que você clicar é o papel que a pessoa recebe. Dá para
+          trocar depois no bloco <b>Quem acessa</b>. Negar um pedido não bloqueia a pessoa para sempre:
+          ela pode pedir de novo.
         </Ajuda>
       </p>
       {!pedidos ? <p className="rotulo">Carregando</p> : pedidos.length === 0 ? (
@@ -409,8 +420,10 @@ export default function Configuracao({ admin }: { admin: boolean }) {
                 <td className="num">{dataHora(p.criada_em)}</td>
                 {admin && (
                   <td style={{ whiteSpace: "nowrap" }}>
-                    <button className="sair" onClick={() => aprovar(p.email, "leitor")}>Leitor</button>{" "}
-                    <button className="sair" onClick={() => aprovar(p.email, "admin")}>Admin</button>{" "}
+                    {PAPEIS.map((x) => (
+                      <button key={x.id} className="sair" title={x.oque}
+                        onClick={() => aprovar(p.email, x.id)}>{x.nome}</button>
+                    ))}{" "}
                     <button className="sair" onClick={() => recusar(p.email)}>Recusar</button>
                   </td>
                 )}
@@ -429,11 +442,14 @@ export default function Configuracao({ admin }: { admin: boolean }) {
           fontes={["Usuários e papéis: cadastro do painel",
                    "A restrição é aplicada no banco, não só na tela",
                    "O papel comercial também é o que amarra a pessoa às vendas dela na planilha"]}>
-          <b>Comercial</b> entra direto no painel dele e no resumo, e não enxerga as telas de gestão nem
-          valor de comissão de outra pessoa. <b>Diretoria</b> vê tudo e é o único papel que aponta curso,
-          cadastra campanha e mexe em meta. O nome cadastrado aqui precisa ser igual ao que está na coluna
-          Vendedor da planilha, senão a pessoa entra e não vê venda própria nenhuma. <b>Senha nova</b>
-          gera uma senha temporária para entregar à pessoa.
+          <b>Comercial</b> entra direto em Meu painel e vê resumo, lançamentos e a fila do que está
+          escapando. Não enxerga o ranking com o nome dos colegas, a performance individual, os ajustes
+          nem a comissão de outra pessoa. <b>Marketing</b> vê resumo, campanha, marketing e qualidade do
+          lead, e não vê comissão de ninguém. <b>Leitor</b> é quem só acompanha: resumo, campanha e
+          marketing. <b>Diretoria</b> vê tudo e é o único papel que aponta curso, cadastra campanha e
+          mexe em meta. Para o papel comercial funcionar, o nome cadastrado aqui precisa ser igual ao que
+          está na coluna Vendedor da planilha, senão a pessoa entra e não vê venda própria nenhuma.
+          <b> Senha nova</b> gera uma senha temporária para entregar à pessoa.
         </Ajuda>
       </p>
       <div className="bloco">
@@ -451,7 +467,7 @@ export default function Configuracao({ admin }: { admin: boolean }) {
                     onChange={(e) => setRascunho({ ...rascunho, nome: e.target.value })} /></td>
                   <td>
                     <select value={rascunho.papel} onChange={(e) => setRascunho({ ...rascunho, papel: e.target.value })}>
-                      <option value="leitor">Leitor</option><option value="admin">Administrador</option>
+                      {PAPEIS.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
                     </select>
                   </td>
                   <td><input type="text" value={rascunho.senha} placeholder="deixe vazio para manter" style={{ width: 170 }}
@@ -465,7 +481,7 @@ export default function Configuracao({ admin }: { admin: boolean }) {
                 <tr key={u.email}>
                   <td>{u.email}</td>
                   <td>{u.nome ?? "-"}</td>
-                  <td>{u.papel === "admin" ? "Administrador" : "Leitor"}</td>
+                  <td>{nomePapel(u.papel)}</td>
                   <td className="mudo">-</td>
                   {admin && (
                     <td style={{ whiteSpace: "nowrap" }}>
@@ -496,7 +512,7 @@ export default function Configuracao({ admin }: { admin: boolean }) {
               <label className="campo" style={{ margin: 0 }}><span className="rotulo">Papel</span>
                 <select value={novo.papel} onChange={(e) => setNovo({ ...novo, papel: e.target.value })}
                   style={{ font: "inherit", padding: 10, border: "1px solid var(--tinta)" }}>
-                  <option value="leitor">Leitor</option><option value="admin">Administrador</option>
+                  {PAPEIS.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
                 </select></label>
               <label className="campo" style={{ margin: 0 }}><span className="rotulo">Senha inicial</span>
                 <input value={novo.senha} onChange={(e) => setNovo({ ...novo, senha: e.target.value })} placeholder="mínimo 8" /></label>

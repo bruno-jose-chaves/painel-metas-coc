@@ -20,6 +20,7 @@ type Linha = {
 
 const NOME_TIPO: Record<string, string> = {
   vendedor: "Dono do contato", curso: "Curso de interesse", etapa: "Etapa do funil",
+  ignorar: "Ignorada de propósito",
 };
 
 export default function EtiquetasPigeon({ admin }: { admin?: boolean }) {
@@ -125,6 +126,10 @@ export default function EtiquetasPigeon({ admin }: { admin?: boolean }) {
                           onChange={(ev) => setEscolha({ ...escolha, [e.etiqueta]: ev.target.value })}
                         >
                           <option value="">{e.tipo ? "Trocar para" : "Escolher"}</option>
+                          {/* Etiqueta de uso interno do time existe e não quer
+                              dizer nada para o painel. Sem este destino ela
+                              ficava para sempre na lista de pendência. */}
+                          <option value="ignorar|ignorar">Ignorar, não significa nada aqui</option>
                           {["curso", "vendedor", "etapa"].map((t) => (
                             <optgroup key={t} label={NOME_TIPO[t] ?? t}>
                               {destinos.filter((d) => d.tipo === t).map((d) => (

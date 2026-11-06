@@ -488,13 +488,11 @@ export default function Campanha() {
           entrou sem passar pelo CRM, ou com dado diferente nos dois lugares.
         </Ajuda>
       </p>
-      {/* O botão "Por fonte" saiu daqui. Das 10.029 negociações de 2026, 87,7%
-          estão sem fonte preenchida, e o campo está bugado no RD: era um botão
-          que produzia leitura errada com cara de certa. A conta por fonte
-          continua existindo no banco, para o dia em que o preenchimento for
-          corrigido na origem. */}
-      <div className="filtros" style={{ marginBottom: 16 }}>
-      </div>
+      {/* O botão "Por fonte" saiu daqui, e a linha de filtros foi embora com
+          ele: sobrava uma faixa vazia no meio da tela. Das 10.029 negociações
+          de 2026, 87,7% estão sem fonte preenchida, e o campo está bugado no
+          RD. A conta por fonte continua existindo no banco, para o dia em que o
+          preenchimento for corrigido na origem. */}
       {!funil ? <p className="rotulo">Carregando</p> : (
         <>
           <div className="faixa">

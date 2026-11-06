@@ -43,7 +43,8 @@ export default function Vendas({ embutido }: { embutido?: boolean } = {}) {
       .select("chave,numero,data,vendedor,status,nome,curso,material,valor_tabela,desconto_pct,valor_venda,cidade,estado,campanha_id",
         { count: "exact" })
       .eq("campanha_id", campanha);
-    if (vendedor) q = q.eq("vendedor", vendedor);
+    if (vendedor === "(automatica)") q = q.is("vendedor", null);
+    else if (vendedor) q = q.eq("vendedor", vendedor);
     if (status === "ativos") q = q.not("status", "ilike", "cancel%");
     else if (status === "cancelados") q = q.ilike("status", "cancel%");
     else if (status) q = q.eq("status", status);
@@ -59,7 +60,8 @@ export default function Vendas({ embutido }: { embutido?: boolean } = {}) {
     if (!campanha) return;
     setResumo(null);
     let q = supabase.from("vendas").select("valor_venda,valor_tabela,status,vendedor,nome").eq("campanha_id", campanha);
-    if (vendedor) q = q.eq("vendedor", vendedor);
+    if (vendedor === "(automatica)") q = q.is("vendedor", null);
+    else if (vendedor) q = q.eq("vendedor", vendedor);
     if (busca.trim()) q = q.ilike("nome", `%${busca.trim()}%`);
     q.then(({ data }) => {
       const todas = (data as { valor_venda: number | null; valor_tabela: number | null; status: string | null }[]) ?? [];
@@ -114,6 +116,10 @@ export default function Vendas({ embutido }: { embutido?: boolean } = {}) {
           <span className="rotulo">Vendedor</span>
           <select value={vendedor} onChange={(e) => setVendedor(e.target.value)}>
             <option value="">Todos</option>
+            {/* A venda automática é a linha sem vendedor na planilha. Sem esta
+                opção não havia como listá-las: o filtro só oferecia nomes que
+                existem, e elas justamente não têm nome. */}
+            <option value="(automatica)">Venda automática</option>
             {vendedores.map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
         </label>
