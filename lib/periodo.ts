@@ -32,4 +32,9 @@ export const inicioDoAno = () => hojeSP().slice(0, 4) + "-01-01";
 // Agosto de 2026 foi quando o registro de conversa do Pigeon passou a ser
 // confiável. Antes disso não há o que ler, então esta é uma data fixa de
 // verdade, e não um ano corrente disfarçado.
-export const DESDE_CONVERSAS = "2026-08-01";
+// O historico de conversa que o Pigeon entregou comeca em 04/03/2026, e nao em
+// agosto como o painel dizia: marco a novembro tem volume parecido e atendente
+// preenchido em todos os meses. O que comeca em agosto e outra coisa, a janela
+// escolhida para a lista de A classificar.
+export const DESDE_CONVERSAS = "2026-03-04";
+export const DESDE_CLASSIFICAR = "2026-08-01";

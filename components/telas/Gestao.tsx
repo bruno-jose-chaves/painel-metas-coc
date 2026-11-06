@@ -83,11 +83,11 @@ export default function Gestao() {
       </div>
 
       <p className="nota">
-        O histórico de conversa importado do Pigeon começa em 01/08/2026.
+        O histórico de conversa importado do Pigeon começa em 04/03/2026.
         <Ajuda titulo="O que isso limita"
           fontes={["Conversas e mensagens: Pigeon Post"]}>
-          As regras de 15 e 20 dias valem cheias de 21/08 em diante. Antes disso, quem conversou em julho pode
-          aparecer como lead novo, porque o painel não enxerga a conversa anterior.
+          As regras de 15 e 20 dias valem cheias de 24/03 em diante. Antes disso, quem conversou em
+          fevereiro pode aparecer como lead novo, porque o painel não enxerga a conversa anterior.
         </Ajuda>
       </p>
 

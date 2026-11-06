@@ -100,7 +100,7 @@ export default function FechamentoLista({
             <p className="rodape">
               Em dias, do mais antigo na base para o mais novo. Traço em <b>conversando há</b> quer dizer
               que não existe conversa registrada daquele telefone antes da matrícula, o que é normal em
-              venda anterior a 01/08/2026 e em quem fechou por telefone. No máximo 400 linhas por vez.
+              venda anterior a 04/03/2026 e em quem fechou por telefone. No máximo 400 linhas por vez.
             </p>
           </>
         )}

@@ -288,7 +288,7 @@ export default function Configuracao({ admin }: { admin: boolean }) {
         <Ajuda titulo="Por que o webhook pode cair calado"
           fontes={["Conversas, mensagens, atendente e etiquetas: Pigeon Post",
                    "Entrega: webhook do Pigeon chamando o painel a cada evento",
-                   "Histórico importado a partir de 01/08/2026"]}>
+                   "Histórico importado a partir de 04/03/2026"]}>
           Como é o Pigeon que chama o painel, e não o contrário, quando a conexão cai não aparece erro:
           simplesmente param de chegar conversas, e a tela fica com a última foto como se o time tivesse
           parado de atender. Já aconteceu de ficar dez dias fora sem ninguém notar, e é por isso que a

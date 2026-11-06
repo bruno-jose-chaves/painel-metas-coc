@@ -82,7 +82,7 @@ export default function Fechamento({
           fontes={["Matrículas, valor e data: planilha comercial",
                    "Negócio de origem e campanha: RD Station CRM, pela negociação ligada à venda",
                    "Ligação venda e negócio: e-mail, telefone e nome normalizados",
-                   "Conversando há: Pigeon Post, pelo telefone, com histórico a partir de 01/08/2026",
+                   "Conversando há: Pigeon Post, pelo telefone, com histórico a partir de 04/03/2026",
                    "Na base há: o mais antigo entre contato criado no RD (desde 19/09/2024), conversão de formulário, primeira conversa e compra anterior"]}>
           <b>Negócio aberto há</b> conta do card criado no CRM até a matrícula: é o ciclo que o comercial
           trabalha, do card aberto até o fechamento. <b>Conversando há</b> conta da primeira conversa de
