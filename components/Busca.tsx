@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { procurar, type Achado } from "@/lib/telas";
+import { procurar, type Achado , type Papel } from "@/lib/telas";
 import { supabase } from "@/lib/supabase";
 import Pessoa, { type Achado as Gente } from "@/components/Pessoa";
 
@@ -17,7 +17,7 @@ import Pessoa, { type Achado as Gente } from "@/components/Pessoa";
 // E procura gente. Nome ou telefone com três letras ou mais vai ao banco e
 // devolve quem comprou, quem é lead e quem conversou, na mesma caixa. Era a
 // pergunta mais natural que existe e o painel não respondia.
-export default function Busca({ admin }: { admin: boolean }) {
+export default function Busca({ papel }: { papel: Papel }) {
   const [aberta, setAberta] = useState(false);
   const [texto, setTexto] = useState("");
   const [escolhido, setEscolhido] = useState(0);
@@ -25,7 +25,7 @@ export default function Busca({ admin }: { admin: boolean }) {
 
   const [gente, setGente] = useState<Gente[]>([]);
   const [ficha, setFicha] = useState<Gente | null>(null);
-  const achados = useMemo(() => procurar(texto, admin).slice(0, 8), [texto, admin]);
+  const achados = useMemo(() => procurar(texto, papel).slice(0, 8), [texto, papel]);
 
   useEffect(() => { setEscolhido(0); }, [texto]);
 

@@ -154,8 +154,10 @@ export default function Vendas({ embutido }: { embutido?: boolean } = {}) {
                    "Produto: o curso da planilha, apontado para produto em Ajustes, Cursos",
                    "Turma e campanha: resolvidas pela data da venda contra a janela de cada uma"]}>
           <b>#</b> é o número da linha na própria planilha, que é por onde se acha a venda lá.
-          <b> Vendedor</b> é o nome que está na planilha, e linha vazia aqui é a venda automática pelo
-          site. <b>Valor</b> é o valor cheio da matrícula no dia em que foi lançada, não a parcela paga.
+          <b> Venda automática</b> é a matrícula que entrou sem vendedor na planilha: é a compra que o
+          aluno fez sozinho pelo site. Ela conta no faturamento e fica fora do ranking e da comissão, de
+          propósito, porque não houve ninguém para creditar. <b>Valor</b> é o valor cheio da matrícula no
+          dia em que foi lançada, não a parcela paga.
           Matrícula com condição cancelada aparece na lista e fica fora de toda contagem do painel.
           E-mail, telefone e responsável financeiro ficam fora desta tela de propósito: quem precisa desse
           dado usa a planilha ou o CRM.
@@ -182,7 +184,9 @@ export default function Vendas({ embutido }: { embutido?: boolean } = {}) {
                     <td className="num">{dataCurta(l.data)}</td>
                     <td>{l.nome ?? "-"}</td>
                     <td className="mudo">{l.curso ?? "-"}{l.material ? ` · ${l.material}` : ""}</td>
-                    <td>{l.vendedor ?? "-"}</td>
+                    <td>
+                      {l.vendedor ?? <span className="mudo">Venda automática</span>}
+                    </td>
                     <td>{l.status ?? "-"}</td>
                     <td className="n">{brl(l.valor_tabela, 2)}</td>
                     <td className="n">{pct(descontoDe(l))}</td>

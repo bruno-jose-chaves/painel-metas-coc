@@ -1,7 +1,7 @@
 "use client";
 import Shell from "@/components/Shell";
 import SubAbas, { useAba, type Aba } from "@/components/SubAbas";
-import { telasDe } from "@/lib/telas";
+import { telasDe, type Papel } from "@/lib/telas";
 import Visao from "@/components/telas/Visao";
 import Gestao from "@/components/telas/Gestao";
 import Meu from "@/components/telas/Meu";
@@ -12,10 +12,11 @@ import Meu from "@/components/telas/Meu";
 //
 // Quem vende entra em Meu painel, não no resumo da empresa: a primeira coisa
 // que ele precisa é o que é dele e o que está parado na mão dele.
-function Tela({ admin }: { admin: boolean }) {
+function Tela({ admin, papel }: { admin: boolean; papel: Papel }) {
+  // Quem vende entra em Meu painel, não no resumo da empresa.
   const abas: Aba[] = admin
-    ? telasDe("hoje", true)
-    : [...telasDe("hoje", false)].sort((a, b) => (a.id === "meu" ? -1 : b.id === "meu" ? 1 : 0));
+    ? telasDe("hoje", papel)
+    : [...telasDe("hoje", papel)].sort((a, b) => (a.id === "meu" ? -1 : b.id === "meu" ? 1 : 0));
   const { aba, escolher } = useAba(abas);
   return (
     <>
@@ -28,5 +29,5 @@ function Tela({ admin }: { admin: boolean }) {
 }
 
 export default function Page() {
-  return <Shell>{({ admin }) => <Tela admin={admin} />}</Shell>;
+  return <Shell>{({ admin, papel }) => <Tela admin={admin} papel={papel} />}</Shell>;
 }

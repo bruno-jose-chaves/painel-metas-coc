@@ -474,30 +474,26 @@ export default function Campanha() {
       <h2><span className="idx" /> Da origem à matrícula</h2>
       <p className="nota">
         De onde veio a gente que matriculou nesta campanha, e quanto tempo levou da origem até a venda.
-        Para decidir verba, vale a visão <b>por campanha</b>: a fonte do CRM está vazia na maior parte
-        das negociações e por isso joga quase tudo em uma linha só.
-        <Ajuda titulo="A diferença entre campanha e fonte, e por que a fonte não serve hoje"
+        A campanha do CRM é o nome da ação que o marketing registrou na negociação, e é a leitura de
+        origem que sustenta decisão de verba hoje.
+        <Ajuda titulo="Por que não existe mais a visão por fonte"
           fontes={["Matrícula: planilha comercial",
                    "Campanha e fonte: RD Station CRM, os campos da negociação que deu origem à matrícula",
                    "Chaves da ligação, nessa ordem: e-mail, telefone e nome normalizados"]}>
-          <b>Por campanha do CRM</b> é o nome da ação que o marketing registrou na negociação, do tipo
-          uma campanha de anúncio específica, e está preenchida em quase nove de cada dez negociações.
-          <b> Por fonte</b> seria o canal, do tipo Facebook, Google, indicação, e é a leitura que
-          naturalmente serviria para verba, mas das 10.029 negociações de 2026 <b>87,7% estão sem fonte
-          preenchida</b>: o campo fica em branco quando o lead não entra por fluxo do RD. Enquanto isso
-          não for corrigido na entrada do lead, leia por campanha. O que aparece sem par é venda que
+          A <b>campanha</b> está preenchida em quase nove de cada dez negociações. A <b>fonte</b> seria o
+          canal, do tipo Facebook, Google, indicação, e seria a leitura natural para verba, mas das
+          10.029 negociações de 2026 <b>87,7% estão sem fonte preenchida</b>: o campo está falhando no
+          RD e fica em branco quando o lead não entra por fluxo. O botão que mostrava por fonte foi
+          retirado porque produzia leitura errada com cara de certa. O que aparece sem par é venda que
           entrou sem passar pelo CRM, ou com dado diferente nos dois lugares.
         </Ajuda>
       </p>
+      {/* O botão "Por fonte" saiu daqui. Das 10.029 negociações de 2026, 87,7%
+          estão sem fonte preenchida, e o campo está bugado no RD: era um botão
+          que produzia leitura errada com cara de certa. A conta por fonte
+          continua existindo no banco, para o dia em que o preenchimento for
+          corrigido na origem. */}
       <div className="filtros" style={{ marginBottom: 16 }}>
-        <div className="atalhos">
-          <button className={porOrigem === "campanha" ? "ativo" : ""} onClick={() => setPorOrigem("campanha")}>
-            Por campanha do CRM
-          </button>
-          <button className={porOrigem === "fonte" ? "ativo" : ""} onClick={() => setPorOrigem("fonte")}>
-            Por fonte
-          </button>
-        </div>
       </div>
       {!funil ? <p className="rotulo">Carregando</p> : (
         <>

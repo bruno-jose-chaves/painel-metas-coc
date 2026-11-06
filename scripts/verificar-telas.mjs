@@ -373,6 +373,7 @@ const rotas0 = {
   "rpc/painel_cenarios": cenarios,
   "rpc/is_autorizado": true,
   "rpc/is_admin": true,
+  "rpc/meu_papel": "admin",
   "rpc/integracoes_status": [{ servico: "planilha", app_configurado: true, conectado: true, expira_em: null, atualizado_em: "2026-10-02T13:05:00Z" }, { servico: "rd_crm", app_configurado: true, conectado: true, expira_em: "2026-10-02T16:00:00Z", atualizado_em: "2026-10-02T13:00:00Z" }, { servico: "rd_marketing", app_configurado: true, conectado: true, expira_em: "2026-10-02T16:00:00Z", atualizado_em: "2026-10-02T13:00:00Z" }],
   "rpc/painel_fases": fases,
   "rpc/painel_vendas_dia": vendasDia,

@@ -1,7 +1,7 @@
 "use client";
 import Shell from "@/components/Shell";
 import SubAbas, { useAba, type Aba } from "@/components/SubAbas";
-import { telasDe } from "@/lib/telas";
+import { telasDe, type Papel } from "@/lib/telas";
 import Time from "@/components/telas/Time";
 import Lancamentos from "@/components/telas/Lancamentos";
 import Agente from "@/components/telas/Agente";
@@ -13,8 +13,8 @@ import Performance from "@/components/telas/Performance";
 // está entregando, e o que exatamente foi vendido.
 // Performance individual e leitura de diretoria: mostra nome, carteira e
 // comissao de todo mundo. Quem vende ve a propria versao disso em Meu painel.
-function Tela({ admin }: { admin: boolean }) {
-  const ABAS: Aba[] = telasDe("comercial", admin);
+function Tela({ admin, papel }: { admin: boolean; papel: Papel }) {
+  const ABAS: Aba[] = telasDe("comercial", papel);
   const { aba, escolher } = useAba(ABAS);
   return (
     <>
@@ -30,5 +30,5 @@ function Tela({ admin }: { admin: boolean }) {
 }
 
 export default function Page() {
-  return <Shell>{({ admin }) => <Tela admin={admin} />}</Shell>;
+  return <Shell>{({ admin, papel }) => <Tela admin={admin} papel={papel} />}</Shell>;
 }

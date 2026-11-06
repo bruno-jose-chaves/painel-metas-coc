@@ -7,22 +7,22 @@ import Insights from "@/components/Insights";
 import { TarjaFontes } from "@/components/Fontes";
 import Indice from "@/components/Indice";
 import Busca from "@/components/Busca";
-import { AREAS } from "@/lib/telas";
+import { areasDe, type Papel } from "@/lib/telas";
 
 // Cinco áreas, no caminho que a pergunta faz: como estamos hoje, como vai a
 // campanha, quem está vendendo, de onde vem o lead, e o que é ajuste de
 // sistema. A lista mora em lib/telas.ts, que é também o que a busca lê, para
 // não existirem dois mapas do painel que podem discordar.
-const MENU = AREAS.map((a) => ({ href: a.href, nome: a.nome, oque: a.oque, soAdmin: a.soAdmin }));
 
 type Estado = "carregando" | "sem_sessao" | "nao_autorizado" | "ok";
 
-export default function Shell({ children }: { children: (ctx: { admin: boolean; session: Session }) => React.ReactNode }) {
+export default function Shell({ children }: { children: (ctx: { admin: boolean; papel: Papel; session: Session }) => React.ReactNode }) {
   const router = useRouter();
   const path = usePathname();
   const [estado, setEstado] = useState<Estado>("carregando");
   const [session, setSession] = useState<Session | null>(null);
   const [admin, setAdmin] = useState(false);
+  const [papel, setPapel] = useState<Papel>("leitor");
   const [menu, setMenu] = useState(false);
   // Quantas vezes a sessão voltou vazia em sequência. Tropeço de renovação de
   // token acontece, principalmente quando o computador dorme, e jogar a pessoa
@@ -53,12 +53,16 @@ export default function Shell({ children }: { children: (ctx: { admin: boolean; 
       }
       vazias.current = 0;
       setSession(s);
-      const [{ data: aut }, { data: adm }] = await Promise.all([
+      const [{ data: aut }, { data: adm }, { data: pap }] = await Promise.all([
         supabase.rpc("is_autorizado"),
         supabase.rpc("is_admin"),
+        supabase.rpc("meu_papel"),
       ]);
       if (!vivo) return;
       setAdmin(!!adm);
+      // Papel desconhecido cai em leitor, que é o menos permissivo.
+      setPapel((["admin", "comercial", "marketing", "leitor"] as Papel[]).includes(pap as Papel)
+        ? (pap as Papel) : "leitor");
       setEstado(aut ? "ok" : "nao_autorizado");
     }
 
@@ -114,7 +118,7 @@ export default function Shell({ children }: { children: (ctx: { admin: boolean; 
           {menu ? "×" : "≡"}
         </button>
         <nav className={"nav" + (menu ? " aberto" : "")}>
-          {MENU.filter((m) => admin || !m.soAdmin).map((m) => (
+          {areasDe(papel).map((m) => (
             <a key={m.href} href={m.href} className={ativo(m.href) ? "ativo" : ""} title={m.oque}>
               {m.nome}
               <small>{m.oque}</small>
@@ -123,14 +127,14 @@ export default function Shell({ children }: { children: (ctx: { admin: boolean; 
         </nav>
         {/* Era um "?" e ninguém entendia o que havia atrás. Agora diz o que é.
             Fica ao lado da estrela: um é o que fazer hoje, o outro é onde olhar. */}
-        <Busca admin={admin} />
+        <Busca papel={papel} />
         <a className="como-usar" href="/guia/" title="Por onde começar no painel">Como usar</a>
         <Insights />
         <button className="sair" onClick={sair}>Sair</button>
       </div></header>
       <TarjaFontes />
       <Indice />
-      <main>{children({ admin, session: session! })}</main>
+      <main>{children({ admin, papel, session: session! })}</main>
     </>
   );
 }

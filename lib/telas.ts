@@ -24,6 +24,9 @@ export type Tela = {
   // às vezes é uma aba só: Operação do dia é leitura de diretoria e fica fora
   // da navegação de quem vende.
   soAdmin?: boolean;
+  // Quem enxerga esta aba. Vazio quer dizer "todo mundo autorizado".
+  // soAdmin continua valendo e é o mesmo que papeis: ["admin"].
+  papeis?: Papel[];
   // Tela de dois modos: o segundo tem os seus próprios quadros, e eles
   // continuam a numeração do primeiro. O modo vai no endereço (&m=), então a
   // busca leva direto ao quadro certo e o link mandado para alguém abre no
@@ -38,8 +41,29 @@ export type Area = {
   href: string;
   oque: string;
   soAdmin?: boolean;
+  papeis?: Papel[];
   telas: Tela[];
 };
+
+// Quatro papéis. A trava de dado mora no banco, função por função: esta lista
+// decide só o que aparece no menu e na busca, para ninguém abrir uma aba que
+// vai responder vazio.
+export type Papel = "admin" | "comercial" | "marketing" | "leitor";
+
+const papelDe = (quem: Papel | boolean): Papel =>
+  typeof quem === "boolean" ? (quem ? "admin" : "leitor") : quem;
+
+export const vePapel = (x: { soAdmin?: boolean; papeis?: Papel[] }, quem: Papel | boolean) => {
+  const papel = papelDe(quem);
+  if (papel === "admin") return true;
+  if (x.soAdmin) return false;
+  return !x.papeis || x.papeis.includes(papel);
+};
+
+export const areasDe = (quem: Papel | boolean) =>
+  // Área sem nenhuma aba visível não aparece no menu: clicar nela abriria uma
+  // página de abas vazias. É o caso de Comercial para quem só observa.
+  AREAS.filter((a) => vePapel(a, quem) && a.telas.some((t) => vePapel(t, quem)));
 
 export const AREAS: Area[] = [
   {
@@ -51,7 +75,7 @@ export const AREAS: Area[] = [
         termos: ["meta", "faturamento", "matrículas", "ritmo", "projeção", "fatia de mercado",
                  "ticket", "ticket médio", "mês", "período", "semana"],
         blocos: ["Campanhas", "Acompanhando", "Metas de captação", "Ritmo diário de matrículas"] },
-      { id: "meu", codigo: 130, nome: "Meu painel",
+      { id: "meu", codigo: 130, nome: "Meu painel", papeis: ["comercial"],
         oque: "O que é seu: matrículas do dia, como você está contra a média do time e o que está parado na sua mão.",
         termos: ["meu painel", "minha visão", "meus números", "minhas matrículas", "minha fila",
                  "meu ticket", "minha conversão", "quanto eu vendi", "o que está comigo",
@@ -65,7 +89,7 @@ export const AREAS: Area[] = [
     ],
   },
   {
-    id: "campanha", codigo: 200, nome: "Campanha", href: "/campanha/",
+    id: "campanha", codigo: 200, nome: "Campanha", papeis: ["marketing", "leitor"], href: "/campanha/",
     oque: "Uma campanha por dentro: fases, funil, origem, histórico e upsell",
     telas: [
       { id: "atual", codigo: 210, nome: "Campanha em curso",
@@ -90,7 +114,7 @@ export const AREAS: Area[] = [
     id: "comercial", codigo: 300, nome: "Comercial", href: "/comercial/",
     oque: "Quem vende, o que foi vendido e o que está parado na mão de quem",
     telas: [
-      { id: "time", codigo: 310, nome: "Time",
+      { id: "time", codigo: 310, nome: "Time", soAdmin: true,
         oque: "Quanto cada vendedor recebeu de lead, quanto fechou, quanto perdeu e quanto está pendurado, com o tempo que cada etapa está segurando negociação.",
         // "comissão" e "bônus" ficaram de fora de propósito: o painel ainda não
         // calcula nenhum dos dois, e apelido que leva a uma tela que não tem a
@@ -102,21 +126,21 @@ export const AREAS: Area[] = [
                  "campanha que fechou", "fonte da venda", "ciclo de venda"],
         blocos: ["Vendas dia a dia", "Ranking de vendas", "Negócios em aberto e tempo parado",
                  "Motivos de perda", "De onde veio quem fechou"] },
-      { id: "lancamentos", codigo: 320, nome: "Lançamentos",
+      { id: "lancamentos", codigo: 320, nome: "Lançamentos", papeis: ["comercial"],
         oque: "A matrícula como ela foi lançada (aluno, curso, valor de tabela, desconto e vendedor), e o que saiu estranho e vale conferir.",
         termos: ["desconto", "desconto médio", "valor de tabela", "aluno", "matrícula", "cancelado",
                  "conferir", "estranho", "erro na planilha", "cidade", "turma"],
         blocos: ["Lançamentos"],
         modo2: { id: "conferir", nome: "A conferir", blocos: ["Lista de conferência"] } },
-      { id: "agente", codigo: 330, nome: "Agente de Pré-vendas",
+      { id: "agente", codigo: 330, nome: "Agente de Pré-vendas", papeis: ["marketing"],
         oque: "A qualidade do agente: de tudo que ele abriu, quanto respondeu, quanto virou conversa e quanto chegou no comercial.",
         termos: ["agente", "pré-vendas", "apv", "sdr", "disparo", "aquecimento"],
         blocos: ["A qualidade do agente", "Dia a dia", "Cada dia por inteiro", "O mesmo agente, pelo funil do CRM"] },
-      { id: "qualidade", codigo: 340, nome: "Qualidade do lead",
+      { id: "qualidade", codigo: 340, nome: "Qualidade do lead", papeis: ["marketing"],
         oque: "Quem procurou a gente e quem foi procurado, quanto respondeu, quanto esperou pelo atendimento e quanto virou matrícula, por canal.",
         termos: ["tempo de resposta", "espera", "respondeu", "nunca respondeu", "canal", "whatsapp", "primeiro atendimento"],
         blocos: ["Procurou contra foi procurado", "Cada canal por inteiro", "Quanto o cliente espera, por dia da semana"] },
-      { id: "atendimento", codigo: 350, nome: "O que está escapando",
+      { id: "atendimento", codigo: 350, nome: "O que está escapando", papeis: ["comercial", "marketing"],
         oque: "A fila do que some sem ninguém ver, com nome, dono e o que fazer, e o diagnóstico de conversa que não virou card no CRM.",
         termos: ["fila", "pagamento pendente", "sem card", "negociação parada", "crm", "parado", "escapando"],
         blocos: ["O tamanho de cada buraco", "A fila"],
@@ -137,7 +161,7 @@ export const AREAS: Area[] = [
     ],
   },
   {
-    id: "marketing", codigo: 400, nome: "Marketing", href: "/marketing/",
+    id: "marketing", codigo: 400, nome: "Marketing", papeis: ["marketing", "leitor"], href: "/marketing/",
     oque: "De onde vem o lead e se ele chegou inteiro no comercial",
     telas: [
       { id: "captacao", codigo: 410, nome: "Captação",
@@ -182,8 +206,8 @@ export const AREAS: Area[] = [
   },
 ];
 
-export const telasDe = (areaId: string, admin = true) =>
-  (AREAS.find((a) => a.id === areaId)?.telas ?? []).filter((t) => admin || !t.soAdmin);
+export const telasDe = (areaId: string, quem: Papel | boolean = true) =>
+  (AREAS.find((a) => a.id === areaId)?.telas ?? []).filter((t) => vePapel(t, quem));
 
 export const linkDa = (area: Area, tela: Tela) =>
   tela.id === area.telas[0].id ? area.href : `${area.href}?v=${tela.id}`;
@@ -264,16 +288,16 @@ export type Achado = {
   bloco?: { nome: string; codigo: number; ancora: string };
 };
 
-export function procurar(texto: string, admin: boolean): Achado[] {
+export function procurar(texto: string, quem: Papel | boolean): Achado[] {
   const q = limpar(texto);
   const telas: Achado[] = AREAS
-    .filter((a) => admin || !a.soAdmin)
-    .flatMap((area) => area.telas.filter((t) => admin || !t.soAdmin)
+    .filter((a) => vePapel(a, quem))
+    .flatMap((area) => area.telas.filter((t) => vePapel(t, quem))
       .map((tela) => ({ area, tela, link: linkDa(area, tela) })));
 
   const blocos: Achado[] = AREAS
-    .filter((a) => admin || !a.soAdmin)
-    .flatMap((area) => area.telas.filter((t) => admin || !t.soAdmin).flatMap((tela) => {
+    .filter((a) => vePapel(a, quem))
+    .flatMap((area) => area.telas.filter((t) => vePapel(t, quem)).flatMap((tela) => {
       const base = linkDa(area, tela);
       const primeiros = (tela.blocos ?? []).map((nome, i) => ({
         area, tela,
