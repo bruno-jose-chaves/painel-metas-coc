@@ -126,3 +126,38 @@ end $corpo$;
 -- decimo. Com cache quente a diferenca e pequena porque as tabelas sao pequenas
 -- e cabem na memoria; o problema nunca foi o tamanho do dado, foi a varredura
 -- completa que o filtro forcava a cada aba aberta.
+
+-- ---------------------------------------------------------------------------
+-- Limpeza das funcoes de teste
+--
+-- Durante as auditorias de desempenho foram criadas trinta e oito copias de
+-- funcoes com o nome prefixado por _t_, _t2_ ou _m_, com a guarda de permissao
+-- trocada por true, para medir tempo sem depender de sessao logada. Mais oito
+-- tabelas _antes_ e _depois_ usadas para conferir resultado antes e depois de
+-- cada mudanca.
+--
+-- Nenhuma foi apagada. Todas foram movidas para o schema rascunho, que nao esta
+-- na lista de schemas que o PostgREST expoe. Com isso saem da API e saem do
+-- public, mas continuam disponiveis para medir a proxima vez, o que e o unico
+-- jeito de cronometrar uma funcao guardada por is_admin sem estar logado.
+-- Apagar de verdade segue possivel e e so pedir.
+create schema if not exists rascunho;
+revoke all on schema rascunho from public, anon, authenticated;
+do $$
+declare r record;
+begin
+  for r in select p.proname, pg_get_function_identity_arguments(p.oid) args
+    from pg_proc p join pg_namespace ns on ns.oid = p.pronamespace
+    where ns.nspname = 'public'
+      and (p.proname like '\_t\_%' or p.proname like '\_t2\_%' or p.proname like '\_m\_%')
+  loop
+    execute format('alter function public.%I(%s) set schema rascunho', r.proname, r.args);
+  end loop;
+  for r in select c.relname from pg_class c join pg_namespace ns on ns.oid = c.relnamespace
+    where ns.nspname = 'public' and c.relkind = 'r'
+      and (c.relname like '\_antes\_%' or c.relname like '\_depois\_%')
+  loop
+    execute format('alter table public.%I set schema rascunho', r.relname);
+  end loop;
+end $$;
+notify pgrst, 'reload schema';
