@@ -1,0 +1,21 @@
+-- Update 66 — Lançamentos deixa de exigir campanha
+--
+-- Nada de banco. O conserto é de tela, mas o diagnóstico vale registro.
+--
+-- A aba Lançamentos filtrava por campanha e começava com a última selecionada.
+-- Como a consulta era ".eq(campanha_id, campanha)", venda sem campanha nunca
+-- aparecia ali. E campanha só existe para o que foi cadastrado à mão: hoje
+-- existem duas, as duas de 2026 e as duas já encerradas.
+--
+-- O tamanho do buraco:
+--   554 das 951 matrículas de 2026 estavam invisíveis em Lançamentos
+--   as 4 matrículas do Extensivo 2027 também
+--
+-- O filtro passou a ser por TURMA, que toda venda tem desde o update 63, com
+-- "Todas as matrículas" no topo e "Sem turma resolvida" no fim, que é onde
+-- aparece curso escrito de um jeito que o painel ainda não conhece.
+--
+-- O que NÃO é problema de painel: as vendas de 2027 estão todas certas no
+-- banco. Quatro matrículas do Extensivo 2027, de 13/10 a 09/11, R$ 59.248,10,
+-- com produto e turma resolvidos. O que falta é campanha de 2027 cadastrada,
+-- e isso é cadastro, não código.

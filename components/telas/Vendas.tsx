@@ -12,14 +12,18 @@ type Venda = {
   desconto_pct: number | null; valor_venda: number | null; cidade: string | null; estado: string | null;
   campanha_id: string | null;
 };
-type Campanha = { id: string; nome: string };
+// O filtro era por campanha, e venda sem campanha simplesmente não existia
+// nesta tela: 554 das 951 matrículas de 2026 e as 4 de 2027 ficavam invisíveis,
+// porque só duas campanhas estão cadastradas. Turma toda venda tem, então é por
+// ela que se filtra agora. Campanha continua existindo nas telas de campanha.
+type Turma = { id: string; nome: string; ano: number; produto: string };
 
 const PAGINA = 100;
 
 export default function Vendas({ embutido }: { embutido?: boolean } = {}) {
   const { volta, em, minutos } = useAtualizacao();
-  const [campanhas, setCampanhas] = useState<Campanha[]>([]);
-  const [campanha, setCampanha] = useState("");
+  const [turmas, setTurmas] = useState<Turma[]>([]);
+  const [turma, setTurma] = useState("");
   const [vendedor, setVendedor] = useState("");
   const [status, setStatus] = useState("");
   const [busca, setBusca] = useState("");
@@ -28,22 +32,20 @@ export default function Vendas({ embutido }: { embutido?: boolean } = {}) {
   const [pagina, setPagina] = useState(0);
 
   useEffect(() => {
-    supabase.from("campanhas").select("id,nome").order("inicio").then(({ data }) => {
-      const lista = (data as Campanha[]) ?? [];
-      setCampanhas(lista);
-      if (lista.length) setCampanha(lista[lista.length - 1].id);
+    supabase.rpc("painel_turmas", { p_so_com_venda: true }).then(({ data }) => {
+      setTurmas((data as Turma[]) ?? []);
     });
   }, [volta]);
 
-  useEffect(() => { setPagina(0); }, [campanha, vendedor, status, busca, volta]);
+  useEffect(() => { setPagina(0); }, [turma, vendedor, status, busca, volta]);
 
   useEffect(() => {
-    if (!campanha) return;
     let q = supabase
       .from("vendas")
       .select("chave,numero,data,vendedor,status,nome,curso,material,valor_tabela,desconto_pct,valor_venda,cidade,estado,campanha_id",
-        { count: "exact" })
-      .eq("campanha_id", campanha);
+        { count: "exact" });
+    if (turma === "(sem turma)") q = q.is("turma_id", null);
+    else if (turma) q = q.eq("turma_id", turma);
     if (vendedor === "(automatica)") q = q.is("vendedor", null);
     else if (vendedor) q = q.eq("vendedor", vendedor);
     if (status === "ativos") q = q.not("status", "ilike", "cancel%");
@@ -53,14 +55,15 @@ export default function Vendas({ embutido }: { embutido?: boolean } = {}) {
     q.order("data", { ascending: false }).order("numero", { ascending: false })
       .range(pagina * PAGINA, pagina * PAGINA + PAGINA - 1)
       .then(({ data, count }) => { setLinhas((data as Venda[]) ?? []); setTotal(count ?? 0); });
-  }, [campanha, vendedor, status, busca, pagina, volta]);
+  }, [turma, vendedor, status, busca, pagina, volta]);
 
   // Totais da seleção inteira, não só da página visível.
   const [resumo, setResumo] = useState<{ alunos: number; faturamento: number; tabela: number } | null>(null);
   useEffect(() => {
-    if (!campanha) return;
     setResumo(null);
-    let q = supabase.from("vendas").select("valor_venda,valor_tabela,status,vendedor,nome").eq("campanha_id", campanha);
+    let q = supabase.from("vendas").select("valor_venda,valor_tabela,status,vendedor,nome");
+    if (turma === "(sem turma)") q = q.is("turma_id", null);
+    else if (turma) q = q.eq("turma_id", turma);
     if (vendedor === "(automatica)") q = q.is("vendedor", null);
     else if (vendedor) q = q.eq("vendedor", vendedor);
     if (busca.trim()) q = q.ilike("nome", `%${busca.trim()}%`);
@@ -80,7 +83,7 @@ export default function Vendas({ embutido }: { embutido?: boolean } = {}) {
         tabela: sel.reduce((s, v) => s + Number(v.valor_tabela ?? 0), 0),
       });
     });
-  }, [campanha, vendedor, status, busca, volta]);
+  }, [turma, vendedor, status, busca, volta]);
 
   const vendedores = useMemo(() => {
     const s = new Set((linhas ?? []).map((l) => l.vendedor).filter(Boolean) as string[]);
@@ -108,9 +111,19 @@ export default function Vendas({ embutido }: { embutido?: boolean } = {}) {
 
       <div className="filtros">
         <label>
-          <span className="rotulo">Campanha</span>
-          <select value={campanha} onChange={(e) => setCampanha(e.target.value)}>
-            {campanhas.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
+          <span className="rotulo">Curso e turma</span>
+          <select value={turma} onChange={(e) => setTurma(e.target.value)}>
+            <option value="">Todas as matrículas</option>
+            {/* Agrupado por ano, do mais novo para o mais velho, porque é
+                assim que a pergunta nasce: "o que já vendeu de 2027". */}
+            {[...new Set(turmas.map((t) => t.ano))].sort((a, b) => b - a).map((ano) => (
+              <optgroup key={ano} label={String(ano)}>
+                {turmas.filter((t) => t.ano === ano).map((t) => (
+                  <option key={t.id} value={t.id}>{t.nome}</option>
+                ))}
+              </optgroup>
+            ))}
+            <option value="(sem turma)">Sem turma resolvida</option>
           </select>
         </label>
         <label>
@@ -155,7 +168,8 @@ export default function Vendas({ embutido }: { embutido?: boolean } = {}) {
       <h2><span className="idx" /> Lançamentos</h2>
       <p className="nota">
         A planilha comercial como o painel a leu, linha por linha. Serve para conferir uma venda
-        específica: se o número da tela parecer errado, é aqui que se vê o que entrou de fato.
+        específica: se o número da tela parecer errado, é aqui que se vê o que entrou de fato. O filtro
+        de cima é por <b>turma</b>, não por campanha, porque toda venda tem turma e nem toda tem campanha.
         <Ajuda titulo="O que cada coluna é"
           fontes={["Tudo nesta tabela vem da planilha comercial, aba Vendas do ano",
                    "Produto: o curso da planilha, apontado para produto em Ajustes, Cursos",
@@ -166,6 +180,8 @@ export default function Vendas({ embutido }: { embutido?: boolean } = {}) {
           propósito, porque não houve ninguém para creditar. <b>Valor</b> é o valor cheio da matrícula no
           dia em que foi lançada, não a parcela paga.
           Matrícula com condição cancelada aparece na lista e fica fora de toda contagem do painel.
+          <b> Sem turma resolvida</b> é a venda cujo curso não casou com nenhuma janela de turma: é
+          onde aparece curso escrito de um jeito que o painel ainda não conhece.
           E-mail, telefone e responsável financeiro ficam fora desta tela de propósito: quem precisa desse
           dado usa a planilha ou o CRM.
         </Ajuda>
