@@ -8,10 +8,12 @@ import Ajuda from "@/components/Ajuda";
 import Fechamento from "@/components/Fechamento";
 import { supabase } from "@/lib/supabase";
 import { useUltima } from "@/lib/consulta";
+import { buscarCampanhas } from "@/lib/campanhas";
 import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta } from "@/lib/formato";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
+import Esqueleto from "@/components/Esqueleto";
 
 type Linha = {
   responsavel: string; recebidas: number; ganhas: number; perdidas: number; abertas: number;
@@ -58,8 +60,7 @@ export default function Time() {
   >(null);
 
   useEffect(() => {
-    supabase.from("resumo_campanhas").select("id,nome,inicio,fim,produto_id").order("inicio")
-      .then(({ data }) => setCampanhas((data as Campanha[]) ?? []));
+    buscarCampanhas<Campanha>().then(setCampanhas);
   }, [volta]);
 
   const produto = campanhas.find((c) => c.id === campanha)?.produto_id ?? null;
@@ -155,7 +156,7 @@ export default function Time() {
           Clique em um ponto para ver as matrículas daquele dia.
         </Ajuda>
       </p>
-      {!diasVenda ? <p className="rotulo">Carregando</p> : diasVenda.length === 0 ? (
+      {!diasVenda ? <Esqueleto tipo="grafico" /> : diasVenda.length === 0 ? (
         <p className="mudo">Sem venda no período.</p>
       ) : (
         <>
@@ -246,7 +247,7 @@ export default function Time() {
           menor aqui do que no cartão dela.
         </Ajuda>
       </p>
-      {!time ? <p className="rotulo">Carregando</p> : time.length === 0 ? (
+      {!time ? <Esqueleto /> : time.length === 0 ? (
         <p className="mudo">Nenhuma atividade comercial no período.</p>
       ) : (
         <div className="rolar">
@@ -314,7 +315,7 @@ export default function Time() {
           <b> média</b> é puxada por esses casos extremos, então olhe a distribuição antes dela.
         </Ajuda>
       </p>
-      {!parados ? <p className="rotulo">Carregando</p> : parados.length === 0 ? (
+      {!parados ? <Esqueleto /> : parados.length === 0 ? (
         <p className="mudo">Nenhum negócio em aberto no período.</p>
       ) : (
         <>
@@ -378,7 +379,7 @@ export default function Time() {
           prestar vestibular. São poucos e valem um por um.
         </Ajuda>
       </p>
-      {!motivos ? <p className="rotulo">Carregando</p> : motivos.length === 0 ? (
+      {!motivos ? <Esqueleto /> : motivos.length === 0 ? (
         <p className="mudo">Nenhuma perda registrada no período.</p>
       ) : (
         <>

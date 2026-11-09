@@ -5,6 +5,7 @@ import Ajuda from "@/components/Ajuda";
 import Chave from "@/components/Chave";
 import { num, dataCurta } from "@/lib/formato";
 import { inicioDoAno } from "@/lib/periodo";
+import Esqueleto from "@/components/Esqueleto";
 
 // As etiquetas que o time coloca no Pigeon não são enfeite: são elas que o
 // painel usa para saber de quem é o contato e que curso a pessoa quer. A
@@ -96,7 +97,7 @@ export default function EtiquetasPigeon({ admin }: { admin?: boolean }) {
         </div>
       </div>
       {aviso && <div className="aviso ok">{aviso}</div>}
-      {!lista ? <p className="rotulo">Carregando</p> : mostrar.length === 0 ? (
+      {!lista ? <Esqueleto /> : mostrar.length === 0 ? (
         <p className="mudo">Nenhuma etiqueta registrada no período.</p>
       ) : (
         <div className="rolar">

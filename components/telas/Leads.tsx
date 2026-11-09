@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 import FiltroCampanha, { type Campanha } from "@/components/FiltroCampanha";
 import Curva from "@/components/Curva";
 import { supabase } from "@/lib/supabase";
+import { buscarCampanhas } from "@/lib/campanhas";
 import { useUltima } from "@/lib/consulta";
 import Ajuda from "@/components/Ajuda";
 import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, pct, dataCurta } from "@/lib/formato";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
+import Esqueleto from "@/components/Esqueleto";
 
 type Dia = { dia: string; conversoes: number; conversoes_lp: number; visitas: number };
 type Origem = { identificador: string; tipo: string; conversoes: number; visitas: number; taxa: number | null };
@@ -29,8 +31,7 @@ export default function Leads() {
   const [tags, setTags] = useState<Tag[] | null>(null);
 
   useEffect(() => {
-    supabase.from("resumo_campanhas").select("id,nome,inicio,fim,produto_id").order("inicio")
-      .then(({ data }) => setCampanhas((data as Campanha[]) ?? []));
+    buscarCampanhas<Campanha>().then(setCampanhas);
   }, [volta]);
 
   const produto = campanhas.find((c) => c.id === campanha)?.produto_id ?? null;
@@ -104,7 +105,7 @@ export default function Leads() {
           confiável, e a tabela abaixo é o lugar certo para olhar isso.
         </Ajuda>
       </p>
-      {!dias ? <p className="rotulo">Carregando</p> : dias.length === 0 ? (
+      {!dias ? <Esqueleto /> : dias.length === 0 ? (
         <p className="mudo">Sem conversões registradas no período.</p>
       ) : (
         <Curva
@@ -129,7 +130,7 @@ export default function Leads() {
           <b> A classificar</b>, e enquanto não for apontada ela não entra em meta de captação nenhuma.
         </Ajuda>
       </p>
-      {!origens ? <p className="rotulo">Carregando</p> : origens.length === 0 ? (
+      {!origens ? <Esqueleto /> : origens.length === 0 ? (
         <p className="mudo">Sem conversões por página no período.</p>
       ) : (
         <div className="rolar">
@@ -169,7 +170,7 @@ export default function Leads() {
           existe tag guardada, então comparar com período anterior a isso não faz sentido.
         </Ajuda>
       </p>
-      {!tags ? <p className="rotulo">Carregando</p> : tags.length === 0 ? (
+      {!tags ? <Esqueleto /> : tags.length === 0 ? (
         <p className="mudo">
           Ainda sem tags no período. O webhook de conversão foi ligado em 02/10/2026, então só há tag a partir dessa data.
         </p>
@@ -209,7 +210,7 @@ export default function Leads() {
           dias depois e às vezes sem formulário nenhum no meio, então as duas bases não precisam bater.
         </Ajuda>
       </p>
-      {!fontes ? <p className="rotulo">Carregando</p> : fontes.length === 0 ? (
+      {!fontes ? <Esqueleto /> : fontes.length === 0 ? (
         <p className="mudo">Nenhum negócio criado no período.</p>
       ) : (
         <div className="rolar">

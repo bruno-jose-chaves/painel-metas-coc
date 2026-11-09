@@ -10,6 +10,7 @@ import { ultimosDias, type Periodo } from "@/lib/periodo";
 import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, pct, dataCurta } from "@/lib/formato";
+import Esqueleto from "@/components/Esqueleto";
 
 // Agente de Pré-vendas, pelo lado da conversa.
 //
@@ -113,7 +114,7 @@ export default function Agente() {
         </p>
       )}
 
-      {!dias ? <p className="rotulo">Carregando</p> : (
+      {!dias ? <Esqueleto /> : (
         <>
           <h2><span className="idx" /> A qualidade do agente</h2>
           <p className="nota">
@@ -246,7 +247,7 @@ export default function Agente() {
               sinal de passagem perdida, não de erro de conta.
             </Ajuda>
           </p>
-          {!crm ? <p className="rotulo">Carregando</p> : (
+          {!crm ? <Esqueleto tipo="faixa" /> : (
             <div className="faixa">
               <div>
                 <div className="rotulo">Leads captados</div>

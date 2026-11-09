@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useUltima } from "@/lib/consulta";
+import { buscarCampanhas, buscarUltimaSync } from "@/lib/campanhas";
 import Ajuda from "@/components/Ajuda";
 import Acompanhando from "@/components/Acompanhando";
 import { useIndicadores } from "@/lib/indicadores";
@@ -9,6 +10,7 @@ import Detalhe, { type Recorte } from "@/components/Detalhe";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta, dataHora } from "@/lib/formato";
 import { hojeSP, somaDias } from "@/lib/periodo";
+import Esqueleto from "@/components/Esqueleto";
 
 type Resumo = {
   id: string; nome: string; inicio: string; fim: string; meta_ativa: number;
@@ -106,8 +108,7 @@ export default function Visao() {
   const [metasProntas, setMetasProntas] = useState(false);
 
   useEffect(() => {
-    supabase.from("resumo_campanhas").select("*").order("inicio").then(({ data }) => {
-      const lista = (data as Resumo[]) ?? [];
+    buscarCampanhas<Resumo>().then((lista) => {
       setDados(lista);
       // Uma consulta para todas as campanhas, em vez de duas por campanha
       // dentro do laço. Era a consulta mais cara do painel: 1.429 chamadas de
@@ -127,8 +128,7 @@ export default function Visao() {
       });
     });
     supabase.rpc("painel_ritmo").then(({ data }) => setRitmo((data as Ritmo[]) ?? []));
-    supabase.from("sincronizacoes").select("terminado_em").eq("status", "ok").like("fonte", "planilha:%")
-      .order("terminado_em", { ascending: false }).limit(1).then(({ data }) => setSync(data?.[0]?.terminado_em ?? null));
+    buscarUltimaSync().then(setSync);
   }, [volta]);
 
   useEffect(() => {
@@ -143,7 +143,17 @@ export default function Visao() {
   const ritmoFiltrado = (ritmo ?? []).filter((r) =>
     (dados ?? []).some((c) => c.id === r.campanha_id && naFaixa(c, faixa)));
 
-  if (!dados) return <p className="rotulo">Carregando</p>;
+  // A moldura da tela aparece na hora: rótulo, título e a forma da faixa de
+  // números. Só o conteúdo é que é esqueleto. Devolver um bloco só no lugar da
+  // página inteira fazia a tela piscar de vazio para cheia.
+  if (!dados) return (
+    <>
+      <div className="rotulo">Visão geral</div>
+      <h1>Como estamos</h1>
+      <Esqueleto tipo="faixa" />
+      <Esqueleto tipo="cartoes" />
+    </>
+  );
 
   return (
     <>
@@ -345,7 +355,7 @@ export default function Visao() {
         </Ajuda>
       </p>
       {!metasProntas ? (
-        <p className="rotulo">Carregando</p>
+        <Esqueleto tipo="cartoes" />
       ) : dados.filter((c) => naFaixa(c, faixa) && metasLeads[c.id]?.length).length === 0 ? (
         <p className="mudo">
           {Object.keys(metasLeads).length === 0
@@ -454,7 +464,7 @@ export default function Visao() {
           necessário parecer menor do que é.
         </Ajuda>
       </p>
-      {!ritmo ? <p className="rotulo">Carregando</p> : ritmoFiltrado.length === 0 ? (
+      {!ritmo ? <Esqueleto /> : ritmoFiltrado.length === 0 ? (
         <p className="mudo">
           {ritmo.length === 0
             ? "Nenhuma campanha ativa."

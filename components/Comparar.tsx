@@ -8,6 +8,7 @@ import Detalhe, { type Recorte } from "@/components/Detalhe";
 import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta } from "@/lib/formato";
+import Esqueleto from "@/components/Esqueleto";
 
 // Turma contra turma.
 //
@@ -150,7 +151,7 @@ export default function Comparar() {
         </Ajuda>
       </p>
 
-      {!turmas ? <p className="rotulo">Carregando</p> : (
+      {!turmas ? <Esqueleto /> : (
         <div className="escolha-par">
           <label>
             <span className="rotulo">Esta turma</span>

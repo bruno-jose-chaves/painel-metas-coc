@@ -5,6 +5,7 @@ import Ajuda from "@/components/Ajuda";
 import FechamentoLista from "@/components/FechamentoLista";
 import { useUltima } from "@/lib/consulta";
 import { brl, num, pct } from "@/lib/formato";
+import Esqueleto from "@/components/Esqueleto";
 
 // De onde veio quem fechou.
 //
@@ -104,7 +105,7 @@ export default function Fechamento({
         </Ajuda>
       </p>
 
-      {!linhas ? <p className="rotulo">Carregando</p> : linhas.length === 0 ? (
+      {!linhas ? <Esqueleto /> : linhas.length === 0 ? (
         <p className="mudo">Nenhuma matrícula no período.</p>
       ) : (
         <>

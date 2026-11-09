@@ -6,6 +6,7 @@ import Chave from "@/components/Chave";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, dataCurta } from "@/lib/formato";
 import { inicioDoAno } from "@/lib/periodo";
+import Esqueleto from "@/components/Esqueleto";
 
 type Pendente = {
   etiqueta: string; pessoas: number; conversoes: number;
@@ -102,7 +103,7 @@ export default function Etiquetas({ admin, embutido }: { admin: boolean; embutid
         </div>
       </div>
 
-      {!lista ? <p className="rotulo">Carregando</p> : lista.length === 0 ? (
+      {!lista ? <Esqueleto /> : lista.length === 0 ? (
         <p className="mudo">Nenhuma etiqueta pendente. Tudo apontado.</p>
       ) : (
         <div className="rolar">
@@ -164,7 +165,7 @@ export default function Etiquetas({ admin, embutido }: { admin: boolean; embutid
           relatório fechado, mas muda a leitura daqui para frente.
         </Ajuda>
       </p>
-      {!regras ? <p className="rotulo">Carregando</p> : regras.length === 0 ? (
+      {!regras ? <Esqueleto /> : regras.length === 0 ? (
         <p className="mudo">Nenhuma regra de etiqueta cadastrada.</p>
       ) : (
         <div className="rolar">

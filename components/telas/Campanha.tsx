@@ -3,12 +3,14 @@ import { useEffect, useMemo, useState } from "react";
 import Curva from "@/components/Curva";
 import Detalhe, { type Recorte } from "@/components/Detalhe";
 import { supabase } from "@/lib/supabase";
+import { buscarCampanhas } from "@/lib/campanhas";
 import { useUltima } from "@/lib/consulta";
 import Ajuda from "@/components/Ajuda";
 import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta } from "@/lib/formato";
 import { hojeSP } from "@/lib/periodo";
+import Esqueleto from "@/components/Esqueleto";
 
 type Resumo = {
   id: string; nome: string; inicio: string; fim: string; meta_ativa: number;
@@ -85,8 +87,7 @@ export default function Campanha() {
   const [origemUpsell, setOrigemUpsell] = useState<UpsellOrigem[] | null>(null);
 
   useEffect(() => {
-    supabase.from("resumo_campanhas").select("*").order("inicio").then(({ data }) => {
-      const lista = (data as Resumo[]) ?? [];
+    buscarCampanhas<Resumo>().then((lista) => {
       setCampanhas(lista);
       if (lista.length) setId(lista[0].id);
     });
@@ -126,7 +127,7 @@ export default function Campanha() {
     };
   }, [pontos, volta]);
 
-  if (!campanhas) return <p className="rotulo">Carregando</p>;
+  if (!campanhas) return <Esqueleto />;
   if (!c) return <p className="mudo">Nenhuma campanha ativa cadastrada.</p>;
 
   const ating = c.meta_alunos ? c.alunos / c.meta_alunos : 0;
@@ -209,7 +210,7 @@ export default function Campanha() {
           porque poucos dias de dado viram muita diferença no total.
         </Ajuda>
       </p>
-      {!proj ? <p className="rotulo">Carregando</p> : proj.projecao_alunos == null ? (
+      {!proj ? <Esqueleto tipo="faixa" /> : proj.projecao_alunos == null ? (
         <p className="mudo">Sem histórico do ano anterior para projetar esta campanha.</p>
       ) : (
         <>
@@ -331,7 +332,7 @@ export default function Campanha() {
             { nome: `Mesmo dia em ${proj?.ref_ano ?? "ano anterior"}`, cor: COR.cinza, pontilhada: true, pontos: curva.anterior },
           ]}
         />
-      ) : <p className="rotulo">Carregando</p>}
+      ) : <Esqueleto tipo="grafico" />}
 
       <h2><span className="idx" /> Escada de preço por fase</h2>
       <p className="nota">
@@ -349,7 +350,7 @@ export default function Campanha() {
           matrículas da fase.
         </Ajuda>
       </p>
-      {!fases ? <p className="rotulo">Carregando</p> : (
+      {!fases ? <Esqueleto /> : (
         <div className="rolar">
           <table className="tabela">
             <thead>
@@ -436,7 +437,7 @@ export default function Campanha() {
           agora, não a mais alta.
         </Ajuda>
       </p>
-      {!cenarios ? <p className="rotulo">Carregando</p> : (
+      {!cenarios ? <Esqueleto /> : (
         <div className="rolar">
           <table className="tabela">
             <thead>
@@ -493,7 +494,7 @@ export default function Campanha() {
           de 2026, 87,7% estão sem fonte preenchida, e o campo está bugado no
           RD. A conta por fonte continua existindo no banco, para o dia em que o
           preenchimento for corrigido na origem. */}
-      {!funil ? <p className="rotulo">Carregando</p> : (
+      {!funil ? <Esqueleto /> : (
         <>
           <div className="faixa">
             <div>
@@ -519,7 +520,7 @@ export default function Campanha() {
             </div>
           </div>
 
-          {!origens ? <p className="rotulo">Carregando</p> : origens.length === 0 ? (
+          {!origens ? <Esqueleto /> : origens.length === 0 ? (
             <p className="mudo">Sem negócios no período da campanha.</p>
           ) : (
             <div className="rolar" style={{ marginTop: 16 }}>
@@ -578,7 +579,7 @@ export default function Campanha() {
           recompra com matrícula total parada é sinal de captação fraca, não de produto bom.
         </Ajuda>
       </p>
-      {!recompra ? <p className="rotulo">Carregando</p> : recompra.length === 0 ? (
+      {!recompra ? <Esqueleto /> : recompra.length === 0 ? (
         <p className="mudo">Sem matrícula nesta campanha ainda.</p>
       ) : (
         <>

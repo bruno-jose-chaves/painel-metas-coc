@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Ajuda from "@/components/Ajuda";
 import { brl, num, dataCurta } from "@/lib/formato";
+import Esqueleto from "@/components/Esqueleto";
 
 type Campanha = {
   id: string; nome: string; produto_id: string; inicio: string; fim: string;
@@ -100,7 +101,7 @@ export default function Cadastro({ admin }: { admin: boolean }) {
   const metaAtiva = metas[c.meta_ativa];
 
   if (!admin) return <p className="mudo">Somente administradores editam campanhas.</p>;
-  if (!lista) return <p className="rotulo">Carregando</p>;
+  if (!lista) return <Esqueleto />;
 
   return (
     <>
@@ -283,7 +284,7 @@ export default function Cadastro({ admin }: { admin: boolean }) {
           A janela de venda de cada turma é o que decide a qual delas uma matrícula pertence.
         </Ajuda>
       </p>
-      {!turmas ? <p className="rotulo">Carregando</p> : turmas.length === 0 ? (
+      {!turmas ? <Esqueleto /> : turmas.length === 0 ? (
         <p className="mudo">Nenhuma turma com venda registrada.</p>
       ) : (
         <div className="rolar">

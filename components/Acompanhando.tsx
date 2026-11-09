@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import Ajuda from "@/components/Ajuda";
 import Detalhe, { type Recorte } from "@/components/Detalhe";
 import { brl, num, pct, dataCurta } from "@/lib/formato";
+import Esqueleto from "@/components/Esqueleto";
 
 // O que eu quero acompanhar hoje.
 //
@@ -120,7 +121,7 @@ export default function Acompanhando({ volta }: { volta: number }) {
 
       {escolha.length === 0 ? (
         <p className="mudo">Nada escolhido ainda.</p>
-      ) : !cartoes ? <p className="rotulo">Carregando</p> : (
+      ) : !cartoes ? <Esqueleto tipo="cartoes" /> : (
         <div className="cards">
           {cartoes.map((c) => {
             const ref = c.anterior_mesmo_ponto;

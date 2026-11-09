@@ -1596,3 +1596,47 @@ main .rolar { scroll-margin-top: 112px; }
   text-transform: uppercase; letter-spacing: .06em; color: var(--cinza);
   border-top: 1px solid var(--linha);
 }
+
+/* ---------- esqueleto de carregamento ---------- */
+
+/* O lugar do dado enquanto ele não chega. Ver components/Esqueleto.tsx: a
+   forma é a informação, o brilho é só conforto. */
+.esqueleto { margin: 10px 0 18px; }
+
+.ossinho {
+  display: inline-block;
+  border-radius: 3px;
+  /* A cor de linha sozinha quase não aparece sobre o fundo creme, e esqueleto
+     que não se vê não informa nada. Esta é a mesma tinta da linha, mais densa. */
+  background: #12121116;
+  background-image: linear-gradient(90deg,
+    #12121116 0%, #1212110A 45%, #12121116 90%);
+  background-size: 280% 100%;
+  animation: ossinho-brilho 1.5s linear infinite;
+  vertical-align: middle;
+}
+
+.esqueleto-linha {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--linha);
+}
+.esqueleto-linha.cabeca { padding: 7px 0; opacity: .65; }
+.esqueleto-linha .ossinho:first-child { flex: 0 0 auto; }
+
+.esqueleto.faixa > div { display: grid; gap: 7px; align-content: start; }
+.esqueleto.cards .card { display: grid; gap: 9px; align-content: start; }
+.esqueleto .ossinho.bloco { display: block; width: 100%; height: 100%; }
+.esqueleto.grafico-vazio { height: 230px; }
+
+@keyframes ossinho-brilho {
+  from { background-position: 140% 0; }
+  to   { background-position: -140% 0; }
+}
+
+/* Quem pediu menos animação no sistema recebe o bloco parado. */
+@media (prefers-reduced-motion: reduce) {
+  .ossinho { animation: none; background-image: none; }
+}

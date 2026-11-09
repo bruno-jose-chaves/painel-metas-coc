@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { supabase } from "@/lib/supabase";
 import { brl, num, dataCurta } from "@/lib/formato";
+import Esqueleto from "@/components/Esqueleto";
 
 // A ficha de uma pessoa.
 //
@@ -74,7 +75,7 @@ export default function Pessoa({ achado, aoFechar }: { achado: Achado; aoFechar:
           </div>
         </div>
 
-        {!itens ? <p className="rotulo">Carregando</p> : itens.length === 0 ? (
+        {!itens ? <Esqueleto /> : itens.length === 0 ? (
           <p className="mudo">Nada registrado para esta pessoa.</p>
         ) : (
           <div className="rolar">

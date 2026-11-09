@@ -10,6 +10,29 @@ let INICIO = Date.now();
 const PRAZO_MS = 110_000;
 const temTempo = () => Date.now() - INICIO < PRAZO_MS;
 const dormir = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+// Toda chamada para fora tem prazo próprio.
+//
+// A função inteira tem 110 segundos, mas nenhuma chamada tinha limite: um
+// pedido ao RD que ficasse pendurado comia o prazo inteiro e a rodada não
+// terminava. Foi assim que 04/09 a 26/09 de 2026 sumiu da conversão de
+// marketing sem deixar rastro, porque o ponteiro avançava sem os dados.
+//
+// Vinte segundos é folgado para uma API que costuma responder em menos de dois,
+// e curto o bastante para a rodada seguir e tentar o resto da fila.
+const PRAZO_FETCH = 20_000;
+async function buscar(entrada: string | URL, init: RequestInit = {}, ms = PRAZO_FETCH) {
+  try {
+    return await fetch(entrada, { ...init, signal: AbortSignal.timeout(ms) });
+  } catch (e) {
+    const nome = (e as Error).name;
+    if (nome === "TimeoutError" || nome === "AbortError") {
+      throw new Error(`tempo esgotado (${ms / 1000}s) em ${String(entrada).slice(0, 80)}`);
+    }
+    throw e;
+  }
+}
+
 let log: string[] = [];
 
 // ---------- credenciais ----------
@@ -24,11 +47,11 @@ async function token(servico: "rd_crm" | "rd_marketing", forcar = false): Promis
   if (!forcar && c.access_token && c.expira_em && new Date(c.expira_em).getTime() - Date.now() > 10 * 60_000) return c.access_token;
   const { client_id, client_secret } = c.extra;
   const r = servico === "rd_crm"
-    ? await fetch("https://api.rd.services/oauth2/token", {
+    ? await buscar("https://api.rd.services/oauth2/token", {
         method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({ client_id, client_secret, refresh_token: c.refresh_token, grant_type: "refresh_token" }),
       })
-    : await fetch("https://api.rd.services/auth/token", {
+    : await buscar("https://api.rd.services/auth/token", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ client_id, client_secret, refresh_token: c.refresh_token }),
       });
@@ -58,7 +81,7 @@ async function crm(tk: string, caminho: string, params: Record<string, string> =
   ultima = Date.now();
   const u = new URL(CRM + caminho);
   for (const [k, v] of Object.entries(params)) u.searchParams.set(k, v);
-  const r = await fetch(u, { headers: { Authorization: `Bearer ${tk}`, accept: "application/json" } });
+  const r = await buscar(u, { headers: { Authorization: `Bearer ${tk}`, accept: "application/json" } });
   if (r.status === 429) { await dormir(Number(r.headers.get("Retry-After") ?? 10) * 1000); return crm(tk, caminho, params); }
   if (r.status === 401) throw new Error("CRM_401");
   if (!r.ok) throw new Error(`CRM ${caminho} ${r.status} ${(await r.text()).slice(0, 200)}`);
@@ -156,16 +179,24 @@ async function sincronizarMarketing() {
   let n = 0;
   for (const dia of dias) {
     if (!temTempo()) break;
-    let r = await fetch(`https://api.rd.services/platform/analytics/conversions?start_date=${dia}&end_date=${dia}`, { headers: { Authorization: `Bearer ${tk}` } });
-    // O RD pode invalidar o token antes da hora. Nesse caso renova à força e tenta de novo.
-    if (r.status === 401) {
-      const novo = await token("rd_marketing", true);
-      if (!novo) { log.push("marketing: token inválido e sem renovação"); break; }
-      tk = novo;
-      r = await fetch(`https://api.rd.services/platform/analytics/conversions?start_date=${dia}&end_date=${dia}`, { headers: { Authorization: `Bearer ${tk}` } });
-    }
     // Erro em um dia não pode derrubar o resto da fila nem marcar o dia como
-    // buscado: ele volta na próxima volta.
+    // buscado: ele volta na próxima volta. Com prazo por chamada, tempo
+    // esgotado vira exceção, e por isso o dia inteiro fica dentro do try.
+    let r: Response;
+    try {
+      r = await buscar(`https://api.rd.services/platform/analytics/conversions?start_date=${dia}&end_date=${dia}`, { headers: { Authorization: `Bearer ${tk}` } });
+      // O RD pode invalidar o token antes da hora. Nesse caso renova à força e tenta de novo.
+      if (r.status === 401) {
+        const novo = await token("rd_marketing", true);
+        if (!novo) { log.push("marketing: token inválido e sem renovação"); break; }
+        tk = novo;
+        r = await buscar(`https://api.rd.services/platform/analytics/conversions?start_date=${dia}&end_date=${dia}`, { headers: { Authorization: `Bearer ${tk}` } });
+      }
+    } catch (e) {
+      log.push(`marketing ${dia}: ${(e as Error).message}`);
+      await dormir(500);
+      continue;
+    }
     if (!r.ok) { log.push(`marketing ${dia}: ${r.status}`); await dormir(500); continue; }
 
     const j = await r.json();

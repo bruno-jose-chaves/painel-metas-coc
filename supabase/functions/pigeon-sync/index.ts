@@ -11,6 +11,24 @@ const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SE
 const TAMANHO_PAGINA = 100;
 const ORCAMENTO_MS = 100_000; // sobra folga no limite da função
 
+// Toda chamada para fora tem prazo próprio. A função inteira tem orçamento de
+// tempo, mas nenhuma chamada tinha limite: um pedido ao Pigeon pendurado comia
+// o orçamento inteiro e a rodada não terminava, sem erro visível. Vinte
+// segundos é folgado para quem costuma responder em menos de dois.
+const PRAZO_FETCH = 20_000;
+async function buscar(entrada: string | URL, init: RequestInit = {}, ms = PRAZO_FETCH) {
+  try {
+    return await fetch(entrada, { ...init, signal: AbortSignal.timeout(ms) });
+  } catch (e) {
+    const nome = (e as Error).name;
+    if (nome === "TimeoutError" || nome === "AbortError") {
+      throw new Error(`tempo esgotado (${ms / 1000}s) em ${String(entrada).slice(0, 80)}`);
+    }
+    throw e;
+  }
+}
+
+
 function normTel(t: unknown) {
   let d = String(t ?? "").replace(/\D/g, "");
   if (d.length >= 12 && d.startsWith("55")) d = d.slice(2);
@@ -103,7 +121,7 @@ async function sincronizar(recurso: string, base: string, token: string, inicio:
     url.searchParams.set("OrderDirection", "ASCENDING");
     url.searchParams.set(campo, corte);
 
-    const r = await fetch(url, { headers: { Authorization: `Bearer ${token}`, Accept: "application/json" } });
+    const r = await buscar(url, { headers: { Authorization: `Bearer ${token}`, Accept: "application/json" } });
     if (r.status === 429) { await new Promise((s) => setTimeout(s, 3000)); continue; }
     if (!r.ok) throw new Error(`${recurso} ${r.status} na página ${pagina}`);
 

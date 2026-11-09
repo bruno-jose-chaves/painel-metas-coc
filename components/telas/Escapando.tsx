@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import Ajuda from "@/components/Ajuda";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, dataCurta } from "@/lib/formato";
+import Esqueleto from "@/components/Esqueleto";
 
 // O que está escapando.
 //
@@ -87,7 +88,7 @@ export default function Escapando({ embutido }: { embutido?: boolean } = {}) {
       </p>
 
 
-      {!resumo ? <p className="rotulo">Carregando</p> : (
+      {!resumo ? <Esqueleto /> : (
         <>
           <h2><span className="idx" /> O tamanho de cada buraco</h2>
           <p className="nota">
@@ -188,7 +189,7 @@ export default function Escapando({ embutido }: { embutido?: boolean } = {}) {
               sai aos 90.
             </Ajuda>
           </p>
-          {!fila ? <p className="rotulo">Carregando</p> : lista.length === 0 ? (
+          {!fila ? <Esqueleto /> : lista.length === 0 ? (
             <p className="mudo">Nada escapando neste recorte.</p>
           ) : (
             <div className="rolar">

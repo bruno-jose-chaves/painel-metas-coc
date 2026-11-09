@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Ajuda from "@/components/Ajuda";
 import { num, dataHora } from "@/lib/formato";
+import Esqueleto from "@/components/Esqueleto";
 
 // Quem recebe a própria fila de manhã.
 //
@@ -132,7 +133,7 @@ export default function FilaManha({ admin }: { admin: boolean }) {
           </div>
         )}
 
-        {!pessoas ? <p className="rotulo">Carregando</p> : pessoas.length === 0 ? (
+        {!pessoas ? <Esqueleto /> : pessoas.length === 0 ? (
           <p className="mudo">Ninguém cadastrado ainda. Enquanto isso, a fila só existe dentro do painel.</p>
         ) : (
           <div className="rolar">

@@ -8,6 +8,7 @@ import { COR as CORES } from "@/lib/cores";
 import Detalhe, { type Recorte } from "@/components/Detalhe";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta } from "@/lib/formato";
+import Esqueleto from "@/components/Esqueleto";
 
 type Ano = {
   ano: number; temporada: string; rotulo: string;
@@ -167,7 +168,7 @@ export default function Historico() {
           anteriores.
         </Ajuda>
       </p>
-      {!curva ? <p className="rotulo">Carregando</p> : semanas.length === 0 ? (
+      {!curva ? <Esqueleto tipo="grafico" /> : semanas.length === 0 ? (
         <p className="mudo">Sem histórico de venda para este curso.</p>
       ) : (
         <Curva rotulos={semanas.map((s) => "s" + s)} series={series} altura={260} />
@@ -190,7 +191,7 @@ export default function Historico() {
           <b> desconto</b> juntos explicam faturamento que cresce mais ou menos que a matrícula.
         </Ajuda>
       </p>
-      {!anos ? <p className="rotulo">Carregando</p> : anos.length === 0 ? (
+      {!anos ? <Esqueleto /> : anos.length === 0 ? (
         <p className="mudo">Sem histórico para este curso.</p>
       ) : (
         <div className="rolar">

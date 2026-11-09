@@ -10,6 +10,7 @@ import { useUltima } from "@/lib/consulta";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, duracao, dataCurta } from "@/lib/formato";
 import { ultimosDias, hojeSP, type Periodo } from "@/lib/periodo";
+import Esqueleto from "@/components/Esqueleto";
 
 // A tela do vendedor.
 //
@@ -229,7 +230,7 @@ export default function Meu({ admin }: { admin?: boolean }) {
           mensagens na mesma conversa são uma. Clicando nas matrículas abre a lista nome por nome.
         </Ajuda>
       </p>
-      {!resumo ? <p className="rotulo">Carregando</p> : (
+      {!resumo ? <Esqueleto /> : (
         <>
           <div className="faixa">
             <div className="abre" onClick={() => setDetalhe({
@@ -292,7 +293,7 @@ export default function Meu({ admin }: { admin?: boolean }) {
           Serve para acompanhar, não para fechar folha.
         </Ajuda>
       </p>
-      {!comissao ? <p className="rotulo">Carregando</p> : (() => {
+      {!comissao ? <Esqueleto /> : (() => {
         const meu = comissao.filter((c) => c.vendedor === euMesmo);
         if (meu.length === 0) return (
           <p className="mudo">
@@ -365,7 +366,7 @@ export default function Meu({ admin }: { admin?: boolean }) {
         </Ajuda>
       </p>
       <SeletorPeriodo valor={periodo} aoMudar={setPeriodo} />
-      {!linhas ? <p className="rotulo">Carregando</p> : linhas.length === 0 ? (
+      {!linhas ? <Esqueleto /> : linhas.length === 0 ? (
         <p className="mudo">Sem dado no período.</p>
       ) : (
         <div className="rolar">
@@ -507,7 +508,7 @@ export default function Meu({ admin }: { admin?: boolean }) {
           ))}
         </div>
       </div>
-      {!grade ? <p className="rotulo">Carregando</p> : grade.length === 0 ? (
+      {!grade ? <Esqueleto /> : grade.length === 0 ? (
         <p className="mudo">Sem registro desta medida no período.</p>
       ) : (
         <MapaCalor
@@ -532,7 +533,7 @@ export default function Meu({ admin }: { admin?: boolean }) {
           <b> Faturamento</b> é o valor cheio da matrícula no dia em que foi lançada, não a parcela paga.
         </Ajuda>
       </p>
-      {!mix ? <p className="rotulo">Carregando</p> : (() => {
+      {!mix ? <Esqueleto /> : (() => {
         const meu = mix.filter((m) => m.vendedor === euMesmo);
         if (meu.length === 0) return <p className="mudo">Sem matrícula no período.</p>;
         return (
@@ -578,7 +579,7 @@ export default function Meu({ admin }: { admin?: boolean }) {
           <b> O que fazer</b> é a ação sugerida para aquele tipo de buraco, não tarefa atribuída.
         </Ajuda>
       </p>
-      {!fila ? <p className="rotulo">Carregando</p> : fila.length === 0 ? (
+      {!fila ? <Esqueleto /> : fila.length === 0 ? (
         <p className="mudo">Nada parado na sua mão. É uma boa notícia.</p>
       ) : (
         <div className="rolar">

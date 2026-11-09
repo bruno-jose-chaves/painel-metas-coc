@@ -13,6 +13,7 @@ import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta, duracao } from "@/lib/formato";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
+import Esqueleto from "@/components/Esqueleto";
 
 // Performance individual do comercial.
 //
@@ -273,7 +274,7 @@ export default function Performance() {
           comercial. Os dois números batem.
         </Ajuda>
       </p>
-      {!total || !agora ? <p className="rotulo">Carregando</p> : porPessoa.length === 0 ? (
+      {!total || !agora ? <Esqueleto /> : porPessoa.length === 0 ? (
         <p className="mudo">Sem atendimento registrado no período.</p>
       ) : (
         <div className="rolar">
@@ -346,7 +347,7 @@ export default function Performance() {
           encerrar, não deixar envelhecendo na mão de alguém.
         </Ajuda>
       </p>
-      {!agora ? <p className="rotulo">Carregando</p> : agoraFiltrado.length === 0 ? (
+      {!agora ? <Esqueleto /> : agoraFiltrado.length === 0 ? (
         <p className="mudo">Nenhuma atividade comercial hoje.</p>
       ) : (
         <div className="rolar">
@@ -426,7 +427,7 @@ export default function Performance() {
           amarrar na matrícula.
         </Ajuda>
       </p>
-      {!semanas ? <p className="rotulo">Carregando</p> : lista.length === 0 ? (
+      {!semanas ? <Esqueleto /> : lista.length === 0 ? (
         <p className="mudo">Sem atendimento registrado no período.</p>
       ) : (
         <div className="rolar">
@@ -509,7 +510,7 @@ export default function Performance() {
           ))}
         </div>
       </div>
-      {!semanas || curva.series.length === 0 ? <p className="rotulo">Carregando</p> : (
+      {!semanas || curva.series.length === 0 ? <Esqueleto tipo="grafico" /> : (
         <Curva rotulos={curva.rotulos} series={curva.series} altura={230} />
       )}
 
@@ -541,7 +542,7 @@ export default function Performance() {
           ))}
         </div>
       </div>
-      {!grade ? <p className="rotulo">Carregando</p> : grade.length === 0 ? (
+      {!grade ? <Esqueleto /> : grade.length === 0 ? (
         <p className="mudo">Sem registro desta medida no período.</p>
       ) : (
         <MapaCalor
@@ -588,7 +589,7 @@ export default function Performance() {
           {relogio === "util" ? "Conta só dia útil, das 8h às 18h" : "Conta do minuto que chegou ao minuto da resposta"}
         </span>
       </div>
-      {!resposta ? <p className="rotulo">Carregando</p> : resposta.length === 0 ? (
+      {!resposta ? <Esqueleto /> : resposta.length === 0 ? (
         <p className="mudo">Ninguém procurou a gente no período, com estes filtros.</p>
       ) : (
         <>
@@ -661,7 +662,7 @@ export default function Performance() {
           não só com o produto. <b>Faturamento</b> é o valor cheio da matrícula no dia em que foi lançada.
         </Ajuda>
       </p>
-      {!mix ? <p className="rotulo">Carregando</p> : mix.length === 0 ? (
+      {!mix ? <Esqueleto /> : mix.length === 0 ? (
         <p className="mudo">Sem matrícula no período.</p>
       ) : (
         <div className="rolar">
@@ -711,7 +712,7 @@ export default function Performance() {
           mudam sem mexer em código.
         </Ajuda>
       </p>
-      {!comissao ? <p className="rotulo">Carregando</p> : (() => {
+      {!comissao ? <Esqueleto /> : (() => {
         const lista = comissao.filter((c) => !quem || c.vendedor === quem);
         if (lista.length === 0) return <p className="mudo">Sem venda com comissão no período.</p>;
         const porPessoa = new Map<string, { matriculas: number; faturamento: number; comissao: number }>();
@@ -767,7 +768,7 @@ export default function Performance() {
           é o tamanho comparado ao time, e na comercial o que importa é qual motivo aparece.
         </Ajuda>
       </p>
-      {!perdas ? <p className="rotulo">Carregando</p> : perdas.length === 0 ? (
+      {!perdas ? <Esqueleto /> : perdas.length === 0 ? (
         <p className="mudo">Nenhuma perda registrada no período.</p>
       ) : (
         <div className="rolar">

@@ -9,6 +9,7 @@ import { COR } from "@/lib/cores";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, pct, dataCurta } from "@/lib/formato";
 import { hojeSP, somaDias, ultimosDias, type Periodo } from "@/lib/periodo";
+import Esqueleto from "@/components/Esqueleto";
 
 type Linha = { indicador: string; rotulo: string; valor: number; detalhe: string | null };
 type Dia = { dia: string; conversas_novas: number; requentados: number; leads_novos: number };
@@ -106,7 +107,7 @@ export default function Gestao() {
           conhecido fecha o total de negociações criadas no período.
         </Ajuda>
       </p>
-      {!linhas ? <p className="rotulo">Carregando</p> : (
+      {!linhas ? <Esqueleto /> : (
         <div className="rolar">
           <table className="tabela">
             <thead><tr><th>O quê</th><th className="n">No período</th><th className="n">Do total</th><th>Como é contado</th></tr></thead>
@@ -150,7 +151,7 @@ export default function Gestao() {
           o dia em retorno de quem já conhecia a gente.
         </Ajuda>
       </p>
-      {!linhas ? <p className="rotulo">Carregando</p> : (
+      {!linhas ? <Esqueleto /> : (
         <div className="rolar">
           <table className="tabela">
             <thead><tr><th>O quê</th><th className="n">No período</th><th>Como é contado</th></tr></thead>
@@ -190,7 +191,7 @@ export default function Gestao() {
           antiga, independente de captação.
         </Ajuda>
       </p>
-      {!dias ? <p className="rotulo">Carregando</p> : dias.length === 0 ? (
+      {!dias ? <Esqueleto tipo="grafico" /> : dias.length === 0 ? (
         <p className="mudo">Sem movimento no período.</p>
       ) : (
         <>

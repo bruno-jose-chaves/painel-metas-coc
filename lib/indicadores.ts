@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { emCache } from "@/lib/cache";
+import { buscarCampanhas } from "@/lib/campanhas";
 
 export type Indicador = {
   id: string; nome: string; ajuda: string | null;
@@ -11,14 +13,12 @@ export type Destino = { id: string; nome: string; grupo: string };
 
 // A lista de indicadores vivia copiada em três telas. Agora é tabela: quem
 // manda é o banco, e acrescentar um indicador não exige mexer em tela nenhuma.
-let cache: Indicador[] | null = null;
-
 export function useIndicadores() {
-  const [lista, setLista] = useState<Indicador[] | null>(cache);
+  const [lista, setLista] = useState<Indicador[] | null>(null);
   useEffect(() => {
-    if (cache) return;
-    supabase.from("indicadores_captacao").select("*").order("ordem")
-      .then(({ data }) => { cache = (data as Indicador[]) ?? []; setLista(cache); });
+    emCache("indicadores", 300, () =>
+      supabase.from("indicadores_captacao").select("*").order("ordem")
+        .then(({ data }) => (data as Indicador[]) ?? [])).then(setLista);
   }, []);
   return lista ?? [];
 }
@@ -34,22 +34,26 @@ export function useIndicadores() {
 export function useDestinos() {
   const [destinos, setDestinos] = useState<Destino[]>([]);
   useEffect(() => {
-    Promise.all([
-      supabase.from("produtos").select("id,nome,ordem").order("ordem"),
-      supabase.from("resumo_campanhas").select("id,nome,inicio").order("inicio"),
-      supabase.rpc("painel_turmas", { p_so_com_venda: false }),
-    ]).then(([pr, c, t]) => {
+    // Três consultas que não mudam durante a sessão. Guardadas por dois
+    // minutos, e juntas: duas telas que abrem a lista de destinos ao mesmo
+    // tempo fazem uma busca só.
+    emCache("destinos", 120, async () => {
+      const [pr, c, t] = await Promise.all([
+        supabase.from("produtos").select("id,nome,ordem").order("ordem"),
+        buscarCampanhas<{ id: string; nome: string }>(),
+        supabase.rpc("painel_turmas", { p_so_com_venda: false }),
+      ]);
       const produtos = ((pr.data as { id: string; nome: string }[]) ?? [])
         .map((x) => ({ id: "p:" + x.id, nome: x.nome, grupo: "Curso, vale para qualquer ano" }));
-      const campanhas = ((c.data as { id: string; nome: string }[]) ?? [])
+      const campanhas = (c ?? [])
         .map((x) => ({ id: "c:" + x.id, nome: x.nome, grupo: "Campanhas do painel" }));
       const anoAtual = new Date().getFullYear();
       const turmas = ((t.data as Turma[]) ?? [])
         .filter((x) => x.ano >= anoAtual - 1 && x.ano <= anoAtual + 1)
         .sort((a, b) => b.ano - a.ano || a.nome.localeCompare(b.nome))
         .map((x) => ({ id: "t:" + x.id, nome: x.nome, grupo: "Turmas" }));
-      setDestinos([...produtos, ...campanhas, ...turmas]);
-    });
+      return [...produtos, ...campanhas, ...turmas] as Destino[];
+    }).then(setDestinos);
   }, []);
   return destinos;
 }

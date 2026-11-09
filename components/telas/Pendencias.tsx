@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { buscarCampanhas } from "@/lib/campanhas";
 import Ajuda from "@/components/Ajuda";
 import Chave from "@/components/Chave";
 import Pessoas from "@/components/Pessoas";
@@ -8,6 +9,7 @@ import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, dataCurta } from "@/lib/formato";
 import { useIndicadores, useDestinos, partirDestino, type Indicador, type Destino } from "@/lib/indicadores";
 import { DESDE_CLASSIFICAR } from "@/lib/periodo";
+import Esqueleto from "@/components/Esqueleto";
 
 type Pendencia = {
   tipo: string; valor: string; volume: number; matriculas: number;
@@ -44,8 +46,7 @@ export default function Pendencias({ admin, embutido }: { admin: boolean; embuti
   }
 
   useEffect(() => {
-    supabase.from("resumo_campanhas").select("id,nome,produto_id").order("inicio")
-      .then(({ data }) => setCampanhas((data as Campanha[]) ?? []));
+    buscarCampanhas<Campanha>().then(setCampanhas);
     carregar();
   }, [volta, tudo]);
 
@@ -155,7 +156,7 @@ export default function Pendencias({ admin, embutido }: { admin: boolean; embuti
           </button>
         )}
       </div>
-      {!lista ? <p className="rotulo">Carregando</p> : lista.length === 0 ? (
+      {!lista ? <Esqueleto /> : lista.length === 0 ? (
         <p className="mudo">Nada pendente. Tudo classificado.</p>
       ) : (
         <div className="rolar">
@@ -242,7 +243,7 @@ export default function Pendencias({ admin, embutido }: { admin: boolean; embuti
           repontada em janeiro.
         </Ajuda>
       </p>
-      {!regras ? <p className="rotulo">Carregando</p> : regras.length === 0 ? (
+      {!regras ? <Esqueleto /> : regras.length === 0 ? (
         <p className="mudo">Nenhuma regra cadastrada. O painel está usando só a regra automática pelo nome do curso.</p>
       ) : (
         <div className="rolar">

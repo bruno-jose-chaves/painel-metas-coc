@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { limparCache } from "@/lib/cache";
 
 const MINUTOS = 5;
 
@@ -14,6 +15,9 @@ export function useAtualizacao() {
   useEffect(() => {
     const t = setInterval(() => {
       if (document.visibilityState !== "visible") return;
+      // O cache curto tem que cair junto, senão atualizar devolveria a mesma
+      // foto guardada e a volta de cinco minutos não valeria nada.
+      limparCache();
       setVolta((v) => v + 1);
       setEm(new Date());
     }, MINUTOS * 60_000);
@@ -22,6 +26,7 @@ export function useAtualizacao() {
     const aoVoltar = () => {
       if (document.visibilityState !== "visible") return;
       if (Date.now() - em.getTime() < MINUTOS * 60_000) return;
+      limparCache();
       setVolta((v) => v + 1);
       setEm(new Date());
     };

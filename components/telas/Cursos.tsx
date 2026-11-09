@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import Ajuda from "@/components/Ajuda";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, dataCurta } from "@/lib/formato";
+import Esqueleto from "@/components/Esqueleto";
 
 // Cursos e produtos.
 //
@@ -108,7 +109,7 @@ export default function Cursos({ admin }: { admin: boolean }) {
         </p>
       ) : null}
 
-      {!cursos ? <p className="rotulo">Carregando</p> : (
+      {!cursos ? <Esqueleto /> : (
         <>
           <h2><span className="idx" /> O tamanho de cada produto</h2>
           <p className="nota">

@@ -5,6 +5,7 @@ import { useUltima } from "@/lib/consulta";
 import Ajuda from "@/components/Ajuda";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct } from "@/lib/formato";
+import Esqueleto from "@/components/Esqueleto";
 
 type Turma = {
   id: string; produto_id: string; produto: string; ano: number; semestre: number | null;
@@ -127,7 +128,7 @@ export default function Upsell() {
         </Ajuda>
       </p>
 
-      {!turmas ? <p className="rotulo">Carregando</p> : (
+      {!turmas ? <Esqueleto /> : (
         <div className="cards" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))" }}>
           <Escolha
             titulo="Base de comparação"

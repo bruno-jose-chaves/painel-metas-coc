@@ -8,6 +8,7 @@ import { TarjaFontes } from "@/components/Fontes";
 import Indice from "@/components/Indice";
 import Busca from "@/components/Busca";
 import { areasDe, type Papel } from "@/lib/telas";
+import { emCache } from "@/lib/cache";
 
 // Cinco áreas, no caminho que a pergunta faz: como estamos hoje, como vai a
 // campanha, quem está vendendo, de onde vem o lead, e o que é ajuste de
@@ -53,11 +54,16 @@ export default function Shell({ children }: { children: (ctx: { admin: boolean; 
       }
       vazias.current = 0;
       setSession(s);
-      const [{ data: aut }, { data: adm }, { data: pap }] = await Promise.all([
-        supabase.rpc("is_autorizado"),
-        supabase.rpc("is_admin"),
-        supabase.rpc("meu_papel"),
-      ]);
+      // Trocar de aba remonta o Shell, e estas três perguntas eram refeitas
+      // em toda navegação. Quem está logado e qual é o papel dele não muda no
+      // meio da sessão: a chave inclui o usuário, então entrar com outra conta
+      // não aproveita a resposta da anterior.
+      const [{ data: aut }, { data: adm }, { data: pap }] = await emCache(
+        "sessao:" + s.user.id, 300, () => Promise.all([
+          supabase.rpc("is_autorizado"),
+          supabase.rpc("is_admin"),
+          supabase.rpc("meu_papel"),
+        ]));
       if (!vivo) return;
       setAdmin(!!adm);
       // Papel desconhecido cai em leitor, que é o menos permissivo.

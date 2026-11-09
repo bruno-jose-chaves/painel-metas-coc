@@ -7,6 +7,7 @@ import SeletorPeriodo from "@/components/Periodo";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, pct } from "@/lib/formato";
+import Esqueleto from "@/components/Esqueleto";
 
 // Conversa do WhatsApp contra card no CRM.
 //
@@ -101,7 +102,7 @@ export default function FunilWhats({ embutido }: { embutido?: boolean } = {}) {
 
       <SeletorPeriodo valor={periodo} aoMudar={setPeriodo} />
 
-      {!pessoas ? <p className="rotulo">Carregando</p> : (
+      {!pessoas ? <Esqueleto /> : (
         <>
           <h2><span className="idx" /> A passagem</h2>
           <p className="nota">
@@ -207,7 +208,7 @@ export default function FunilWhats({ embutido }: { embutido?: boolean } = {}) {
               e card parado em Aguardando Pagamento é venda que foi dada como feita e não aconteceu.
             </Ajuda>
           </p>
-          {!etapas ? <p className="rotulo">Carregando</p> : (
+          {!etapas ? <Esqueleto /> : (
             <div className="rolar">
               <table className="tabela">
                 <thead>

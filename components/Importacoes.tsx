@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Ajuda from "@/components/Ajuda";
 import { dataHora, num } from "@/lib/formato";
+import Esqueleto from "@/components/Esqueleto";
 
 // A importação da planilha comercial, aba por aba.
 //
@@ -57,7 +58,7 @@ export default function Importacoes() {
         </p>
       )}
 
-      {!lista ? <p className="rotulo">Carregando</p> : lista.length === 0 ? (
+      {!lista ? <Esqueleto /> : lista.length === 0 ? (
         <p className="mudo">Nenhuma importação registrada.</p>
       ) : (
         <div className="rolar">

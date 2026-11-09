@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta } from "@/lib/formato";
 import Ajuda from "@/components/Ajuda";
+import Esqueleto from "@/components/Esqueleto";
 
 type Venda = {
   chave: string; numero: string | null; data: string; vendedor: string | null; status: string | null;
@@ -169,7 +170,7 @@ export default function Vendas({ embutido }: { embutido?: boolean } = {}) {
           dado usa a planilha ou o CRM.
         </Ajuda>
       </p>
-      {!linhas ? <p className="rotulo">Carregando</p> : linhas.length === 0 ? (
+      {!linhas ? <Esqueleto /> : linhas.length === 0 ? (
         <p className="mudo">Nenhuma venda com esses filtros.</p>
       ) : (
         <div className="rolar">

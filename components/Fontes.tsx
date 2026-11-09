@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Ajuda from "@/components/Ajuda";
 import { dataHora, duracao } from "@/lib/formato";
+import Esqueleto from "@/components/Esqueleto";
 
 // Saúde das fontes.
 //
@@ -135,7 +136,7 @@ export default function Fontes() {
           altura o número que está na tela já não é o de agora.
         </Ajuda>
       </p>
-      {!fontes ? <p className="rotulo">Carregando</p> : (
+      {!fontes ? <Esqueleto /> : (
         <div className="rolar">
           <table className="tabela">
             <thead>

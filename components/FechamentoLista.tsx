@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { supabase } from "@/lib/supabase";
 import { brl, num, dataCurta } from "@/lib/formato";
+import Esqueleto from "@/components/Esqueleto";
 
 // A gaveta do bloco 315.
 //
@@ -63,7 +64,7 @@ export default function FechamentoLista({
           <button className="btn claro" onClick={aoFechar}>Fechar</button>
         </div>
 
-        {!lista ? <p className="rotulo">Carregando</p> : lista.length === 0 ? (
+        {!lista ? <Esqueleto /> : lista.length === 0 ? (
           <p className="mudo">Nenhuma matrícula neste recorte.</p>
         ) : (
           <>

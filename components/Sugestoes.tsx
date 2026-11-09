@@ -5,6 +5,7 @@ import Ajuda from "@/components/Ajuda";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, dataCurta } from "@/lib/formato";
 import { inicioDoAno } from "@/lib/periodo";
+import Esqueleto from "@/components/Esqueleto";
 
 type Sugestao = {
   tipo: string; titulo: string; detalhe: string;
@@ -78,7 +79,7 @@ export default function Sugestoes({ embutido }: { embutido?: boolean } = {}) {
         </Ajuda>
       </p>
 
-      {!lista ? <p className="rotulo">Carregando</p> : lista.length === 0 ? (
+      {!lista ? <Esqueleto /> : lista.length === 0 ? (
         <p className="mudo">Nada a conferir. A base está limpa.</p>
       ) : (
         <div style={{ display: "grid", gap: 14 }}>
@@ -115,7 +116,7 @@ export default function Sugestoes({ embutido }: { embutido?: boolean } = {}) {
 
               {aberto === s.tipo && (
                 <div style={{ marginTop: 14 }}>
-                  {!casos ? <p className="rotulo">Carregando</p> : casos.length === 0 ? (
+                  {!casos ? <Esqueleto /> : casos.length === 0 ? (
                     <p className="mudo">Nada para mostrar.</p>
                   ) : (
                     <>

@@ -9,6 +9,7 @@ import Chave from "@/components/Chave";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, pct, duracao } from "@/lib/formato";
+import Esqueleto from "@/components/Esqueleto";
 
 // Qualidade do lead, pelo lado da conversa.
 //
@@ -172,7 +173,7 @@ export default function Qualidade() {
         </p>
       )}
 
-      {!linhas ? <p className="rotulo">Carregando</p> : (
+      {!linhas ? <Esqueleto /> : (
         <>
           <h2><span className="idx" /> Procurou contra foi procurado</h2>
           <p className="nota">
@@ -351,7 +352,7 @@ export default function Qualidade() {
               cima; quem quiser saber o tamanho do fim de semana olha aqui.
             </Ajuda>
           </p>
-          {!espera ? <p className="rotulo">Carregando</p> : porDia.length === 0 ? (
+          {!espera ? <Esqueleto /> : porDia.length === 0 ? (
             <p className="mudo">Ninguém procurou a gente neste período.</p>
           ) : (
             <>

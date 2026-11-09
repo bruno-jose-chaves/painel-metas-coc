@@ -7,6 +7,7 @@ import Fontes from "@/components/Fontes";
 import EtiquetasPigeon from "@/components/EtiquetasPigeon";
 import Importacoes from "@/components/Importacoes";
 import { dataHora, dataCurta, num } from "@/lib/formato";
+import Esqueleto from "@/components/Esqueleto";
 
 type Status = { servico: string; app_configurado: boolean; conectado: boolean; expira_em: string | null; atualizado_em: string | null };
 type Sync = { id: number; fonte: string; terminado_em: string | null; lidas: number; importadas: number; rejeitadas: number; status: string };
@@ -368,7 +369,7 @@ export default function Configuracao({ admin }: { admin: boolean }) {
           nenhum. Por isso a cobertura é acompanhada dia a dia e o buraco vira aviso na estrela.
         </Ajuda>
       </p>
-      {!cobertura ? <p className="rotulo">Carregando</p> : (
+      {!cobertura ? <Esqueleto /> : (
         <div className="faixa">
           <div>
             <div className="rotulo">Dias cobertos</div>
@@ -406,7 +407,7 @@ export default function Configuracao({ admin }: { admin: boolean }) {
           ela pode pedir de novo.
         </Ajuda>
       </p>
-      {!pedidos ? <p className="rotulo">Carregando</p> : pedidos.length === 0 ? (
+      {!pedidos ? <Esqueleto /> : pedidos.length === 0 ? (
         <p className="mudo">Nenhum pedido esperando resposta.</p>
       ) : (
         <div className="bloco">

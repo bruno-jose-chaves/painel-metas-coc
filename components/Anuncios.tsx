@@ -2,12 +2,14 @@
 import { useEffect, useState } from "react";
 import FiltroCampanha, { type Campanha } from "@/components/FiltroCampanha";
 import { supabase } from "@/lib/supabase";
+import { buscarCampanhas } from "@/lib/campanhas";
 import { useUltima } from "@/lib/consulta";
 import Ajuda from "@/components/Ajuda";
 import Pessoas from "@/components/Pessoas";
 import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { brl, num } from "@/lib/formato";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
+import Esqueleto from "@/components/Esqueleto";
 
 type Anuncio = {
   anuncio: string; rede: string | null; anuncio_id: string | null;
@@ -37,8 +39,7 @@ export default function Anuncios() {
   const [aberto, setAberto] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.from("resumo_campanhas").select("id,nome,inicio,fim,produto_id").order("inicio")
-      .then(({ data }) => setCampanhas((data as Campanha[]) ?? []));
+    buscarCampanhas<Campanha>().then(setCampanhas);
   }, [volta]);
 
   const produto = campanhas.find((c) => c.id === campanha)?.produto_id ?? null;
@@ -106,7 +107,7 @@ export default function Anuncios() {
           é o Pigeon, que guarda a peça que originou a conversa.
         </Ajuda>
       </p>
-      {!lista ? <p className="rotulo">Carregando</p> : lista.length === 0 ? (
+      {!lista ? <Esqueleto /> : lista.length === 0 ? (
         <p className="mudo">
           Nenhuma conversa de anúncio no período. Só entra conversa que chegou por peça de clique para WhatsApp.
         </p>

@@ -11,6 +11,7 @@ import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, pct, dataCurta } from "@/lib/formato";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
 import { useIndicadores, useDestinos, partirDestino, type Indicador, type Destino } from "@/lib/indicadores";
+import Esqueleto from "@/components/Esqueleto";
 
 type Linha = {
   identificador: string; conversoes: number; campanhas: string[] | null; pessoas_crm: number;
@@ -113,7 +114,7 @@ export default function Passagem({ admin }: { admin: boolean }) {
         </Ajuda>
       </p>
 
-      {!lista ? <p className="rotulo">Carregando</p> : lista.length === 0 ? (
+      {!lista ? <Esqueleto /> : lista.length === 0 ? (
         <p className="mudo">Nenhum formulário com conversão no período.</p>
       ) : (
         <div className="rolar">
@@ -203,7 +204,7 @@ export default function Passagem({ admin }: { admin: boolean }) {
           importa é a distância entre elas mudar de repente, que é o sinal de fluxo quebrado.
         </Ajuda>
       </p>
-      {!dias ? <p className="rotulo">Carregando</p> : dias.length === 0 ? (
+      {!dias ? <Esqueleto /> : dias.length === 0 ? (
         <p className="mudo">Sem dados no período.</p>
       ) : (
         <Curva
