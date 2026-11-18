@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { limparCache } from "@/lib/cache";
+import { EVENTO_RECARREGAR, limparFalhas } from "@/lib/erros";
 
 const MINUTOS = 5;
 
@@ -18,6 +19,7 @@ export function useAtualizacao() {
       // O cache curto tem que cair junto, senão atualizar devolveria a mesma
       // foto guardada e a volta de cinco minutos não valeria nada.
       limparCache();
+      limparFalhas();
       setVolta((v) => v + 1);
       setEm(new Date());
     }, MINUTOS * 60_000);
@@ -30,8 +32,20 @@ export function useAtualizacao() {
       setVolta((v) => v + 1);
       setEm(new Date());
     };
+    // Botão "Tentar de novo" do aviso de erro.
+    const aoPedir = () => {
+      limparCache();
+      limparFalhas();
+      setVolta((v) => v + 1);
+      setEm(new Date());
+    };
     document.addEventListener("visibilitychange", aoVoltar);
-    return () => { clearInterval(t); document.removeEventListener("visibilitychange", aoVoltar); };
+    window.addEventListener(EVENTO_RECARREGAR, aoPedir);
+    return () => {
+      clearInterval(t);
+      document.removeEventListener("visibilitychange", aoVoltar);
+      window.removeEventListener(EVENTO_RECARREGAR, aoPedir);
+    };
   }, [em]);
 
   return { volta, em, minutos: MINUTOS };

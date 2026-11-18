@@ -5,6 +5,7 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import Insights from "@/components/Insights";
 import { TarjaFontes } from "@/components/Fontes";
+import { limparFalhas, recarregarTudo, useFalhas } from "@/lib/erros";
 import Indice from "@/components/Indice";
 import Busca from "@/components/Busca";
 import { areasDe, type Papel } from "@/lib/telas";
@@ -96,7 +97,8 @@ export default function Shell({ children }: { children: (ctx: { admin: boolean; 
     };
   }, [router]);
 
-  useEffect(() => { setMenu(false); }, [path]);
+  useEffect(() => { setMenu(false); limparFalhas(); }, [path]);
+  const falhas = useFalhas();
 
   const sair = async () => { await supabase.auth.signOut(); router.replace("/login/"); };
 
@@ -140,6 +142,15 @@ export default function Shell({ children }: { children: (ctx: { admin: boolean; 
         <button className="sair" onClick={sair}>Sair</button>
       </div></header>
       <TarjaFontes />
+      {falhas > 0 && (
+        <div className="aviso-erro" role="alert">
+          <span>
+            Não consegui carregar parte dos dados. O que aparece zerado ou em branco pode estar incompleto,
+            não vazio.
+          </span>
+          <button onClick={recarregarTudo}>Tentar de novo</button>
+        </div>
+      )}
       <Indice />
       <main>{children({ admin, papel, session: session! })}</main>
     </>

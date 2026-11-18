@@ -1,4 +1,5 @@
 "use client";
+import { useMemo, useState } from "react";
 import type { Periodo } from "@/lib/periodo";
 import { hojeSP, somaDias, ultimosDias } from "@/lib/periodo";
 
@@ -29,6 +30,22 @@ export default function FiltroCampanha({
     return p.de === periodo.de && p.ate === periodo.ate;
   };
 
+  // Com as campanhas de dois ou três anos na mesma fila, a linha de botões
+  // passava de vinte e rolava para o lado. Agora há um seletor de ano (o do
+  // fim da campanha, que é o ano do ciclo) e só aparecem as campanhas dele.
+  const anoDe = (c: Campanha) => c.fim.slice(0, 4);
+  const anos = useMemo(() => [...new Set(campanhas.map(anoDe))].sort().reverse(), [campanhas]);
+  const anoPadrao = useMemo(() => {
+    const atual = campanhas.find((c) => c.id === campanha);
+    if (atual) return anoDe(atual);
+    const hoje = hojeSP();
+    const recente = [...campanhas].filter((c) => c.inicio <= hoje).sort((a, b) => b.inicio.localeCompare(a.inicio))[0];
+    return recente ? anoDe(recente) : anos[0];
+  }, [campanhas, campanha, anos]);
+  const [anoEscolhido, setAnoEscolhido] = useState<string | null>(null);
+  const ano = anoEscolhido && anos.includes(anoEscolhido) ? anoEscolhido : anoPadrao;
+  const doAno = campanhas.filter((c) => anoDe(c) === ano);
+
   function escolher(c: Campanha | null) {
     if (!c) { aoMudarCampanha(null); return; }
     aoMudarCampanha(c.id);
@@ -37,11 +54,19 @@ export default function FiltroCampanha({
 
   return (
     <div className="filtros" style={{ flexWrap: "wrap" }}>
+      {anos.length > 1 && (
+        <div className="atalhos" aria-label="Ano da campanha">
+          {anos.map((a) => (
+            <button key={a} className={ano === a ? "ativo" : ""} onClick={() => setAnoEscolhido(a)}>{a}</button>
+          ))}
+        </div>
+      )}
+
       <div className="atalhos">
         <button className={campanha === null ? "ativo" : ""} onClick={() => escolher(null)}>
           Todos os cursos
         </button>
-        {campanhas.map((c) => (
+        {doAno.map((c) => (
           <button key={c.id} className={campanha === c.id ? "ativo" : ""} onClick={() => escolher(c)}>
             {c.nome}
           </button>

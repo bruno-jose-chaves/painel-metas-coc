@@ -146,7 +146,11 @@ export default function Campanha() {
         <label>
           <span className="rotulo">Campanha</span>
           <select value={id} onChange={(e) => setId(e.target.value)}>
-            {campanhas.map((x) => <option key={x.id} value={x.id}>{x.nome}</option>)}
+            {[...new Set(campanhas.map((x) => x.fim.slice(0, 4)))].sort().reverse().map((ano) => (
+              <optgroup key={ano} label={ano}>
+                {campanhas.filter((x) => x.fim.slice(0, 4) === ano).map((x) => <option key={x.id} value={x.id}>{x.nome}</option>)}
+              </optgroup>
+            ))}
           </select>
         </label>
         <div style={{ marginLeft: "auto", display: "flex", gap: 12, alignItems: "center" }}>
