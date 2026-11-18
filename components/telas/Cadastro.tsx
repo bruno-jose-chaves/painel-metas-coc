@@ -78,18 +78,18 @@ export default function Cadastro({ admin }: { admin: boolean }) {
       vendas_desde: c.vendas_desde || null,
       regra_curso: c.regra_curso?.trim() || null,
     };
-    const { error: e1 } = await supabase.from("campanhas").upsert(campanha);
-    if (e1) { setOcupado(false); setAviso({ tipo: "erro", texto: e1.message }); return; }
-
-    const { error: e2 } = await supabase.from("metas")
-      .upsert(metas.map((m) => ({ ...m, campanha_id: campanha.id })));
-    if (e2) { setOcupado(false); setAviso({ tipo: "erro", texto: e2.message }); return; }
-
-    await supabase.from("fases").delete().eq("campanha_id", campanha.id);
-    if (fases.length) {
-      const { error: e3 } = await supabase.from("fases")
-        .insert(fases.map((f, i) => ({ ...f, ordem: i + 1, campanha_id: campanha.id, bonus: f.bonus || null })));
-      if (e3) { setOcupado(false); setAviso({ tipo: "erro", texto: e3.message }); return; }
+    // Campanha, metas e escada são gravadas numa transação só, no banco. Antes
+    // eram quatro chamadas separadas: se a das fases falhasse depois de apagar a
+    // escada antiga, a campanha ficava sem preço nenhum.
+    const { error } = await supabase.rpc("salvar_campanha", {
+      p_campanha: campanha,
+      p_metas: metas,
+      p_fases: fases.map((f) => ({ ...f, bonus: f.bonus || null })),
+    });
+    if (error) {
+      setOcupado(false);
+      setAviso({ tipo: "erro", texto: "Nada foi salvo. " + error.message });
+      return;
     }
     setOcupado(false);
     setAviso({ tipo: "ok", texto: "Campanha salva." });

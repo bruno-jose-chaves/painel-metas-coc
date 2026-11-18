@@ -363,8 +363,8 @@ export default function Performance() {
               <tr>
                 <th>Comercial</th>
                 <th className="n">Carteira aberta</th><th style={{ minWidth: 70 }} />
-                <th className="n">Até 7 d</th><th className="n">8 a 15</th>
-                <th className="n">16 a 30</th><th className="n">31 a 60</th><th className="n">+ de 60</th>
+                <th className="n">Até 7 d</th><th className="n">8 a 15 d</th>
+                <th className="n">16 a 30 d</th><th className="n">31 a 60 d</th><th className="n">Mais de 60 d</th>
                 <th className="n">Atendeu hoje</th><th className="n">Vendeu hoje</th>
                 <th className="n">Matrículas no mês</th>
               </tr>

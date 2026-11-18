@@ -324,8 +324,8 @@ export default function Time() {
               <thead>
                 <tr>
                   <th>Etapa</th><th className="n">Em aberto</th><th style={{ minWidth: 140 }}>Distribuição do tempo</th>
-                  <th className="n">Até 3d</th><th className="n">4 a 7d</th><th className="n">8 a 15d</th>
-                  <th className="n">16 a 30d</th><th className="n">+30d</th><th className="n">Média</th>
+                  <th className="n">Até 3 d</th><th className="n">4 a 7 d</th><th className="n">8 a 15 d</th>
+                  <th className="n">16 a 30 d</th><th className="n">Mais de 30 d</th><th className="n">Média</th>
                 </tr>
               </thead>
               <tbody>

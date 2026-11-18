@@ -11,7 +11,7 @@
   --superficie-2: #FAF9F5;
   --tinta: #121211;
   --tinta-2: #3E3D39;
-  --cinza: #76746D;
+  --cinza: #6B6963;
   --cinza-claro: #A8A59C;
   --lima: #CFFF04;
   --lima-suave: #EEFFB8;
@@ -19,7 +19,7 @@
   --linha-forte: #12121122;
   --ok: #1B7A42;
   --ok-fundo: #E6F4EA;
-  --alerta: #96650C;
+  --alerta: #855A0A;
   --alerta-fundo: #FBF0D8;
   --ruim: #B5301A;
   --ruim-fundo: #FBE9E5;
@@ -55,7 +55,7 @@ button { font: inherit; cursor: pointer; }
 }
 
 .rotulo {
-  font-size: 10.5px;
+  font-size: 12px;
   letter-spacing: .1em;
   text-transform: uppercase;
   color: var(--cinza);
@@ -67,7 +67,7 @@ button { font: inherit; cursor: pointer; }
 /* Lista de identificador de página e formulário. São nomes técnicos: caixa
    alta e espaçamento de rótulo deixam ilegível. */
 .ids {
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--cinza);
   line-height: 1.7;
   word-break: break-word;
@@ -150,6 +150,7 @@ button { font: inherit; cursor: pointer; }
 
 /* Menu de telefone: o nav vira uma gaveta. */
 .menu-botao { display: none; }
+.sair-gaveta { display: none; }
 
 main {
   max-width: 1240px;
@@ -181,7 +182,7 @@ h2 {
 }
 
 h2 .idx {
-  color: var(--cinza-claro);
+  color: var(--cinza);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -242,7 +243,7 @@ h3 { letter-spacing: -.02em; }
 }
 
 .selo {
-  font-size: 10.5px;
+  font-size: 12px;
   letter-spacing: .06em;
   text-transform: uppercase;
   padding: 4px 9px;
@@ -347,7 +348,7 @@ h3 { letter-spacing: -.02em; }
 
 .tabela th {
   text-align: left;
-  font-size: 10.5px;
+  font-size: 12px;
   letter-spacing: .08em;
   text-transform: uppercase;
   color: var(--cinza);
@@ -440,7 +441,7 @@ select:focus, input:focus, textarea:focus {
   box-shadow: 0 0 0 3px #1212110F;
 }
 
-select:disabled, input:disabled { color: var(--cinza-claro); background: var(--superficie-2); cursor: not-allowed; }
+select:disabled, input:disabled { color: var(--cinza); background: var(--superficie-2); cursor: not-allowed; }
 
 .campo { display: grid; gap: 6px; margin-bottom: 14px; }
 
@@ -534,6 +535,7 @@ select:disabled, input:disabled { color: var(--cinza-claro); background: var(--s
   font-weight: 550;
   background: none;
   border: 0;
+  min-height: 32px;
   padding: 6px 11px;
   border-radius: 8px;
   color: var(--cinza);
@@ -588,7 +590,7 @@ select:disabled, input:disabled { color: var(--cinza-claro); background: var(--s
   min-width: 18px;
   margin-left: 6px;
   padding: 1px 5px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   border-radius: 999px;
   background: var(--lima);
@@ -641,7 +643,7 @@ select:disabled, input:disabled { color: var(--cinza-claro); background: var(--s
 
 /* Tipografia do gráfico junto com a do resto do site, em vez de número solto
    dentro do SVG. */
-.grafico .eixo { font-size: 11px; font-family: var(--fonte); }
+.grafico .eixo { font-size: 12px; font-family: var(--fonte); }
 
 .legenda-serie {
   display: flex;
@@ -754,12 +756,28 @@ select:disabled, input:disabled { color: var(--cinza-claro); background: var(--s
 /* ---------- telefone ---------- */
 
 @media (max-width: 880px) {
+  /* Sair sai do cabeçalho e fica no fim da gaveta: no telefone a linha do topo
+     não comporta marca, busca, Como usar, estrela, Sair e menu em 390 px. */
+  .topo .sair { display: none; }
+  .nav .sair-gaveta {
+    display: block;
+    margin-top: 6px;
+    padding: 12px 13px;
+    min-height: 44px;
+    text-align: left;
+    background: none;
+    border: 0;
+    border-top: 1px solid var(--linha);
+    font: inherit;
+    font-size: 15px;
+    color: var(--cinza);
+  }
   .menu-botao {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     background: none;
     border: 1px solid var(--linha-forte);
     border-radius: var(--raio-p);
@@ -1005,7 +1023,7 @@ select:disabled, input:disabled { color: var(--cinza-claro); background: var(--s
   border-radius: 999px;
   background: var(--tinta);
   color: var(--papel);
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 750;
   line-height: 17px;
 }
@@ -1142,7 +1160,7 @@ select:disabled, input:disabled { color: var(--cinza-claro); background: var(--s
   color: var(--tinta-2);
   text-transform: none;
   letter-spacing: 0;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 650;
 }
 
@@ -1180,7 +1198,7 @@ select:disabled, input:disabled { color: var(--cinza-claro); background: var(--s
   .nav a { display: grid; gap: 1px; }
   .nav a small {
     display: block;
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 450;
     color: var(--cinza);
     line-height: 1.35;
@@ -1205,7 +1223,7 @@ select:disabled, input:disabled { color: var(--cinza-claro); background: var(--s
   .nota, .rodape { max-width: none; }
   /* No telefone o cabeçalho tem menos lugar: o rótulo encolhe mas continua
      sendo palavra, porque era justamente o ícone que não comunicava. */
-  .como-usar { height: 30px; padding: 0 9px; font-size: 11.5px; }
+  .como-usar { height: 30px; padding: 0 9px; font-size: 12px; }
 }
 
 
@@ -1234,12 +1252,15 @@ select:disabled, input:disabled { color: var(--cinza-claro); background: var(--s
   border: 1px solid var(--linha-forte);
   background: none;
   color: var(--cinza);
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 750;
   font-style: italic;
   line-height: 13px;
   font-family: Georgia, "Times New Roman", serif;
 }
+
+/* O desenho continua com 15 px; a área que aceita o toque tem 45. */
+.ajuda > button::after { content: ""; position: absolute; inset: -15px; }
 
 .ajuda > button:hover,
 .ajuda > button[aria-expanded="true"] {
@@ -1425,7 +1446,7 @@ select:disabled, input:disabled { color: var(--cinza-claro); background: var(--s
    igual ao que aparece no título do bloco. Serve para conversar sobre o painel
    sem ter que descrever o caminho inteiro até a caixa. */
 .indice-in button .indice-num {
-  font-size: 10px; color: var(--cinza-claro); letter-spacing: .06em;
+  font-size: 12px; color: var(--cinza); letter-spacing: .06em;
   margin-right: 1px;
 }
 .indice-in button.ativo .indice-num { color: var(--cinza); }
@@ -1502,7 +1523,7 @@ select:disabled, input:disabled { color: var(--cinza-claro); background: var(--s
 .busca-lista button.ativo { background: #12121109; }
 
 .busca-num {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--cinza);
   letter-spacing: .04em;
@@ -1516,12 +1537,12 @@ select:disabled, input:disabled { color: var(--cinza-claro); background: var(--s
   margin: 0;
   padding: 10px 18px;
   border-top: 1px solid var(--linha);
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--cinza);
 }
 
 @media (max-width: 760px) {
-  .busca-botao { height: 30px; padding: 0 9px; font-size: 11.5px; }
+  .busca-botao { height: 30px; padding: 0 9px; font-size: 12px; }
   .busca-fundo { padding: 6vh 12px 12px; }
 }
 
@@ -1567,15 +1588,15 @@ main .rolar { scroll-margin-top: 112px; }
 }
 .calor { border-collapse: separate; border-spacing: 2px; width: 100%; }
 .calor th {
-  font-size: 11px; font-weight: 600; color: var(--cinza);
+  font-size: 12px; font-weight: 600; color: var(--cinza);
   text-transform: uppercase; letter-spacing: .04em; padding: 2px 4px; text-align: center;
 }
 .calor tbody th { text-align: right; white-space: nowrap; padding-right: 8px; }
-.calor tr.fds tbody th, .calor tr.fds th { color: var(--cinza-claro); }
+.calor tr.fds tbody th, .calor tr.fds th { color: var(--cinza); }
 .calor td {
   background: #1212110A; border-radius: 4px; height: 30px; min-width: 30px;
-  text-align: center; font-size: 11px; font-weight: 600;
-  font-variant-numeric: tabular-nums; color: var(--cinza-claro);
+  text-align: center; font-size: 12px; font-weight: 600;
+  font-variant-numeric: tabular-nums; color: var(--cinza);
 }
 .calor td.abre { cursor: pointer; }
 .calor td.abre:hover { outline: 2px solid var(--lima); outline-offset: -2px; }
@@ -1586,13 +1607,13 @@ main .rolar { scroll-margin-top: 112px; }
 .calor-escala { display: flex; align-items: center; gap: 4px; }
 .calor-escala i { width: 20px; height: 10px; border-radius: 2px; display: block; }
 @media (max-width: 760px) {
-  .calor td { height: 26px; min-width: 26px; font-size: 10px; }
+  .calor td { height: 28px; min-width: 28px; font-size: 12px; }
 }
 
 /* Cabeçalho de seção dentro da busca: separa tela de pessoa sem precisar de
    duas caixas. */
 .busca-secao {
-  padding: 10px 18px 4px; font-size: 11px; font-weight: 600;
+  padding: 10px 18px 4px; font-size: 12px; font-weight: 600;
   text-transform: uppercase; letter-spacing: .06em; color: var(--cinza);
   border-top: 1px solid var(--linha);
 }

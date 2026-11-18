@@ -130,6 +130,7 @@ export default function Shell({ children }: { children: (ctx: { admin: boolean; 
               <small>{m.oque}</small>
             </a>
           ))}
+          <button className="sair-gaveta" onClick={sair}>Sair</button>
         </nav>
         {/* Era um "?" e ninguém entendia o que havia atrás. Agora diz o que é.
             Fica ao lado da estrela: um é o que fazer hoje, o outro é onde olhar. */}
