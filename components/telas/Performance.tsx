@@ -146,22 +146,29 @@ export default function Performance() {
     ultima("semanas", supabase.rpc("painel_performance_semana",
       { p_de: periodo.de, p_ate: periodo.ate, p_passo: passo }),
       ({ data }) => setSemanas((data as Semana[]) ?? []));
-    setResposta(null); setMix(null); setPerdas(null); setTotal(null);
+    setMix(null); setPerdas(null); setTotal(null);
     ultima("periodo", supabase.rpc("painel_performance_periodo", { p_de: periodo.de, p_ate: periodo.ate }),
       ({ data }) => setTotal((data as Periodo361[]) ?? []));
     setComissao(null);
     ultima("comissao", supabase.rpc("painel_comissao", { p_de: periodo.de, p_ate: periodo.ate }),
       ({ data }) => setComissao((data as Comissao[]) ?? []));
-    ultima("resposta", supabase.rpc("painel_performance_resposta", {
-      p_de: periodo.de, p_ate: periodo.ate, p_relogio: relogio,
-      p_so_dia_util: soDiaUtil, p_so_horario_comercial: soComercial,
-    }), ({ data }) => setResposta((data as Resposta[]) ?? []));
     ultima("mix", supabase.rpc("painel_performance_mix", { p_de: periodo.de, p_ate: periodo.ate }),
       ({ data }) => setMix((data as Mix[]) ?? []));
     ultima("perdas", supabase.rpc("painel_performance_perdas", { p_de: periodo.de, p_ate: periodo.ate }),
       ({ data }) => setPerdas((data as Perda[]) ?? []));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [periodo.de, periodo.ate, volta]);
+
+  // Tempo de resposta tem o próprio efeito: mudar o relógio ou os filtros de dia
+  // útil e horário comercial refaz só esta consulta, não o resto da tela.
+  useEffect(() => {
+    setResposta(null);
+    ultima("resposta", supabase.rpc("painel_performance_resposta", {
+      p_de: periodo.de, p_ate: periodo.ate, p_relogio: relogio,
+      p_so_dia_util: soDiaUtil, p_so_horario_comercial: soComercial,
+    }), ({ data }) => setResposta((data as Resposta[]) ?? []));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [periodo.de, periodo.ate, relogio, soDiaUtil, soComercial, volta]);
 
   useEffect(() => {
     setGrade(null);

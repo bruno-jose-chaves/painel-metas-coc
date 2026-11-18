@@ -48,7 +48,7 @@ export default function Vendas({ embutido }: { embutido?: boolean } = {}) {
     else if (turma) q = q.eq("turma_id", turma);
     if (vendedor === "(automatica)") q = q.is("vendedor", null);
     else if (vendedor) q = q.eq("vendedor", vendedor);
-    if (status === "ativos") q = q.not("status", "ilike", "cancel%");
+    if (status === "ativos") q = q.or("status.is.null,status.not.ilike.cancel%");
     else if (status === "cancelados") q = q.ilike("status", "cancel%");
     else if (status) q = q.eq("status", status);
     if (busca.trim()) q = q.ilike("nome", `%${busca.trim()}%`);
@@ -57,32 +57,23 @@ export default function Vendas({ embutido }: { embutido?: boolean } = {}) {
       .then(({ data, count }) => { setLinhas((data as Venda[]) ?? []); setTotal(count ?? 0); });
   }, [turma, vendedor, status, busca, pagina, volta]);
 
-  // Totais da seleção inteira, não só da página visível.
+  // Totais da seleção inteira, somados no banco com os mesmos filtros da lista.
+  // Somar no navegador lia no máximo 1.000 linhas e subestimava o total.
   const [resumo, setResumo] = useState<{ alunos: number; faturamento: number; tabela: number } | null>(null);
+  const [erroResumo, setErroResumo] = useState(false);
   useEffect(() => {
-    setResumo(null);
-    let q = supabase.from("vendas").select("valor_venda,valor_tabela,status,vendedor,nome");
-    if (turma === "(sem turma)") q = q.is("turma_id", null);
-    else if (turma) q = q.eq("turma_id", turma);
-    if (vendedor === "(automatica)") q = q.is("vendedor", null);
-    else if (vendedor) q = q.eq("vendedor", vendedor);
-    if (busca.trim()) q = q.ilike("nome", `%${busca.trim()}%`);
-    q.then(({ data }) => {
-      const todas = (data as { valor_venda: number | null; valor_tabela: number | null; status: string | null }[]) ?? [];
-      const filtra = (v: { status: string | null }) => {
-        const cancel = (v.status ?? "").toLowerCase().startsWith("cancel");
-        if (status === "ativos") return !cancel;
-        if (status === "cancelados") return cancel;
-        if (status) return v.status === status;
-        return true;
-      };
-      const sel = todas.filter(filtra);
-      setResumo({
-        alunos: sel.length,
-        faturamento: sel.reduce((s, v) => s + Number(v.valor_venda ?? 0), 0),
-        tabela: sel.reduce((s, v) => s + Number(v.valor_tabela ?? 0), 0),
-      });
+    setResumo(null); setErroResumo(false);
+    let atual = true;
+    supabase.rpc("painel_vendas_totais", {
+      p_turma: turma || null, p_vendedor: vendedor || null,
+      p_status: status || null, p_busca: busca.trim() || null,
+    }).then(({ data, error }) => {
+      if (!atual) return;
+      const r = (data as { alunos: number; faturamento: number; tabela: number }[] | null)?.[0];
+      if (error || !r) { setErroResumo(true); return; }
+      setResumo({ alunos: Number(r.alunos), faturamento: Number(r.faturamento), tabela: Number(r.tabela) });
     });
+    return () => { atual = false; };
   }, [turma, vendedor, status, busca, volta]);
 
   const vendedores = useMemo(() => {
@@ -153,8 +144,8 @@ export default function Vendas({ embutido }: { embutido?: boolean } = {}) {
       </div>
 
       <div className="faixa">
-        <div><div className="rotulo">Alunos na seleção</div><div className="valor num">{resumo ? num(resumo.alunos) : "..."}</div></div>
-        <div><div className="rotulo">Faturamento</div><div className="valor num">{resumo ? brl(resumo.faturamento) : "..."}</div></div>
+        <div><div className="rotulo">Alunos na seleção</div><div className="valor num">{resumo ? num(resumo.alunos) : erroResumo ? "erro" : "..."}</div></div>
+        <div><div className="rotulo">Faturamento</div><div className="valor num">{resumo ? brl(resumo.faturamento) : erroResumo ? "erro" : "..."}</div></div>
         <div>
           <div className="rotulo">Ticket médio</div>
           <div className="valor num">{resumo && resumo.alunos ? brl(resumo.faturamento / resumo.alunos) : "-"}</div>

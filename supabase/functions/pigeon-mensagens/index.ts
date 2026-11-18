@@ -27,6 +27,15 @@ async function buscar(entrada: string | URL, init: RequestInit = {}, ms = PRAZO_
   }
 }
 
+// Erro com o status HTTP que o Pigeon devolveu. Sem ele não dá para separar
+// "esta conversa deu problema" de "o Pigeon está fora do ar".
+class ErroPigeon extends Error {
+  status?: number;
+  constructor(mensagem: string, status?: number) {
+    super(mensagem);
+    this.status = status;
+  }
+}
 
 async function credencial(servico: string) {
   const { data } = await db.rpc("credencial_obter", { p_servico: servico });
@@ -67,7 +76,7 @@ async function mensagens(base: string, token: string, sessao: string) {
   const r = await buscar(url, { headers: { Authorization: `Bearer ${token}`, Accept: "application/json" } });
   if (r.status === 429) { await new Promise((s) => setTimeout(s, 2500)); return mensagens(base, token, sessao); }
   if (r.status === 404) return [];
-  if (!r.ok) throw new Error(`mensagem ${r.status} na sessão ${sessao}`);
+  if (!r.ok) throw new ErroPigeon(`mensagem ${r.status} na sessão ${sessao}`, r.status);
   const corpo = await r.json();
   return Array.isArray(corpo) ? corpo : (corpo.items ?? []);
 }
@@ -98,9 +107,10 @@ Deno.serve(async (req) => {
   }
 
   let lidas = 0, gravadas = 0, vazias = 0;
+  let abortou = false;
   const erros: string[] = [];
 
-  while (Date.now() - inicio < ORCAMENTO_MS) {
+  while (Date.now() - inicio < ORCAMENTO_MS && !abortou) {
     // Lia cada conversa UMA vez e nunca mais voltava. Como a leitura acontece
     // em até 30 minutos depois de a conversa abrir, o cliente que respondia
     // duas horas depois ficava marcado para sempre como "nunca respondeu".
@@ -134,13 +144,23 @@ Deno.serve(async (req) => {
           .eq("id", c.id);
       } catch (err) {
         erros.push(String((err as Error).message ?? err));
-        // Marca como lida para a fila andar; o erro fica registrado na resposta.
+        // Falha de rede, prazo esgotado, 401/403 ou 5xx quer dizer que o Pigeon
+        // (ou o token) está com problema, não esta conversa. Marcar como lida
+        // aqui descartaria até 40 conversas por rodada, sem volta. Interrompe e
+        // deixa tudo como estava para a próxima rodada tentar de novo.
+        const st = err instanceof ErroPigeon ? err.status : undefined;
+        if (st === undefined || st === 401 || st === 403 || st >= 500) {
+          abortou = true;
+          break;
+        }
+        // Erro específico da conversa (4xx): marca como lida para a fila andar.
         await db.from("pigeon_conversas")
           .update({ mensagens_lidas_em: new Date().toISOString() })
           .eq("id", c.id);
         if (erros.length > 20) break;
       }
     }
+    if (erros.length > 20) break;
   }
 
   const { count: faltam } = await db
@@ -149,5 +169,8 @@ Deno.serve(async (req) => {
     .is("primeira_mensagem_cliente", null)
     .eq("mexeu_depois", true);
 
-  return Response.json({ ok: true, lidas, gravadas, sem_mensagem_do_cliente: vazias, faltam, erros: erros.slice(0, 5) });
+  return Response.json(
+    { ok: !abortou, abortou, lidas, gravadas, sem_mensagem_do_cliente: vazias, faltam, erros: erros.slice(0, 5) },
+    { status: abortou ? 502 : 200 },
+  );
 });

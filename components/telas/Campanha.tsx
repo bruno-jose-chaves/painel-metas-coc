@@ -89,7 +89,7 @@ export default function Campanha() {
   useEffect(() => {
     buscarCampanhas<Resumo>().then((lista) => {
       setCampanhas(lista);
-      if (lista.length) setId(lista[0].id);
+      setId((atual) => (atual && lista.some((x) => x.id === atual) ? atual : lista[0]?.id ?? ""));
     });
   }, [volta]);
 

@@ -528,17 +528,17 @@ export default function Visao() {
               <tfoot>
                 <tr>
                   <td>Total</td>
-                  <td className="n">{num(ritmo.reduce((s, r) => s + Number(r.alunos), 0))}</td>
-                  <td className="n">{num(ritmo.reduce((s, r) => s + Number(r.esperado_hoje), 0))}</td>
+                  <td className="n">{num(ritmoFiltrado.reduce((s, r) => s + Number(r.alunos), 0))}</td>
+                  <td className="n">{num(ritmoFiltrado.reduce((s, r) => s + Number(r.esperado_hoje), 0))}</td>
                   <td className="n">
-                    <b>{num(ritmo.reduce((s, r) => s + Number(r.hoje), 0))}</b>
-                    <span className="mudo"> · {num(ritmo.reduce((s, r) => s + Number(r.ontem), 0))} · {num(ritmo.reduce((s, r) => s + Number(r.anteriores ?? 0), 0))}</span>
+                    <b>{num(ritmoFiltrado.reduce((s, r) => s + Number(r.hoje), 0))}</b>
+                    <span className="mudo"> · {num(ritmoFiltrado.reduce((s, r) => s + Number(r.ontem), 0))} · {num(ritmoFiltrado.reduce((s, r) => s + Number(r.anteriores ?? 0), 0))}</span>
                   </td>
-                  <td className="n">{num(ritmo.reduce((s, r) => s + Number(r.media_7), 0).toFixed(2))}</td>
-                  <td className="n">{num(ritmo.reduce((s, r) => s + Number(r.necessario_dia ?? 0), 0).toFixed(2))}</td>
-                  <td className="n">{num(ritmo.reduce((s, r) => s + Number(r.falta), 0))}</td>
+                  <td className="n">{num(ritmoFiltrado.reduce((s, r) => s + Number(r.media_7), 0).toFixed(2))}</td>
+                  <td className="n">{num(ritmoFiltrado.reduce((s, r) => s + Number(r.necessario_dia ?? 0), 0).toFixed(2))}</td>
+                  <td className="n">{num(ritmoFiltrado.reduce((s, r) => s + Number(r.falta), 0))}</td>
                   <td />
-                  <td className="n">{num(ritmo.reduce((s, r) => s + Number(r.projecao_restante), 0))} alunos</td>
+                  <td className="n">{num(ritmoFiltrado.reduce((s, r) => s + Number(r.projecao_restante), 0))} alunos</td>
                 </tr>
               </tfoot>
             </table>

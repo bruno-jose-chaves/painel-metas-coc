@@ -79,6 +79,28 @@ Deno.serve(async (req) => {
     if (alvo && pos[alvo] === undefined) pos[alvo] = i;
   });
 
+  // Se alguém renomear ou apagar uma coluna, o mapa não a encontra, o campo vira
+  // vazio em todas as linhas e o upsert grava esse vazio por cima do que estava
+  // certo, sem erro nenhum. Antes de gravar, confere as colunas que importam:
+  // "data" sempre; as outras só se a aba já tem esse dado preenchido no banco
+  // (algumas abas antigas nunca tiveram valor da venda, e isso é normal).
+  const faltando: string[] = [];
+  if (pos.data === undefined) faltando.push("data");
+  for (const col of ["nome", "curso", "valor_venda", "status"]) {
+    if (pos[col] !== undefined) continue;
+    const { count } = await db.from("vendas").select("chave", { count: "exact", head: true })
+      .eq("aba", aba).not(col, "is", null);
+    if ((count ?? 0) > 0) faltando.push(col);
+  }
+  if (faltando.length) {
+    const erro = `coluna ausente no cabeçalho: ${faltando.join(", ")}`;
+    await db.from("sincronizacoes").update({
+      terminado_em: new Date().toISOString(), lidas: linhas.length, importadas: 0, rejeitadas: 0,
+      status: "erro", detalhes: { erro, cabecalho_recebido: cabecalho.slice(0, 40) },
+    }).eq("id", sync!.id);
+    return Response.json({ ok: false, erro }, { status: 422 });
+  }
+
   const registros: Record<string, unknown>[] = [];
   const rejeitadas: { linha: number; motivo: string }[] = [];
   const avisos: string[] = [];
