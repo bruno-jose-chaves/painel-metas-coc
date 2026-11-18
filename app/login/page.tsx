@@ -23,7 +23,7 @@ export default function Login() {
     if (!error) { window.location.href = "/"; return; }
     const m = error.message.toLowerCase();
     if (m.includes("invalid")) {
-      setAviso({ tipo: "erro", texto: "E-mail ou senha não conferem. Se é seu primeiro acesso, use Criar senha." });
+      setAviso({ tipo: "erro", texto: "E-mail ou senha não conferem. Se é seu primeiro acesso, clique em Defina sua senha aqui, logo abaixo." });
     } else if (m.includes("not confirmed")) {
       setAviso({ tipo: "erro", texto: "Falta confirmar o e-mail. Procure a mensagem de confirmação na sua caixa de entrada." });
     } else {
@@ -43,7 +43,7 @@ export default function Login() {
     if (error) {
       const m = error.message.toLowerCase();
       if (m.includes("already") || m.includes("registered")) {
-        setAviso({ tipo: "erro", texto: "Esse e-mail já tem senha. Use Entrar, ou Esqueci a senha para trocar." });
+        setAviso({ tipo: "ok", texto: "Enviamos um e-mail para " + limpo() + ". Abra o link para continuar. Se não chegar em alguns minutos, peça à diretoria para definir sua senha." });
       } else if (m.includes("pwned") || m.includes("compromised") || m.includes("weak")) {
         setAviso({ tipo: "erro", texto: "Essa senha já apareceu em vazamentos conhecidos. Escolha outra." });
       } else {
@@ -56,13 +56,10 @@ export default function Login() {
     // Nesse caso o caminho certo é redefinir a senha.
     if (data.user && (data.user.identities?.length ?? 0) === 0) {
       await supabase.auth.resetPasswordForEmail(limpo(), { redirectTo: window.location.origin + "/senha/" });
-      setAviso({
-        tipo: "ok",
-        texto: "Esse e-mail já tem conta. Enviamos o link para definir uma senha nova. Se não chegar em alguns minutos, peça para a diretoria definir sua senha direto no painel.",
-      });
+      setAviso({ tipo: "ok", texto: "Enviamos um e-mail para " + limpo() + ". Abra o link para continuar. Se não chegar em alguns minutos, peça à diretoria para definir sua senha." });
       return;
     }
-    setAviso({ tipo: "ok", texto: "Conta criada. Confirme pelo link que enviamos para " + limpo() + " e depois entre normalmente." });
+    setAviso({ tipo: "ok", texto: "Enviamos um e-mail para " + limpo() + ". Abra o link para continuar. Se não chegar em alguns minutos, peça à diretoria para definir sua senha." });
   }
 
   async function recuperar() {
@@ -86,12 +83,12 @@ export default function Login() {
     setOcupado(false);
     if (error) { setAviso({ tipo: "erro", texto: error.message }); return; }
     const resposta: Record<string, { tipo: "ok" | "erro"; texto: string }> = {
-      registrada: { tipo: "ok", texto: "Pedido enviado. A diretoria libera o acesso e você recebe um aviso." },
-      ja_autorizado: { tipo: "ok", texto: "Esse e-mail já tem acesso liberado. Use Criar senha e depois entre." },
+      registrada: { tipo: "ok", texto: "Pedido enviado. A diretoria libera o acesso e você recebe um aviso. Se você já tinha acesso, volte em Entrar." },
+      ja_autorizado: { tipo: "ok", texto: "Pedido enviado. A diretoria libera o acesso e você recebe um aviso. Se você já tinha acesso, volte em Entrar." },
       email_invalido: { tipo: "erro", texto: "Esse e-mail não parece válido." },
       muitas_solicitacoes: { tipo: "erro", texto: "Muitos pedidos em pouco tempo. Tente de novo mais tarde." },
     };
-    setAviso(resposta[data as string] ?? { tipo: "ok", texto: "Pedido registrado." });
+    setAviso(resposta[data as string] ?? { tipo: "ok", texto: "Pedido enviado. A diretoria libera o acesso e você recebe um aviso. Se você já tinha acesso, volte em Entrar." });
   }
 
   return (
