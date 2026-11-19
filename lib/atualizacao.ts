@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { limparCache } from "@/lib/cache";
 import { EVENTO_RECARREGAR, limparFalhas } from "@/lib/erros";
 
@@ -53,4 +53,16 @@ export function useAtualizacao() {
 
 export function horaCurta(d: Date) {
   return d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" });
+}
+
+// Diz se a busca está rodando só por causa da volta de cinco minutos (ou do
+// "Tentar de novo"), com os mesmos filtros de antes. Nesse caso a tela mantém o
+// dado antigo até o novo chegar, em vez de virar esqueleto e perder a rolagem.
+// Quando um filtro muda, devolve falso e a tela limpa normalmente.
+export function useSoVolta(volta: number, ...filtros: unknown[]) {
+  const chave = JSON.stringify(filtros);
+  const anterior = useRef<{ volta: number; chave: string } | null>(null);
+  const so = anterior.current !== null && anterior.current.chave === chave && anterior.current.volta !== volta;
+  useEffect(() => { anterior.current = { volta, chave }; });
+  return so;
 }

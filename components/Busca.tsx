@@ -35,11 +35,12 @@ export default function Busca({ papel }: { papel: Papel }) {
   useEffect(() => {
     const t = texto.trim();
     if (t.length < 3) { setGente([]); return; }
+    let vivo = true;
     const espera = setTimeout(() => {
       supabase.rpc("painel_pessoa_buscar", { p_termo: t, p_limite: 6 })
-        .then(({ data }) => setGente((data as Gente[]) ?? []));
+        .then(({ data }) => { if (vivo) setGente((data as Gente[]) ?? []); });
     }, 250);
-    return () => clearTimeout(espera);
+    return () => { vivo = false; clearTimeout(espera); };
   }, [texto]);
 
   useEffect(() => {

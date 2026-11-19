@@ -74,8 +74,8 @@ export default function Qualidade() {
       p_de: periodo.de, p_ate: periodo.ate,
       p_atendente: atendente || null, p_turma: turma || null,
     }), ({ data }) => setEspera((data as Espera[]) ?? []));
-    supabase.rpc("painel_filtros_conversa", { p_de: periodo.de, p_ate: periodo.ate })
-      .then(({ data }) => setFiltros((data as Filtro[]) ?? []));
+    ultima("filtros", supabase.rpc("painel_filtros_conversa", { p_de: periodo.de, p_ate: periodo.ate }),
+      ({ data }) => setFiltros((data as Filtro[]) ?? []));
   }, [periodo, atendente, turma, volta]);
 
   const entrou = useMemo(() => (linhas ?? []).filter((l) => l.quem_comecou === "Cliente procurou"), [linhas]);

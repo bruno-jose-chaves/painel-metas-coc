@@ -10,7 +10,7 @@ import { supabase } from "@/lib/supabase";
 import { useUltima } from "@/lib/consulta";
 import { buscarCampanhas } from "@/lib/campanhas";
 import { COR } from "@/lib/cores";
-import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
+import { useAtualizacao, useSoVolta, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta } from "@/lib/formato";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
 import Esqueleto from "@/components/Esqueleto";
@@ -65,9 +65,10 @@ export default function Time() {
 
   const produto = campanhas.find((c) => c.id === campanha)?.produto_id ?? null;
 
+  const quieto = useSoVolta(volta, periodo, produto, comparar);
   useEffect(() => {
     const p = { p_de: periodo.de, p_ate: periodo.ate };
-    setTime(null); setParados(null); setMotivos(null); setDiasVenda(null);
+    if (!quieto) { setTime(null); setParados(null); setMotivos(null); setDiasVenda(null); }
     ultima("time", supabase.rpc("painel_time_comercial", { ...p, p_produto: produto }),
       ({ data }) => setTime((data as Linha[]) ?? []));
     ultima("parados", supabase.rpc("painel_parados", { ...p, p_trilha: "comercial", p_produto: produto }),

@@ -52,9 +52,11 @@ export default function Vendas({ embutido }: { embutido?: boolean } = {}) {
     else if (status === "cancelados") q = q.ilike("status", "cancel%");
     else if (status) q = q.eq("status", status);
     if (busca.trim()) q = q.ilike("nome", `%${busca.trim()}%`);
+    let vivo = true;
     q.order("data", { ascending: false }).order("numero", { ascending: false })
       .range(pagina * PAGINA, pagina * PAGINA + PAGINA - 1)
-      .then(({ data, count }) => { setLinhas((data as Venda[]) ?? []); setTotal(count ?? 0); });
+      .then(({ data, count }) => { if (!vivo) return; setLinhas((data as Venda[]) ?? []); setTotal(count ?? 0); });
+    return () => { vivo = false; };
   }, [turma, vendedor, status, busca, pagina, volta]);
 
   // Totais da seleção inteira, somados no banco com os mesmos filtros da lista.

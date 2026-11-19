@@ -7,7 +7,7 @@ import SeletorPeriodo from "@/components/Periodo";
 import Chave from "@/components/Chave";
 import MapaCalor, { type Celula } from "@/components/MapaCalor";
 import { useUltima } from "@/lib/consulta";
-import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
+import { useAtualizacao, useSoVolta, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, duracao, dataCurta } from "@/lib/formato";
 import { ultimosDias, hojeSP, type Periodo } from "@/lib/periodo";
 import Esqueleto from "@/components/Esqueleto";
@@ -109,19 +109,23 @@ export default function Meu({ admin }: { admin?: boolean }) {
       .order("nome").then(({ data }) => setNomes(((data as { nome: string }[]) ?? []).map((v) => v.nome)));
   }, [admin]);
 
+  const quieto = useSoVolta(volta, quem, periodo.de, periodo.ate);
   useEffect(() => {
-    setResumo(null); setFila(null);
+    if (!quieto) { setResumo(null); setFila(null); }
+    let vivo = true;
     const p = quem ? { p_vendedor: quem } : {};
     supabase.rpc("painel_meu_resumo", p).then(({ data }) => {
+      if (!vivo) return;
       const l = (data as Resumo[]) ?? [];
       setResumo(l.length ? l[0] : "nenhum");
     });
     supabase.rpc("painel_minha_fila", { ...p, p_limite: 60 })
-      .then(({ data }) => setFila((data as Fila[]) ?? []));
+      .then(({ data }) => { if (vivo) setFila((data as Fila[]) ?? []); });
+    return () => { vivo = false; };
   }, [quem, volta]);
 
   useEffect(() => {
-    setLinhas(null);
+    if (!quieto) setLinhas(null);
     ultima("contra", supabase.rpc("painel_meu_contra_time", {
       p_de: periodo.de, p_ate: periodo.ate, ...(quem ? { p_vendedor: quem } : {}),
     }), ({ data }) => setLinhas((data as Linha[]) ?? []));

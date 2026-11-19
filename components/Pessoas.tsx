@@ -32,7 +32,9 @@ export default function Pessoas({
 
   useEffect(() => {
     setLista(null);
-    supabase.rpc(rpc, params).then(({ data }) => setLista((data as Pessoa[]) ?? []));
+    let vivo = true;
+    supabase.rpc(rpc, params).then(({ data }) => { if (vivo) setLista((data as Pessoa[]) ?? []); });
+    return () => { vivo = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpc, JSON.stringify(params)]);
 

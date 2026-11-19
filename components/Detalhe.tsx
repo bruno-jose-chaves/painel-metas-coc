@@ -32,8 +32,10 @@ export default function Detalhe({
 
   useEffect(() => {
     setLista(null);
+    let vivo = true;
     supabase.rpc("painel_vendas_detalhe", { ...recorte, p_limite: 300 })
-      .then(({ data }) => setLista((data as Venda[]) ?? []));
+      .then(({ data }) => { if (vivo) setLista((data as Venda[]) ?? []); });
+    return () => { vivo = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(recorte)]);
 

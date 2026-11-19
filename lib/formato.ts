@@ -9,7 +9,7 @@ export const dataCurta = (d: string | null | undefined) => {
   return `${dia}/${m}`;
 };
 export const dataHora = (d: string | null | undefined) =>
-  d ? new Date(d).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "-";
+  d ? new Date(d).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" }) : "-";
 
 // Duração em minutos, escrita como gente lê. Minuto puro fica ilegível acima de
 // uma hora: "2356 min" ninguém processa como "quase dois dias".

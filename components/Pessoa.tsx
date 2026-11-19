@@ -34,8 +34,10 @@ export default function Pessoa({ achado, aoFechar }: { achado: Achado; aoFechar:
   useEffect(() => { setMontado(true); }, []);
   useEffect(() => {
     setItens(null);
+    let vivo = true;
     supabase.rpc("painel_pessoa_ficha", { p_chave: achado.chave })
-      .then(({ data }) => setItens((data as Item[]) ?? []));
+      .then(({ data }) => { if (vivo) setItens((data as Item[]) ?? []); });
+    return () => { vivo = false; };
   }, [achado.chave]);
 
   const matriculas = (itens ?? []).filter((i) => i.bloco === "matricula" && i.situacao !== "cancelada");

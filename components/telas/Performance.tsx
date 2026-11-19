@@ -10,7 +10,7 @@ import Curva from "@/components/Curva";
 import MapaCalor, { type Celula } from "@/components/MapaCalor";
 import { useUltima } from "@/lib/consulta";
 import { COR } from "@/lib/cores";
-import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
+import { useAtualizacao, useSoVolta, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta, duracao } from "@/lib/formato";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
 import Esqueleto from "@/components/Esqueleto";
@@ -97,9 +97,11 @@ const CALORES: { id: CALOR; nome: string; oque: string; unidade: string }[] = [
     oque: "Média de minutos até a primeira resposta, só em conversa que o cliente começou." },
 ];
 
+// Conta em UTC do começo ao fim: somar dias numa data local e ler em UTC
+// mudava o dia para quem abre o painel fora do fuso de Brasília.
 const fimDaSemana = (d: string) => {
-  const fim = new Date(d + "T12:00:00");
-  fim.setDate(fim.getDate() + 6);
+  const fim = new Date(d + "T12:00:00Z");
+  fim.setUTCDate(fim.getUTCDate() + 6);
   return fim.toISOString().slice(0, 10);
 };
 const semanaCurta = (d: string) => dataCurta(d) + " a " + dataCurta(fimDaSemana(d));
@@ -141,15 +143,16 @@ export default function Performance() {
     supabase.rpc("painel_performance_carteira").then(({ data }) => setCarteira((data as Carteira[]) ?? []));
   }, [volta]);
 
+  const quieto = useSoVolta(volta, periodo.de, periodo.ate, relogio, soDiaUtil, soComercial, calor, quem);
   useEffect(() => {
-    setSemanas(null);
+    if (!quieto) setSemanas(null);
     ultima("semanas", supabase.rpc("painel_performance_semana",
       { p_de: periodo.de, p_ate: periodo.ate, p_passo: passo }),
       ({ data }) => setSemanas((data as Semana[]) ?? []));
-    setMix(null); setPerdas(null); setTotal(null);
+    if (!quieto) { setMix(null); setPerdas(null); setTotal(null); }
     ultima("periodo", supabase.rpc("painel_performance_periodo", { p_de: periodo.de, p_ate: periodo.ate }),
       ({ data }) => setTotal((data as Periodo361[]) ?? []));
-    setComissao(null);
+    if (!quieto) setComissao(null);
     ultima("comissao", supabase.rpc("painel_comissao", { p_de: periodo.de, p_ate: periodo.ate }),
       ({ data }) => setComissao((data as Comissao[]) ?? []));
     ultima("mix", supabase.rpc("painel_performance_mix", { p_de: periodo.de, p_ate: periodo.ate }),
@@ -162,7 +165,7 @@ export default function Performance() {
   // Tempo de resposta tem o próprio efeito: mudar o relógio ou os filtros de dia
   // útil e horário comercial refaz só esta consulta, não o resto da tela.
   useEffect(() => {
-    setResposta(null);
+    if (!quieto) setResposta(null);
     ultima("resposta", supabase.rpc("painel_performance_resposta", {
       p_de: periodo.de, p_ate: periodo.ate, p_relogio: relogio,
       p_so_dia_util: soDiaUtil, p_so_horario_comercial: soComercial,
@@ -171,7 +174,7 @@ export default function Performance() {
   }, [periodo.de, periodo.ate, relogio, soDiaUtil, soComercial, volta]);
 
   useEffect(() => {
-    setGrade(null);
+    if (!quieto) setGrade(null);
     ultima("calor", supabase.rpc("painel_mapa_calor", {
       p_de: periodo.de, p_ate: periodo.ate, p_medida: calor, p_vendedor: quem || null,
     }), ({ data }) => setGrade((data as Celula[]) ?? []));

@@ -7,7 +7,7 @@ import { buscarCampanhas } from "@/lib/campanhas";
 import { useUltima } from "@/lib/consulta";
 import Ajuda from "@/components/Ajuda";
 import { COR } from "@/lib/cores";
-import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
+import { useAtualizacao, useSoVolta, horaCurta } from "@/lib/atualizacao";
 import { brl, num, pct, dataCurta } from "@/lib/formato";
 import { hojeSP } from "@/lib/periodo";
 import Esqueleto from "@/components/Esqueleto";
@@ -93,16 +93,17 @@ export default function Campanha() {
     });
   }, [volta]);
 
+  const quieto = useSoVolta(volta, id);
   useEffect(() => {
     if (!id) return;
-    setFases(null); setPontos(null); setProj(null); setCenarios(null); setFunil(null); setOrigens(null); setRecompra(null); setOrigemUpsell(null);
+    if (!quieto) { setFases(null); setPontos(null); setProj(null); setCenarios(null); setFunil(null); setOrigens(null); setRecompra(null); setOrigemUpsell(null); }
     const p = { p_campanha: id };
     ultima("fases", supabase.rpc("painel_fases", p), ({ data }) => setFases((data as Fase[]) ?? []));
     ultima("curva", supabase.rpc("painel_curva", p), ({ data }) => setPontos((data as Ponto[]) ?? []));
     ultima("projecao", supabase.rpc("painel_projecao", p), ({ data }) => setProj(((data as Projecao[]) ?? [])[0] ?? null));
     ultima("cenarios", supabase.rpc("painel_cenarios", p), ({ data }) => setCenarios((data as Cenario[]) ?? []));
     ultima("funil", supabase.rpc("painel_funil", p), ({ data }) => setFunil(((data as Funil[]) ?? [])[0] ?? null));
-    supabase.rpc("painel_ritmo").then(({ data }) =>
+    ultima("ritmo", supabase.rpc("painel_ritmo"), ({ data }) =>
       setRitmo(((data as Ritmo[]) ?? []).find((r) => r.campanha_id === id) ?? null));
     ultima("recompra", supabase.rpc("painel_recompra", p), ({ data }) => setRecompra((data as Recompra[]) ?? []));
     ultima("upsell", supabase.rpc("painel_upsell_origem", p), ({ data }) => setOrigemUpsell((data as UpsellOrigem[]) ?? []));

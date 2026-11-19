@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Ajuda from "@/components/Ajuda";
 import { brl, num, dataCurta } from "@/lib/formato";
@@ -50,7 +50,11 @@ export default function Cadastro({ admin }: { admin: boolean }) {
   };
   useEffect(carregar, []);
 
+  // Trocar de campanha duas vezes seguidas dispara duas leituras; só a da
+  // última escolha pode preencher o formulário.
+  const pedido = useRef(0);
   async function abrir(id: string) {
+    const meu = ++pedido.current;
     setSel(id); setAviso(null);
     if (!id) { setC(vazia()); setMetas(metasVazias()); setFases([]); return; }
     const atual = lista?.find((x) => x.id === id);
@@ -59,6 +63,7 @@ export default function Cadastro({ admin }: { admin: boolean }) {
       supabase.from("metas").select("nivel,alunos,faturamento").eq("campanha_id", id).order("nivel"),
       supabase.from("fases").select("ordem,nome,inicio,fim,preco,meta_alunos,bonus").eq("campanha_id", id).order("ordem"),
     ]);
+    if (meu !== pedido.current) return;
     const base = metasVazias();
     for (const linha of (m as Meta[]) ?? []) base[linha.nivel] = linha;
     setMetas(base);
