@@ -11,6 +11,7 @@ import { useAtualizacao, horaCurta } from "@/lib/atualizacao";
 import { num, pct, dataCurta } from "@/lib/formato";
 import { ultimosDias, type Periodo } from "@/lib/periodo";
 import Esqueleto from "@/components/Esqueleto";
+import LeadsQuentes from "@/components/LeadsQuentes";
 
 type Dia = { dia: string; conversoes: number; conversoes_lp: number; visitas: number };
 type Origem = { identificador: string; tipo: string; conversoes: number; visitas: number; taxa: number | null };
@@ -65,6 +66,11 @@ export default function Leads() {
         periodo={periodo}
         aoMudarPeriodo={setPeriodo}
       />
+
+      <LeadsQuentes periodo={periodo} campanha={campanha} produto={produto} volta={volta} />
+
+      <h2 style={{ marginTop: 44 }}><span className="idx" /> Todas as conversões</h2>
+      <p className="nota">Daqui para baixo, toda conversão de formulário, quente e fria juntas.</p>
 
       <div className="faixa">
         <div><div className="rotulo">Conversões</div><div className="valor num">{dias ? num(totalConv) : "..."}</div></div>

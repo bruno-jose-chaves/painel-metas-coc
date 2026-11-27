@@ -165,10 +165,10 @@ export const AREAS: Area[] = [
     oque: "De onde vem o lead e se ele chegou inteiro no comercial",
     telas: [
       { id: "captacao", codigo: 410, nome: "Captação",
-        oque: "Quantos leads entraram por dia e por página, contra a meta de captação da campanha.",
-        termos: ["leads captados", "formulário", "página", "meta de captação", "inscritos",
+        oque: "Leads quentes (reserva, lead, live) contra a meta, por dia, canal e formulário; e toda a captação abaixo.",
+        termos: ["leads captados", "lead quente", "reserva", "canal", "origem do lead", "formulário", "página", "meta de captação", "inscritos",
                  "landing page", "lp", "visitas", "site", "conversão da página"],
-        blocos: ["Conversões por dia", "Páginas e formulários", "Tags dos leads", "Origem dos negócios no CRM"] },
+        blocos: ["Leads quentes contra a meta", "Leads quentes por canal", "Leads quentes por formulário", "Todas as conversões", "Conversões por dia", "Páginas e formulários", "Tags dos leads", "Origem dos negócios no CRM"] },
       { id: "anuncios", codigo: 420, nome: "Anúncios",
         oque: "Quantas conversas cada peça de clique para WhatsApp precisa para sair uma matrícula.",
         termos: ["anúncio", "criativo", "meta ads", "clique para whatsapp", "campanha paga"],

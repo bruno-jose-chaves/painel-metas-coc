@@ -1,0 +1,19 @@
+-- Update 76: leads quentes na Captação e alerta de fonte fora.
+-- Aplicado no banco em 27/11/2026 pela migração update76_leads_quentes_e_alerta.
+--
+-- 1. canal_da_origem(text): junta a origem crua do RD em canais (Anúncio Meta,
+--    Google Ads, Busca orgânica, Redes sociais, Acesso direto, Site do COC,
+--    E-mail, Link em outro site, Desconhecida).
+-- 2. painel_leads_quentes(p_de, p_ate, p_produto, p_indicadores): conversões de
+--    formulário por dia, formulário, tipo (indicador da regra), canal e origem.
+--    Padrão: reservas, leads e inscritos em live. 'sem_regra' devolve o que
+--    ainda não tem tipo. security definer com is_autorizado().
+-- 3. alertar_fontes_fora(): manda mensagem pelo destino do resumo diário quando
+--    uma fonte fica "fora", repete a cada 6 horas e avisa quando volta. Sem
+--    apagar linhas: a coluna privado.alerta_fonte.ativa marca o que já voltou.
+--    Rotina pg_cron 'alerta-fontes' a cada 10 minutos.
+--
+-- O corpo das três funções está no banco; para conferir:
+--   select pg_get_functiondef('public.painel_leads_quentes'::regproc);
+--   select pg_get_functiondef('public.canal_da_origem'::regproc);
+--   select pg_get_functiondef('public.alertar_fontes_fora'::regproc);
