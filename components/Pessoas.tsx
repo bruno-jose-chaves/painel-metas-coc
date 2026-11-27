@@ -26,14 +26,25 @@ export default function Pessoas({
   aoFechar: () => void;
 }) {
   const [lista, setLista] = useState<Pessoa[] | null>(null);
+  const [totalGeral, setTotalGeral] = useState<number | null>(null);
   const [montado, setMontado] = useState(false);
 
   useEffect(() => { setMontado(true); }, []);
 
   useEffect(() => {
-    setLista(null);
+    setLista(null); setTotalGeral(null);
     let vivo = true;
-    supabase.rpc(rpc, params).then(({ data }) => { if (vivo) setLista((data as Pessoa[]) ?? []); });
+    const limite = Number((params as Record<string, unknown>).p_limite ?? 200);
+    supabase.rpc(rpc, params).then(({ data }) => {
+      if (!vivo) return;
+      const l = (data as Pessoa[]) ?? [];
+      setLista(l);
+      // Lista cortada no limite: conta o total para escrever "300 de 412".
+      if (l.length >= limite) {
+        supabase.rpc(rpc, { ...params, p_limite: 100000 })
+          .then(({ data: tudo }) => { if (vivo) setTotalGeral(((tudo as Pessoa[]) ?? []).length); });
+      }
+    });
     return () => { vivo = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rpc, JSON.stringify(params)]);
@@ -59,7 +70,9 @@ export default function Pessoas({
             <h3 className="gaveta-titulo">{titulo}</h3>
             {lista && (
               <p className="mudo num" style={{ margin: "4px 0 0" }}>
-                {num(lista.length)} {lista.length === 1 ? "pessoa" : "pessoas"}
+                {totalGeral && totalGeral > lista.length
+                  ? `${num(lista.length)} de ${num(totalGeral)} pessoas (as primeiras da lista)`
+                  : `${num(lista.length)} ${lista.length === 1 ? "pessoa" : "pessoas"}`}
                 {compraram > 0 ? ` · ${num(compraram)} viraram matrícula` : ""}
                 {comConversa > 0 ? ` · ${num(comConversa)} com conversa no Pigeon` : ""}
               </p>

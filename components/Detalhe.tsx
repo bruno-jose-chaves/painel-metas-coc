@@ -26,15 +26,26 @@ export default function Detalhe({
   aoFechar: () => void;
 }) {
   const [lista, setLista] = useState<Venda[] | null>(null);
+  const [totalGeral, setTotalGeral] = useState<number | null>(null);
   const [montado, setMontado] = useState(false);
 
   useEffect(() => { setMontado(true); }, []);
 
   useEffect(() => {
-    setLista(null);
+    setLista(null); setTotalGeral(null);
     let vivo = true;
     supabase.rpc("painel_vendas_detalhe", { ...recorte, p_limite: 300 })
-      .then(({ data }) => { if (vivo) setLista((data as Venda[]) ?? []); });
+      .then(({ data }) => {
+        if (!vivo) return;
+        const l = (data as Venda[]) ?? [];
+        setLista(l);
+        // Lista cortada: conta o total para a gaveta dizer "300 de 412" em vez
+        // de parecer que o número clicado estava errado.
+        if (l.length === 300) {
+          supabase.rpc("painel_vendas_detalhe", { ...recorte, p_limite: 100000 })
+            .then(({ data: tudo }) => { if (vivo) setTotalGeral(((tudo as Venda[]) ?? []).length); });
+        }
+      });
     return () => { vivo = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(recorte)]);
@@ -62,7 +73,11 @@ export default function Detalhe({
             {lista && (
               <p className="mudo num" style={{ margin: "4px 0 0" }}>
                 {num(lista.length)} {lista.length === 1 ? "matrícula" : "matrículas"} · {brl(total)}
-                {lista.length === 300 ? " · mostrando as 300 mais recentes" : ""}
+                {lista.length === 300
+                  ? totalGeral && totalGeral > 300
+                    ? ` · mostrando as 300 mais recentes de ${num(totalGeral)}`
+                    : " · mostrando as 300 mais recentes"
+                  : ""}
               </p>
             )}
           </div>

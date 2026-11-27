@@ -463,8 +463,10 @@ export default function Performance() {
                   <td className="n abre" onClick={() => setGaveta({
                     titulo: s.vendedor + ", " + (passo === "dia" ? dataCurta(s.semana) : semanaCurta(s.semana)),
                     rotulo: "pessoas atendidas no período",
-                    rpc: "painel_qualidade_pessoas",
-                    params: { p_de: s.semana, p_ate: passo === "dia" ? s.semana : fimDaSemana(s.semana), p_atendente: primeiro(s.vendedor), p_limite: 300 },
+                    // Mesma função e nome completo da tabela de cima: com o primeiro nome
+                    // e outra função, o número da gaveta não batia com o clicado.
+                    rpc: "painel_performance_pessoas",
+                    params: { p_de: s.semana, p_ate: passo === "dia" ? s.semana : fimDaSemana(s.semana), p_vendedor: s.vendedor, p_limite: 300 },
                   })}><b>{num(s.pessoas)}</b></td>
                   <td className="n">{num(s.conversas)}</td>
                   {passo === "semana" && <td className="n num">{num(s.dias_trabalhados)} de 7</td>}

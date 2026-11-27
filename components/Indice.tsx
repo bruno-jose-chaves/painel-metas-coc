@@ -22,6 +22,21 @@ export default function Indice() {
     if (!main) return;
 
     let observador: IntersectionObserver | null = null;
+    // A busca leva para "tela#s3". Os títulos só ganham id depois de numerados,
+    // então o navegador não acha a âncora sozinho: rolamos nós, uma vez por
+    // âncora, e de novo um pouco depois, quando os quadros de cima já carregaram.
+    let rolouPara = "";
+    const rolarParaAncora = () => {
+      const alvo = decodeURIComponent(window.location.hash.slice(1));
+      if (!alvo || rolouPara === alvo) return;
+      const el = document.getElementById(alvo);
+      if (!el) return;
+      rolouPara = alvo;
+      el.scrollIntoView({ block: "start" });
+      setTimeout(() => document.getElementById(alvo)?.scrollIntoView({ block: "start" }), 900);
+    };
+    const aoMudarAncora = () => { rolouPara = ""; rolarParaAncora(); };
+    window.addEventListener("hashchange", aoMudarAncora);
 
     const ler = () => {
       const base = Number(main.getAttribute("data-codigo")) || 0;
@@ -55,6 +70,7 @@ export default function Indice() {
         { rootMargin: "-70px 0px -72% 0px" },
       );
       hs.forEach((h) => observador!.observe(h));
+      rolarParaAncora();
     };
 
     ler();
@@ -69,6 +85,7 @@ export default function Indice() {
       mo.disconnect();
       observador?.disconnect();
       window.removeEventListener("scroll", aoRolar);
+      window.removeEventListener("hashchange", aoMudarAncora);
     };
   }, []);
 
