@@ -1,15 +1,16 @@
 "use client";
 import Shell from "@/components/Shell";
 import SubAbas, { useAba, type Aba } from "@/components/SubAbas";
-import { telasDe } from "@/lib/telas";
+import { telasDe, type Papel } from "@/lib/telas";
 import Campanha from "@/components/telas/Campanha";
 import Historico from "@/components/Historico";
 import Upsell from "@/components/Upsell";
 import Comparar from "@/components/Comparar";
 
-const ABAS: Aba[] = telasDe("campanha");
-
-function Tela() {
+// As abas seguem o papel de quem entra, como no Comercial: antes a lista era
+// montada sem o papel e mostrava aba que a pessoa não deveria ver.
+function Tela({ papel }: { papel: Papel }) {
+  const ABAS: Aba[] = telasDe("campanha", papel);
   const { aba, escolher } = useAba(ABAS);
   return (
     <>
@@ -23,5 +24,5 @@ function Tela() {
 }
 
 export default function Page() {
-  return <Shell>{() => <Tela />}</Shell>;
+  return <Shell>{({ papel }) => <Tela papel={papel} />}</Shell>;
 }

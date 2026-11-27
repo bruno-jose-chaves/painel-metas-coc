@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Shell from "@/components/Shell";
 import SubAbas, { useAba, type Aba } from "@/components/SubAbas";
-import { telasDe } from "@/lib/telas";
+import { telasDe, type Papel } from "@/lib/telas";
 import Anuncios from "@/components/Anuncios";
 import Passagem from "@/components/Passagem";
 import Classificar from "@/components/telas/Classificar";
@@ -13,7 +13,7 @@ import { inicioDoAno, DESDE_CLASSIFICAR } from "@/lib/periodo";
 // Tudo que responde "de onde vem o lead" em um lugar: captação por página,
 // anúncio de clique para WhatsApp, e a fila de classificação. O marcador nas
 // abas mostra quanto está esperando decisão, sem precisar entrar para ver.
-function Tela({ admin }: { admin: boolean }) {
+function Tela({ admin, papel }: { admin: boolean; papel: Papel }) {
   const [paginas, setPaginas] = useState<number | null>(null);
   const [etiquetas, setEtiquetas] = useState<number | null>(null);
   const [passagem, setPassagem] = useState<number | null>(null);
@@ -34,7 +34,7 @@ function Tela({ admin }: { admin: boolean }) {
     passagem,
     classificar: paginas == null && etiquetas == null ? null : (paginas ?? 0) + (etiquetas ?? 0),
   };
-  const abas: Aba[] = telasDe("marketing").map((t) => ({ ...t, marcador: marcadores[t.id] ?? undefined }));
+  const abas: Aba[] = telasDe("marketing", papel).map((t) => ({ ...t, marcador: marcadores[t.id] ?? undefined }));
 
   const { aba, escolher } = useAba(abas);
 
@@ -50,5 +50,5 @@ function Tela({ admin }: { admin: boolean }) {
 }
 
 export default function Page() {
-  return <Shell>{({ admin }) => <Tela admin={admin} />}</Shell>;
+  return <Shell>{({ admin, papel }) => <Tela admin={admin} papel={papel} />}</Shell>;
 }

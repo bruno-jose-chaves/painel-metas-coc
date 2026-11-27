@@ -7,7 +7,7 @@ const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SE
 });
 
 const norm = (s: string) =>
-  s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+  s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
 
 // nome do cabeçalho (normalizado) -> coluna do banco
 const MAPA: Record<string, string> = {
@@ -153,8 +153,19 @@ Deno.serve(async (req) => {
   // espelho: remove da base o que saiu da aba
   if (!erro && lista.length > 0) {
     const chaves = lista.map((r) => r.chave as string);
-    const { data: existentes } = await db.from("vendas").select("chave").eq("aba", aba);
-    const sobrando = (existentes ?? []).map((e) => e.chave).filter((c) => !chaves.includes(c));
+    // O servidor devolve no máximo 1.000 linhas por consulta e a maior aba passa
+    // disso: lia só parte das chaves, e linha apagada na planilha continuava viva
+    // no banco. Agora lê a aba inteira em páginas.
+    const existentes: string[] = [];
+    for (let de = 0; ; de += 1000) {
+      const { data: pagina, error: e } = await db.from("vendas").select("chave")
+        .eq("aba", aba).order("chave").range(de, de + 999);
+      if (e) { erro = "leitura das chaves: " + e.message; break; }
+      existentes.push(...(pagina ?? []).map((x) => x.chave as string));
+      if (!pagina || pagina.length < 1000) break;
+    }
+    const naPlanilha = new Set(chaves);
+    const sobrando = erro ? [] : existentes.filter((c) => !naPlanilha.has(c));
     for (let i = 0; i < sobrando.length; i += 200) {
       await db.from("vendas").delete().in("chave", sobrando.slice(i, i + 200));
     }
@@ -169,6 +180,6 @@ Deno.serve(async (req) => {
     detalhes: { erro, rejeitadas: rejeitadas.slice(0, 50), avisos: avisos.slice(0, 50) },
   }).eq("id", sync!.id);
 
-  return Response.json({ ok: !erro, importadas: lista.length, rejeitadas: rejeitadas.length, erro },
+  return Response.json({ ok: !erro, importadas: lista.length, rejeitadas: rejeitadas.length, avisos: avisos.length, erro },
     { status: erro ? 500 : 200 });
 });

@@ -1,15 +1,14 @@
 "use client";
 import Shell from "@/components/Shell";
 import SubAbas, { useAba, type Aba } from "@/components/SubAbas";
-import { telasDe } from "@/lib/telas";
+import { telasDe, type Papel } from "@/lib/telas";
 import Cadastro from "@/components/telas/Cadastro";
 import Configuracao from "@/components/telas/Configuracao";
 import Cursos from "@/components/telas/Cursos";
 
 // O que é ajuste de sistema sai do caminho de quem só quer ver número.
-const ABAS: Aba[] = telasDe("ajustes");
-
-function Tela({ admin }: { admin: boolean }) {
+function Tela({ admin, papel }: { admin: boolean; papel: Papel }) {
+  const ABAS: Aba[] = telasDe("ajustes", papel);
   const { aba, escolher } = useAba(ABAS);
   return (
     <>
@@ -22,5 +21,5 @@ function Tela({ admin }: { admin: boolean }) {
 }
 
 export default function Page() {
-  return <Shell>{({ admin }) => <Tela admin={admin} />}</Shell>;
+  return <Shell>{({ admin, papel }) => <Tela admin={admin} papel={papel} />}</Shell>;
 }
