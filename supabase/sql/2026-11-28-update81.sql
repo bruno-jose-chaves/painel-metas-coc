@@ -1,0 +1,17 @@
+-- Update 81: reprocesso de eventos do webhook do RD (B14).
+-- Aplicado em 28/11/2026.
+--
+-- reprocessar_conversoes_pendentes(): pega evento de conversão do RD Marketing
+-- que ficou sem processar há mais de 10 minutos e refaz o que o webhook faz,
+-- com a mesma chave (sem duplicar). Rotina pg_cron 'reprocessar-conversoes'
+-- de hora em hora (minuto 17). Na primeira rodada: 102 eventos, 30 conversões
+-- que não tinham entrado.
+--
+-- Eventos do CRM que falharam por limite de chamadas do RD (429): 22.718 em
+-- out-nov/2026. Os que a sincronização do CRM (rd-sync, a cada 5 min) já
+-- cobriu foram marcados como processados com a nota "coberto pela
+-- sincronização do CRM". Ficaram 2.556 eventos de negociações cuja versão no
+-- banco é anterior ao evento; reler essas exige chamadas à API do RD com
+-- limite de ritmo, em uma Edge Function própria.
+--
+-- Corpo no banco: select pg_get_functiondef('public.reprocessar_conversoes_pendentes'::regproc);
