@@ -60,7 +60,7 @@ export default function FilaManha({ admin }: { admin: boolean }) {
   }
 
   async function tirar(p: Pessoa) {
-    if (!confirm(`Tirar ${p.nome} da fila de manhã? Ela para de receber a mensagem. O trabalho dela continua aparecendo no painel.`)) return;
+    if (!confirm(`Remover ${p.nome} da fila de manhã? Ela para de receber a mensagem. O trabalho dela continua aparecendo no painel.`)) return;
     const { error } = await supabase.from("pessoas_fila").delete().eq("id", p.id);
     if (error) { setAviso(error.message); return; }
     setAviso(`${p.nome} saiu da lista e não recebe mais a fila.`);
@@ -160,7 +160,7 @@ export default function FilaManha({ admin }: { admin: boolean }) {
                             setEditando(p.id);
                             setForm({ nome: p.nome, apelidos: p.apelidos.join(", "), telefone: p.telefone, ativo: p.ativo });
                           }}>Mudar</button>
-                          <button className="btn claro" onClick={() => tirar(p)}>Tirar</button>
+                          <button className="btn claro" onClick={() => tirar(p)}>Remover da fila</button>
                         </>
                       )}
                     </td>

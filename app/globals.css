@@ -1675,3 +1675,9 @@ main .rolar { scroll-margin-top: 112px; }
   background: var(--ruim); color: #fff; border: 0; border-radius: var(--raio-p);
   padding: 7px 14px; min-height: 32px; font: inherit; font-size: 13px; font-weight: 650; cursor: pointer;
 }
+
+/* Texto só para leitor de tela: some da vista, continua sendo lido. */
+.so-leitor {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}

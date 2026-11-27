@@ -264,7 +264,7 @@ export default function Pendencias({ admin, embutido }: { admin: boolean; embuti
                   <td>{indicadores.find((i) => i.id === r.indicador)?.nome ?? r.indicador}</td>
                   <td className="mudo">{TIPO[r.tipo] ?? r.tipo}</td>
                   <td style={{ wordBreak: "break-word" }}>{r.valor}</td>
-                  {admin && <td><button className="btn claro" onClick={() => remover(r.id)}>Tirar</button></td>}
+                  {admin && <td><button className="btn claro" onClick={() => remover(r.id)}>Remover regra</button></td>}
                 </tr>
               ))}
             </tbody>

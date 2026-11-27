@@ -1,0 +1,37 @@
+# Confere o painel antes de publicar: tipos, build e as telas abertas num
+# navegador com o banco simulado. Roda em todo Pull Request e em todo push
+# na main. Se tipos ou build falharem, o PR fica vermelho e não deve ser
+# mergeado.
+name: Conferir antes de publicar
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  conferir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Tipos
+        run: npx tsc --noEmit
+      - name: Build
+        run: npm run build
+      - name: Navegador
+        run: npx playwright install --with-deps chromium
+      - name: Telas
+        # Começa como aviso: o roteiro de telas usa dados simulados que podem
+        # estar desatualizados. Quando passar limpo por uma semana, tirar esta linha.
+        continue-on-error: true
+        run: |
+          mkdir -p /tmp/claude-0
+          npx --yes serve out -l 4599 &
+          npx --yes wait-on http://127.0.0.1:4599 --timeout 60000
+          npm run verificar

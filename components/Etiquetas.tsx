@@ -161,7 +161,7 @@ export default function Etiquetas({ admin, embutido }: { admin: boolean; embutid
           O painel tenta nesta ordem e para no primeiro que responde, então o que foi classificado por um
           degrau acima não é reclassificado por um de baixo: primeiro a regra apontada à mão, depois a
           regra do formulário que a pessoa preencheu, depois o nome da campanha no CRM, e só então a
-          etiqueta. Tirar uma regra não desclassifica o lead que já foi classificado por ela em um
+          etiqueta. Remover uma regra não desclassifica o lead que já foi classificado por ela em um
           relatório fechado, mas muda a leitura daqui para frente.
         </Ajuda>
       </p>
@@ -176,7 +176,7 @@ export default function Etiquetas({ admin, embutido }: { admin: boolean; embutid
                 <tr key={r.id}>
                   <td style={{ wordBreak: "break-word" }}>{r.etiqueta}</td>
                   <td>{nomeProduto(r.produto_id)}</td>
-                  {admin && <td><button className="btn claro" onClick={() => remover(r.id)}>Tirar</button></td>}
+                  {admin && <td><button className="btn claro" onClick={() => remover(r.id)}>Remover regra</button></td>}
                 </tr>
               ))}
             </tbody>

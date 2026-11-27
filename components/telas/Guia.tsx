@@ -17,7 +17,7 @@ const PAPEIS: { id: Papel; nome: string; oque: string }[] = [
   { id: "comercial", nome: "Comercial", oque: "Falo com lead e fecho matrícula" },
   { id: "marketing", nome: "Marketing", oque: "Trago lead e cuido de campanha" },
   { id: "diretoria", nome: "Diretoria", oque: "Acompanho meta e decido rumo" },
-  { id: "pedagogico", nome: "Outra área", oque: "Só preciso olhar número de vez em quando" },
+  { id: "pedagogico", nome: "Leitor", oque: "Só acompanho os números, sem cadastrar nada" },
 ];
 
 const PERGUNTAS: { id: Pergunta; nome: string }[] = [

@@ -78,7 +78,9 @@ export default function SubAbas({
             title={a.oque}
           >
             {a.nome}
-            {a.marcador != null && a.marcador > 0 && <span className="marcador">{a.marcador}</span>}
+            {a.marcador != null && a.marcador > 0 && (
+              <span className="marcador"><span className="so-leitor">, </span>{a.marcador}<span className="so-leitor"> pendentes</span></span>
+            )}
           </button>
         ))}
       </nav>
