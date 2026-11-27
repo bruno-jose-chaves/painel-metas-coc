@@ -1,0 +1,19 @@
+-- Update 77: metas de leads de 2027 e meta por frente de campanha.
+-- Aplicado em 28/11/2026 (migração update77_metas_leads_frentes e insert em metas_leads).
+--
+-- Fonte das metas: 6_Dados_e_Operacao/Meta_de_Leads_por_Campanha_2027.md (v1.0, nov/2026).
+--
+-- metas_leads: 'leads' = 3.123 (Meta 2) em extensivo-2027 e em semi-2027-1,
+-- rótulo "Leads Extensivo + Semi 1º" (as duas campanhas dividem a mesma captação).
+--
+-- metas_leads_frentes (campanha_id, frente, ordem, padrao, inicio, fim, meta0..meta3):
+--   Black November  ^\[black nov - 2027\]$  01/11/2026 a 30/11/2026  244 / 272 / 297 / 344
+--   ConCOC 2027/1   concoc                  01/12/2026 a 31/01/2027  913 / 1.020 / 1.118 / 1.296
+--   Site PV         site pv                 01/12/2026 a 31/03/2027  1.083 / 1.211 / 1.332 / 1.540
+--   COC Experience  experience              01/01/2027 a 31/03/2027  303 / 339 / 376 / 432
+-- RLS: leitura para autorizados, escrita para admin.
+--
+-- painel_metas_leads_frentes(p_campanha): por frente, negociações criadas no CRM
+-- com o nome da campanha da frente (uma por pessoa, fora do SDR) dentro da
+-- janela, a meta ativa da campanha, o esperado hoje dentro da janela e a situação.
+-- Corpo no banco: select pg_get_functiondef('public.painel_metas_leads_frentes'::regproc);

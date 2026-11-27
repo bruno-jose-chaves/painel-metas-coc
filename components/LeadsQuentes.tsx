@@ -17,6 +17,10 @@ type Linha = {
   conversoes: number; pessoas: number;
 };
 type Meta = { indicador: string; rotulo: string; meta: number; realizado: number; esperado_hoje: number; situacao: string };
+type Frente = {
+  frente: string; inicio: string; fim: string; captados: number; meta: number;
+  esperado_hoje: number; situacao: string; campanhas_crm: string[] | null;
+};
 
 const TIPOS: { id: string; nome: string; indicadores: string[] }[] = [
   { id: "quentes", nome: "Quentes", indicadores: ["reservas", "leads", "inscritos_lives"] },
@@ -29,7 +33,9 @@ const NOME_TIPO: Record<string, string> = {
   reservas: "Reserva", leads: "Lead de curso", inscritos_lives: "Inscrito em live",
   material_rico: "Material rico", sem_regra: "Sem tipo",
 };
-const SITUACAO: Record<string, string> = { no_ritmo: "No ritmo", atencao: "Atenção", atras: "Atrás", sem_meta: "Sem meta" };
+const SITUACAO: Record<string, string> = {
+  no_ritmo: "No ritmo", atencao: "Atenção", atras: "Atrás", sem_meta: "Sem meta", nao_iniciada: "Não começou",
+};
 
 export default function LeadsQuentes({ periodo, campanha, produto, volta }: {
   periodo: Periodo; campanha: string | null; produto: string | null; volta: number;
@@ -39,6 +45,7 @@ export default function LeadsQuentes({ periodo, campanha, produto, volta }: {
   const [linhas, setLinhas] = useState<Linha[] | null>(null);
   const [semTipo, setSemTipo] = useState<number | null>(null);
   const [metas, setMetas] = useState<Meta[] | null>(null);
+  const [frentes, setFrentes] = useState<Frente[] | null>(null);
   const indicadores = TIPOS.find((t) => t.id === tipo)!.indicadores;
 
   useEffect(() => {
@@ -61,10 +68,12 @@ export default function LeadsQuentes({ periodo, campanha, produto, volta }: {
   }, [periodo.de, periodo.ate, produto, volta]);
 
   useEffect(() => {
-    setMetas(null);
+    setMetas(null); setFrentes(null);
     if (!campanha) return;
     ultima("metas", supabase.rpc("painel_metas_leads_todas", { p_campanhas: [campanha] }),
       ({ data }) => setMetas((data as Meta[]) ?? []));
+    ultima("frentes", supabase.rpc("painel_metas_leads_frentes", { p_campanha: campanha }),
+      ({ data }) => setFrentes((data as Frente[]) ?? []));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [campanha, volta]);
 
@@ -125,6 +134,9 @@ export default function LeadsQuentes({ periodo, campanha, produto, volta }: {
           Formulário sem regra ainda não tem tipo e não entra em nenhuma conta desta parte até ser
           classificado. A meta aparece quando há uma campanha escolhida no filtro e ela tem meta de
           captação cadastrada; o número da meta conta a campanha inteira, não só o período escolhido.
+          Na tabela de frentes (Black, ConCOC, Site PV, COC Experience), lead é negociação criada no CRM
+          com o nome da campanha daquela frente, uma por pessoa, dentro da janela da frente; o esperado
+          hoje cresce só dentro dessa janela.
         </Ajuda>
       </p>
 
@@ -168,6 +180,34 @@ export default function LeadsQuentes({ periodo, campanha, produto, volta }: {
           </div>
         )}
       </div>
+
+      {campanha && frentes && frentes.length > 0 && indicadores.includes("leads") && (
+        <div className="rolar" style={{ marginBottom: 18 }}>
+          <table className="tabela">
+            <thead>
+              <tr>
+                <th>Frente da campanha</th><th>Janela</th><th className="n">Leads</th><th className="n">Meta</th>
+                <th className="n">Atingido</th><th className="n">Esperado hoje</th><th>Situação</th>
+              </tr>
+            </thead>
+            <tbody>
+              {frentes.map((f) => (
+                <tr key={f.frente}>
+                  <td title={f.campanhas_crm?.length ? "No CRM: " + f.campanhas_crm.join(", ") : "Nenhuma campanha do CRM com esse nome ainda"}>
+                    {f.frente}
+                  </td>
+                  <td className="mudo num">{dataCurta(f.inicio)} a {dataCurta(f.fim)}</td>
+                  <td className="n"><b>{num(f.captados)}</b></td>
+                  <td className="n">{num(f.meta)}</td>
+                  <td className="n">{f.meta ? pct(Number(f.captados) / f.meta, 0) : "-"}</td>
+                  <td className="n">{num(Math.round(Number(f.esperado_hoje)))}</td>
+                  <td><span className={"selo " + f.situacao}>{SITUACAO[f.situacao] ?? f.situacao}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {semTipo != null && semTipo > 0 && (
         <p className="nota">
